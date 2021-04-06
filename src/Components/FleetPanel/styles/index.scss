@@ -1,0 +1,73 @@
+@import "../../../globalStyles/variables.scss";
+
+.config-form { 
+  .rs {
+    &-modal {
+      &-title {
+        text-align: center;
+        font-size: 1.4rem !important;
+      }
+
+      &-body {
+        margin-top: 20px;
+        .rs-nav-item {
+          &-content {
+            font-size: 1.15rem;
+          }
+          &-active {
+            flex: 1 1 50% !important;
+            a {
+              font-size: 1.35rem !important;
+              font-weight: 600 !important;
+            }
+          }
+        }
+      }
+
+      &-footer {
+        .rs-btn {
+          display: inline-flex;
+          align-items: center;
+        }
+        .btn-left {
+          float: left;
+        }
+        .rs-icon {
+          padding-right: 10px;
+          font-size: 1.35rem !important;
+        }
+      }
+    }
+    &-nav {
+      text-align: center;
+    }
+    &-table {
+      font-size: 1.15rem;      
+      &-cell {
+        &.parameter-cell {
+          font-weight: 600 !important;
+        }
+        &-expand-wrapper {
+          margin-right: 0;
+        }
+        &-expand-icon {
+          margin-right: 10px;
+        }
+        &-content {
+          .rs {
+            &-input {
+            font-size: 1.15rem !important;
+            padding: 4px 11px;
+            color: $secondaryDark;
+            }
+          }
+        }
+        &-header {
+          text-align: center;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

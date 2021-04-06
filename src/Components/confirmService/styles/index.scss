@@ -1,0 +1,16 @@
+.confirm-message {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+
+  .rs-icon {
+    color: #ffb300;
+    margin-right: 10px;
+    align-self: center;
+  }
+
+  p {
+    align-self: center;
+    grid-column-start: none;
+    line-height: 1.7;
+  }
+}

@@ -1,0 +1,21 @@
+.input-wrapper {
+  display: flex;
+  padding-bottom: 10px;
+  p {
+    flex: 0 1 15%;
+    text-align: center;
+    align-self: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0 20px 0 5px;
+  }
+  .rs-input-group {
+    flex: 1 1 1%;
+  }
+}
+
+.rs-modal-footer {
+  .rs-checkbox {
+    float: left;
+  }
+}

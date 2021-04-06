@@ -1,0 +1,24 @@
+@import "../../../globalStyles/variables.scss";
+
+table {
+  background-color: $primary;
+  padding: 10px 25px;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 3px 5px 5px 2px rgba(0, 3, 25, 0.3);
+  border-collapse: unset !important;
+  border-spacing: unset !important;
+  align-self: center;
+
+  th {
+    height: 30px;
+    text-align: right;
+    padding: 0 10px 0 0;
+  }
+
+  td {
+    height: 30px;
+    text-align: left;
+    padding: 0 0 0 10px;
+  }
+}

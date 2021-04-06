@@ -1,7 +1,10 @@
 {
   "name": "calipri-csv-parser",
+  "author": "Facundo Rodriguez",
+  "description": "Parser for CSV files emited by Calipri",
   "version": "0.1.0",
   "private": true,
+  "main": "public/main.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^11.2.6",
@@ -12,7 +15,9 @@
     "@types/react-dom": "^17.0.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-papaparse": "^3.11.1",
     "react-scripts": "4.0.3",
+    "rsuite": "^4.9.3",
     "typescript": "^4.2.3",
     "web-vitals": "^1.1.1"
   },
@@ -20,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron-start": "electron ."
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +45,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron": "^12.0.2",
+    "electron-builder": "^22.10.5",
+    "node-sass": "^5.0.0"
   }
 }
