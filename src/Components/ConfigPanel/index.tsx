@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React, { useState, useEffect } from "react"
 import Modal from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
@@ -20,6 +19,8 @@ import { normalize } from "../../Scripts/utils"
 import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
 import { TEMPLATE, Dimension } from "./template"
 import "./styles/index.scss"
+
+const PROFILES_FOLDER = "perfiles"
 
 interface IConfigPanel {
   configHandler: (value: boolean) => void,
@@ -69,11 +70,11 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
   useEffect(() => {
     const loadProfiles = async() => {
       setLoading(true)
-      const files = await getFiles()
-      if (files) {
-        setProfiles(files.files.filter(file => file.type === "file" && file.name.includes(".json")).map(file => file.name.replace(".json", "")))
+      const files = await getFiles(PROFILES_FOLDER)
+      if (files.length !== 0) {
+        setProfiles(files.map((file: string) => file.replace(".json", "")))
       } else {
-        await save(profiles[0], getActiveDataWithoutParent()) && Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
+        await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
       }
       setLoading(false)
     }
@@ -83,7 +84,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
   useEffect(() => {
     const dataLoad = async() => {
       setLoading(true)
-      const nextData = await load(activeProfile)
+      const nextData = await load(activeProfile, PROFILES_FOLDER)
       setLoading(false)
       nextData
         ? setActiveData(nextData)
@@ -212,7 +213,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
 
   const handleAddProfile = async(profileName: string) => {
     setLoading(true)
-    const saved = await save(profileName, getActiveDataWithoutParent())
+    const saved = await save(profileName, getActiveDataWithoutParent(), PROFILES_FOLDER)
     if (saved) {
       profiles.push(profileName.toUpperCase())
       setActiveProfile(profileName.toUpperCase())
@@ -231,7 +232,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
       iconColor: "#f44336",
     })
     if (confirm) {
-      const deleted = await deleteFile(profileName.toUpperCase())
+      const deleted = await deleteFile(profileName.toUpperCase(), PROFILES_FOLDER)
       if (deleted) {
         const removeIndex = profiles.indexOf(profileName.toUpperCase())
         removeIndex > -1 && profiles.splice(removeIndex, 1)
@@ -251,7 +252,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
     })
     if (confirm) {
       setLoading(true)
-      const saved = await save(activeProfile, dataToSave)
+      const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
       configHandler(false)
@@ -260,7 +261,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
 
   const handleDiscard = async(event: React.SyntheticEvent | string) => {
     setLoading(true)
-    const savedData = await load(activeProfile)
+    const savedData = await load(activeProfile, PROFILES_FOLDER)
     setLoading(false)
     if (savedData && JSON.stringify(savedData) !== JSON.stringify(getActiveDataWithoutParent())) {
       const confirm = await confirmService.show({

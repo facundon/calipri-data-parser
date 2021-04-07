@@ -33,14 +33,16 @@ const InputModal: React.FC<IInputModal> = ({
 }) => {
   const [inputName, setinputName] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
-
+  let newChildren
   const change = (data: string) => {
     setinputName(data)
     setError(false)
   }
 
   useEffect(() => {
-    children!.props.onChange = change
+    newChildren = JSON.parse(JSON.stringify(children.props));
+    newChildren.onChange = change;
+    Object.preventExtensions(newChildren);
   }, [children])
 
   const reset = () => {
@@ -78,7 +80,7 @@ const InputModal: React.FC<IInputModal> = ({
           placement="bottomStart"
           speaker={<Tooltip className="modal-form">{validationMessage}</Tooltip>}
         >
-          {children}
+          {newChildren}
         </Whisper>
       </Modal.Body>
 
