@@ -33,32 +33,38 @@ app.whenReady().then(() => {
   })
 })
 
-ipcMain.handle("save", async (_, name, data, folder) => {
+ipcMain.handle("save", async(_, name, data, folder) => {
   const dir = getRelativePath(folder)
-  if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir, {recursive: true})
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
   }
   const err = await fsp.writeFile(path.join(dir, name), data)
-  return err ? false : true
+  return !err
 })
 
-ipcMain.handle("load", async (_, name, folder) => {
+ipcMain.handle("load", async(_, name, folder) => {
   const dir = getRelativePath(folder)
   try {
     const data = await fsp.readFile(path.join(dir, name))
     return data
   } catch (error) {
     return false
-  }  
+  }
 })
 
-ipcMain.handle("getFiles", async (_, folder) => {
+ipcMain.handle("delete", async(_, name, folder) => {
+  const dir = getRelativePath(folder)
+  const err = await fsp.rmdir(path.join(dir, name))
+  return !err
+})
+
+ipcMain.handle("getFiles", async(_, folder) => {
   const dir = getRelativePath(folder)
   try {
-    const data = await fsp.readdir(folder)
+    const data = await fsp.readdir(dir)
     return data
   } catch (error) {
-    fs.mkdirSync(dir, {recursive: true})
+    fs.mkdirSync(dir, { recursive: true })
     return []
   }
 })

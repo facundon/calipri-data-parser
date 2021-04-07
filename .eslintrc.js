@@ -5,7 +5,6 @@ module.exports = {
   },
   extends: [
     "plugin:react/recommended",
-    "standard",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -15,7 +14,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
+  plugins: ["react", "@typescript-eslint", "react-hooks"],
   rules: {
     indent: [2, 2],
     // "no-tabs": 0,
@@ -23,6 +22,9 @@ module.exports = {
     quotes: [2, "double"],
     "space-before-function-paren": ["error", "never"],
     "react/prop-types": [0],
+    "max-len": ["warn", { "code": 130 }],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
   },
   settings: {
     react: {
@@ -37,7 +39,7 @@ module.exports = {
       flowVersion: "0.53", // Flow version
     },
     propWrapperFunctions: [
-      // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
+      // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`.
       "forbidExtraProps",
       { property: "freeze", object: "Object" },
       { property: "myFavoriteWrapper" },

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 import React, { useState, useEffect } from "react"
 import Modal from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
@@ -46,12 +47,17 @@ function getNewId(activeItem: Dimension) {
       }
       return subArrId
     }) // Get new array of index last number
-    let newLastIndex = arrId.findIndex((val, index) => parseInt(val) !== index + 1) + 1 // Find empty space in the index chain and save the number
+    
+    // Find empty space in the index chain and save the number
+    let newLastIndex = arrId.findIndex((val, index) => parseInt(val) !== index + 1) + 1 
     if (newLastIndex === -1 || newLastIndex === 0) {
-      newLastIndex = parseInt(arrId[arrId.length - 1]) + 1 // If there is no empty space, add a newLastIndex to the end of the array
+      // If there is no empty space, add a newLastIndex to the end of the array
+      newLastIndex = parseInt(arrId[arrId.length - 1]) + 1 
     }
-    const nextIndex = activeItem.children![0].id.split("-") // Save a template index to get the firsts numbers (if it has)
-    nextIndex.splice(nextIndex.length - 1, 1, newLastIndex.toString()) // Remove the last item and replace it with the newLastIndex
+    // Save a template index to get the firsts numbers (if it has)
+    const nextIndex = activeItem.children![0].id.split("-") 
+    // Remove the last item and replace it with the newLastIndex
+    nextIndex.splice(nextIndex.length - 1, 1, newLastIndex.toString()) 
     return nextIndex.join("-")
   }
 }
@@ -74,12 +80,13 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
       if (files.length !== 0) {
         setProfiles(files.map((file: string) => file.replace(".json", "")))
       } else {
-        await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
+        await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
+          Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
       }
       setLoading(false)
     }
     loadProfiles()
-  }, [])
+  })
 
   useEffect(() => {
     const dataLoad = async() => {
@@ -129,14 +136,17 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
     switch (action) {
     case "remove": {
       const confirm = await confirmService.show({
-        message: `Seguro que desea eliminar el item ${activeItem.name}? ${activeItem.children.length !== 0 ? "También se eliminaran todos los sub-items" : ""}`
+        message: `Seguro que desea eliminar el item ${activeItem.name}? ${activeItem.children.length !== 0 
+          ? "También se eliminaran todos los sub-items" 
+          : ""}`
       })
       confirm &&
         nextData.forEach((val, index) =>
           val.children?.forEach((childVal, childIndex) =>
             childVal.id === id
               ? nextData[index].children?.splice(childIndex, 1)
-              : childVal.children?.includes(activeItem) && nextData[index].children![childIndex].children?.splice(childVal.children?.findIndex(val => val.id === id), 1)
+              : childVal.children?.includes(activeItem) && 
+                nextData[index].children![childIndex].children?.splice(childVal.children?.findIndex(val => val.id === id), 1)
           )
         )
       const parentIndex = nextData.findIndex(val => val.id === id.split("-")[0])
