@@ -129,6 +129,18 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
     return [activeItem!, nextData]
   }
 
+  function closeEditCells() {
+    activeData.forEach(item => {
+      item.status = null
+      item.children.forEach(subItem => {
+        subItem.status = null
+        subItem.children.forEach(subSubItem => {
+          subSubItem.status = null
+        })
+      })
+    })
+  }
+
   const handleManage = async(id: string, action: "remove" | "add") => {
     const [activeItem, nextData] = findActiveItem(id)
     switch (action) {
@@ -276,15 +288,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
         iconColor: "#f44336",
       })
       if (confirm) {
-        activeData.forEach(item => {
-          item.status = null
-          item.children.forEach(subItem => {
-            subItem.status = null
-            subItem.children.forEach(subSubItem => {
-              subSubItem.status = null
-            })
-          })
-        })
+        closeEditCells()
         typeof event !== "string"
           ? configHandler(false)
           : setActiveProfile(event)

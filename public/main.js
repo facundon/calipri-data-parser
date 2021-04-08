@@ -7,11 +7,13 @@ function getRelativePath(folder) {
   return path.join(__dirname, "storage", folder)
 }
 
-let win
-function createWindow() {
-  win = new BrowserWindow({
-    width: 1400,
-    height: 800,
+let mainWindow
+function createMainWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1600,
+    height: 1000,
+    center: true,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -20,18 +22,32 @@ function createWindow() {
     }
   })
 
-  win.loadURL("http://localhost:3000/")
+  mainWindow.loadURL("http://localhost:3000/")
 }
 
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
+app.on("ready", () => {
+  let loading = new BrowserWindow({
+    show: false,
+    frame: false,
+    transparent: true,
+    center: true,
+    minimizable: false,
+    width: 120,
+    height: 120,
+    opacity: 0.85,
   })
+  loading.once("show", () => {
+    createMainWindow()
+    mainWindow.webContents.once("dom-ready", () => {
+      mainWindow.show()
+      loading.hide()
+      loading.close()
+    })
+  })
+  loading.loadFile(path.join(__dirname, "loading.html"))
+  loading.show()
 })
+
 
 ipcMain.handle("save", async(_, name, data, folder) => {
   const dir = getRelativePath(folder)
