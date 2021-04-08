@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 
-import { ConfigPanel, DragLoader } from "./Components"
+import { ProfilePanel, DragLoader, FleetPanel } from "./Components"
 import Button from "rsuite/lib/Button"
 import ButtonGroup from "rsuite/lib/ButtonGroup"
 import Dropdown from "rsuite/lib/Dropdown"
@@ -18,7 +18,7 @@ interface IProps {
 interface IState {
   isLoaded: boolean,
   isPrinting: boolean,
-  isProfileConfigOpen: boolean,
+  isProfilePanelOpen: boolean,
   isFleetConfigOpen: boolean,
   parsedData: IParsedData
 }
@@ -29,7 +29,7 @@ class App extends Component<IProps, IState> {
     this.state = {
       isLoaded: false,
       isPrinting: false,
-      isProfileConfigOpen: false,
+      isProfilePanelOpen: false,
       isFleetConfigOpen: false,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
@@ -78,7 +78,7 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
-              <Dropdown.Item onSelect={() => this.setState({ isProfileConfigOpen: true })}>
+              <Dropdown.Item onSelect={() => this.setState({ isProfilePanelOpen: true })}>
                 <Icon icon="gear" size="lg" />
                 Perfiles
               </Dropdown.Item>
@@ -90,9 +90,13 @@ class App extends Component<IProps, IState> {
 
           </ButtonGroup>
         </div>
-        <ConfigPanel 
-          configHandler={(value) => this.setState({ isProfileConfigOpen: value })} 
-          isProfileConfigOpen={this.state.isProfileConfigOpen} 
+        <ProfilePanel 
+          profilePanelHandler={value => this.setState({ isProfilePanelOpen: value })} 
+          isProfilePanelOpen={this.state.isProfilePanelOpen} 
+        />
+        <FleetPanel
+          fleetPanelHandler={val => this.setState({ isFleetConfigOpen: val })}
+          isFleetPanelOpen={this.state.isFleetConfigOpen}
         />
       </div>
     )

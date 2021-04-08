@@ -10,7 +10,7 @@ function getRelativePath(folder) {
 let mainWindow
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1600,
+    width: 1300,
     height: 1000,
     center: true,
     show: false,
@@ -23,6 +23,7 @@ function createMainWindow() {
   })
 
   mainWindow.loadURL("http://localhost:3000/")
+  // mainWindow.removeMenu()
 }
 
 app.on("ready", () => {
@@ -32,8 +33,8 @@ app.on("ready", () => {
     transparent: true,
     center: true,
     minimizable: false,
-    width: 120,
-    height: 120,
+    width: 350,
+    height: 350,
     opacity: 0.85,
   })
   loading.once("show", () => {

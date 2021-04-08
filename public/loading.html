@@ -5,7 +5,7 @@
         display: inline-block;
         position: relative;
         width: 80px;
-        height: 80px;
+        height: 76px;
         }
         .lds-roller div {
         animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
@@ -91,12 +91,25 @@
         <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     </head>
     <body style="
-        background: #161516;    
+        background: transparent;    
         position: fixed;
         top: 48%;
-        left: 47%;
-        transform: translate(-52%, -52%);"
+        left: 45%;
+        transform: translate(-52%, -52%);
+        "
     >
+    <div style="
+    border-radius: 30%;
+    background-color: #141314;
+    padding: 20px 40px;
+    ">
         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        <p style="
+        color:whitesmoke;
+        line-height: 0;
+        -webkit-font-smoothing: antialiased;
+        font-family: Apple-System, Arial, Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', STXihei, sans-serif;
+        ">Cargando...</p>
+    </div>
     </body>
 </html>

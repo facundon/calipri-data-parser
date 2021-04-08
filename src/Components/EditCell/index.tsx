@@ -3,7 +3,7 @@ import * as React from "react"
 import Table from "rsuite/lib/Table"
 import InputNumber, { InputNumberProps } from "rsuite/lib/InputNumber"
 import InputGroup from "rsuite/lib/InputGroup"
-import { Dimension } from "../ConfigPanel/template"
+import { Dimension } from "../ProfilePanel/template"
 
 import "./styles/index.scss"
 

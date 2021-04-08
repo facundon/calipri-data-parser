@@ -19,11 +19,11 @@ import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
 import { TEMPLATE, Dimension } from "./template"
 import "./styles/index.scss"
 
-const PROFILES_FOLDER = "perfiles"
+export const PROFILES_FOLDER = "perfiles"
 
-interface IConfigPanel {
-  configHandler: (value: boolean) => void,
-  isProfileConfigOpen: boolean,
+interface IProfilePanel {
+  profilePanelHandler: (value: boolean) => void,
+  isProfilePanelOpen: boolean,
 }
 
 function trimmedId(string: string, substring: string, position: number) {
@@ -60,7 +60,7 @@ function getNewId(activeItem: Dimension) {
   }
 }
 
-const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpen }) => {
+const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfilePanelOpen }) => {
   const [profiles, setProfiles] = useState<string[]>(["ORE"])
   const [activeProfile, setActiveProfile] = useState<string>(profiles[0])
   const [showAddProfile, setshowAddProfile] = useState<boolean>(false)
@@ -272,7 +272,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
       const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
-      configHandler(false)
+      profilePanelHandler(false)
     }
   }
 
@@ -290,19 +290,19 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
       if (confirm) {
         closeEditCells()
         typeof event !== "string"
-          ? configHandler(false)
+          ? profilePanelHandler(false)
           : setActiveProfile(event)
         setActiveData(savedData)
       }
     } else {
       typeof event !== "string"
-        ? configHandler(false)
+        ? profilePanelHandler(false)
         : setActiveProfile(event)
     }
   }
 
   return (
-    <Modal full show={isProfileConfigOpen} className="config-form">
+    <Modal full show={isProfilePanelOpen} className="config-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Perfiles de Rueda</Modal.Title>
       </Modal.Header>
@@ -410,4 +410,4 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
   )
 }
 
-export default ConfigPanel
+export default ProfilePanel

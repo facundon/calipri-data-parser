@@ -4,7 +4,7 @@ import IconButton from "rsuite/lib/IconButton"
 import Icon from "rsuite/lib/Icon"
 import Table from "rsuite/lib/Table"
 import Divider from "rsuite/lib/Divider"
-import { Dimension } from "../ConfigPanel/template"
+import { Dimension } from "../ProfilePanel/template"
 import { DataKey } from "../EditCell"
 
 export type EditableValues = {

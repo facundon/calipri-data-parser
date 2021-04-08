@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-use-before-define
 import * as React from "react"
 import Table from "rsuite/lib/Table"
-import { Dimension } from "../ConfigPanel/template"
+import { Dimension } from "../ProfilePanel/template"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 import Icon from "rsuite/lib/Icon"

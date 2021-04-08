@@ -9,7 +9,7 @@ import Input from "rsuite/lib/Input"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 import { InputWithButtons } from "../EditCell"
-import { Dimension } from "../ConfigPanel/template"
+import { Dimension } from "../ProfilePanel/template"
 
 import "./styles/index.scss"
 

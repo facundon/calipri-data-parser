@@ -1,4 +1,4 @@
-import { Dimension } from "../Components/ConfigPanel/template"
+import { Dimension } from "../Components/ProfilePanel/template"
 
 declare global {
   interface Window { 
