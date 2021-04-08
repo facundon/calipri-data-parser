@@ -115,7 +115,7 @@ interface IEvaluateSubstractions {
 const getProfilesReferences = async(profiles: string[], fleet: string): Promise<Profiles | null> => {
   const loadedProfiles: Profiles = {}
   for (const profile of profiles) {
-    const loadedData = await load(profile.toUpperCase(), "perfiles")
+    const loadedData = await load(profile, "perfiles")
     if (loadedData) {
       const fleetExists = loadedData.some(item => item.children.find(child => child.name.toUpperCase() === fleet))
       if (!fleetExists) {

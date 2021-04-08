@@ -7,7 +7,7 @@ import TagGroup from "rsuite/lib/TagGroup"
 import Tag from "rsuite/lib/Tag"
 
 import { getFiles } from "../../Scripts/storage"
-import { Fleet } from "../FleetPanel"
+import { Fleet } from "../FleetPanel/template"
 import InputPicker from "rsuite/lib/InputPicker"
 import { PROFILES_FOLDER } from "../ProfilePanel"
 
