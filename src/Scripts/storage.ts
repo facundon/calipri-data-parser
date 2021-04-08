@@ -29,12 +29,12 @@ interface IGetFiles {
 }
 
 export const save: ISave = async(name, data, folder) => {
-  const success = await window.electron.storage.save(`${name}.json`, JSON.stringify(data), folder)
+  const success = await window.electron.storage.save(`${name.toUpperCase()}.json`, JSON.stringify(data), folder)
   return success
 }
 
 export const load: ILoad = async(name, folder) => {
-  const data = await window.electron.storage.load(`${name}.json`, folder)
+  const data = await window.electron.storage.load(`${name.toUpperCase()}.json`, folder)
   if (data) {
     return JSON.parse(new TextDecoder().decode(data))
   } else {
@@ -43,7 +43,7 @@ export const load: ILoad = async(name, folder) => {
 }
 
 export const deleteFile: IDelete = async(name, folder) => {
-  const success = await window.electron.storage.delete(`${name}.json`, folder)
+  const success = await window.electron.storage.delete(`${name.toUpperCase()}.json`, folder)
   return success
 }
 

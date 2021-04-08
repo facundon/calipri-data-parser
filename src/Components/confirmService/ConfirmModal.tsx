@@ -25,7 +25,7 @@ interface IProps {
 }
 
 interface ICreate {
-  (props: Config): void
+  (props: Config): ConfirmModal
 }
 
 let resolveAction : (value: any) => void

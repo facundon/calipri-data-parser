@@ -38,8 +38,12 @@ ipcMain.handle("save", async(_, name, data, folder) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
-  const err = await fsp.writeFile(path.join(dir, name), data)
-  return !err
+  try {
+    const err = await fsp.writeFile(path.join(dir, name), data)
+    return !err
+  } catch (error) {
+    return false
+  }
 })
 
 ipcMain.handle("load", async(_, name, folder) => {
@@ -54,8 +58,13 @@ ipcMain.handle("load", async(_, name, folder) => {
 
 ipcMain.handle("delete", async(_, name, folder) => {
   const dir = getRelativePath(folder)
-  const err = await fsp.rmdir(path.join(dir, name))
-  return !err
+  try {  
+    const err = await fsp.rm(path.join(dir, name))
+    return !err
+  } catch (error) {
+    console.log(error)
+    return false
+  }
 })
 
 ipcMain.handle("getFiles", async(_, folder) => {

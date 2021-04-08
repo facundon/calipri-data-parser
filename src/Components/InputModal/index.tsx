@@ -1,8 +1,10 @@
 // eslint-disable-next-line no-use-before-define
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Modal, { ModalProps } from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
 import Icon, { IconNames } from "rsuite/lib/Icon"
+import Input from "rsuite/lib/Input"
+import InputPicker from "rsuite/lib/InputPicker"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 
@@ -15,9 +17,10 @@ interface IInputModal {
   title: string,
   size?: ModalProps["size"]
   validationMessage: string,
-  actionMessage: string
+  actionMessage: string,
   actionIcon?: IconNames,
-  children: React.ReactElement,
+  type: "add" | "delete",
+  data: string[]
 }
 
 const InputModal: React.FC<IInputModal> = ({
@@ -29,21 +32,16 @@ const InputModal: React.FC<IInputModal> = ({
   validationMessage,
   actionMessage,
   actionIcon,
-  children,
+  type,
+  data,
 }) => {
   const [inputName, setinputName] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
-  let newChildren
-  const change = (data: string) => {
+
+  const handleChange = (data: string) => {
     setinputName(data)
     setError(false)
   }
-
-  useEffect(() => {
-    newChildren = JSON.parse(JSON.stringify(children.props));
-    newChildren.onChange = change;
-    Object.preventExtensions(newChildren);
-  }, [children])
 
   const reset = () => {
     setError(false)
@@ -52,13 +50,13 @@ const InputModal: React.FC<IInputModal> = ({
   }
 
   const handleSave = () => {
-    if (!children!.props.data.some(
-      (item: string) => item === inputName.toUpperCase()
-    )) {
+    if (data.some(
+      item => item === inputName.toUpperCase()
+    ) && type === "add") {
+      setError(true)
+    } else {
       onSubmit(inputName)
       reset()
-    } else {
-      setError(true)
     }
   }
 
@@ -72,7 +70,6 @@ const InputModal: React.FC<IInputModal> = ({
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-
       <Modal.Body>
         <Whisper
           open={error}
@@ -80,7 +77,28 @@ const InputModal: React.FC<IInputModal> = ({
           placement="bottomStart"
           speaker={<Tooltip className="modal-form">{validationMessage}</Tooltip>}
         >
-          {newChildren}
+          <>
+            {type === "add" &&
+            <Input
+              placeholder="Nuevo Perfil"
+              maxLength={10}
+              autoFocus
+              onChange={handleChange}
+            />
+            }
+            {type === "delete" &&
+            <InputPicker
+              onChange={handleChange}
+              block
+              cleanable={false}
+              placeholder="Perfil"
+              locale={{ noResultsText: "No se encontraron resultados" }}
+              data={data.map(
+                (item: string) => ({ value: item, label: item })
+              )}
+            />
+            }
+          </>
         </Whisper>
       </Modal.Body>
 

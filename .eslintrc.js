@@ -22,9 +22,9 @@ module.exports = {
     quotes: [2, "double"],
     "space-before-function-paren": ["error", "never"],
     "react/prop-types": [0],
-    "max-len": ["warn", { "code": 130 }],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "semi": ["error", "never"]
   },
   settings: {
     react: {

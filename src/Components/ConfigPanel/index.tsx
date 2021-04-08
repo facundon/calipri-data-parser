@@ -4,8 +4,6 @@ import Modal from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
 import Icon from "rsuite/lib/Icon"
 import Nav from "rsuite/lib/Nav"
-import InputPicker from "rsuite/lib/InputPicker"
-import Input from "rsuite/lib/Input"
 import Table from "rsuite/lib/Table"
 import InputModal from "../InputModal"
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
@@ -86,7 +84,7 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
       setLoading(false)
     }
     loadProfiles()
-  })
+  }, [])
 
   useEffect(() => {
     const dataLoad = async() => {
@@ -136,17 +134,14 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
     switch (action) {
     case "remove": {
       const confirm = await confirmService.show({
-        message: `Seguro que desea eliminar el item ${activeItem.name}? ${activeItem.children.length !== 0 
-          ? "También se eliminaran todos los sub-items" 
-          : ""}`
+        message: `Seguro que desea eliminar el item ${activeItem.name}? ${activeItem.children.length !== 0 ? "También se eliminaran todos los sub-items" : ""}`
       })
       confirm &&
         nextData.forEach((val, index) =>
           val.children?.forEach((childVal, childIndex) =>
             childVal.id === id
               ? nextData[index].children?.splice(childIndex, 1)
-              : childVal.children?.includes(activeItem) && 
-                nextData[index].children![childIndex].children?.splice(childVal.children?.findIndex(val => val.id === id), 1)
+              : childVal.children?.includes(activeItem) && nextData[index].children![childIndex].children?.splice(childVal.children?.findIndex(val => val.id === id), 1)
           )
         )
       const parentIndex = nextData.findIndex(val => val.id === id.split("-")[0])
@@ -236,13 +231,13 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
 
   const handleRemoveProfile = async(profileName: string) => {
     const confirm = await confirmService.show({
-      message: `Seguro que desea eliminar el perfil ${activeProfile}?`,
+      message: `Seguro que desea eliminar el perfil ${profileName}?`,
       actionIcon: "eraser",
       actionMessage: "Eliminar",
       iconColor: "#f44336",
     })
     if (confirm) {
-      const deleted = await deleteFile(profileName.toUpperCase(), PROFILES_FOLDER)
+      const deleted = await deleteFile(profileName, PROFILES_FOLDER)
       if (deleted) {
         const removeIndex = profiles.indexOf(profileName.toUpperCase())
         removeIndex > -1 && profiles.splice(removeIndex, 1)
@@ -281,6 +276,15 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
         iconColor: "#f44336",
       })
       if (confirm) {
+        activeData.forEach(item => {
+          item.status = null
+          item.children.forEach(subItem => {
+            subItem.status = null
+            subItem.children.forEach(subSubItem => {
+              subSubItem.status = null
+            })
+          })
+        })
         typeof event !== "string"
           ? configHandler(false)
           : setActiveProfile(event)
@@ -376,17 +380,9 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
         actionIcon="minus"
         title="Eliminar Perfil"
         validationMessage="Seleccionar un perfil"
-      >
-        <InputPicker
-          block
-          cleanable={false}
-          placeholder="Perfil"
-          locale={{ noResultsText: "No se encontraron resultados" }}
-          data={profiles.map(
-            item => ({ value: item, label: item })
-          )}
-        />
-      </InputModal>
+        type={"delete"}
+        data={profiles}
+      />
       <InputModal
         setShow={setshowAddProfile}
         onSubmit={handleAddProfile}
@@ -395,14 +391,9 @@ const ConfigPanel: React.FC<IConfigPanel> = ({ configHandler, isProfileConfigOpe
         actionIcon="plus"
         title="Crear Perfil"
         validationMessage="Ese perfil ya existe"
-      >
-        <Input
-          placeholder="Nuevo Perfil"
-          data={profiles}
-          maxLength={10}
-          autoFocus
-        />
-      </InputModal>
+        type={"add"}
+        data={profiles}
+      />
       <AddItemModal
         setShow={setShowAddItem}
         onSubmit={handleAddItem}

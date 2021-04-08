@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import './rsuite-default.css';
 
 import { ConfigPanel, DragLoader } from "./Components"
 import Button from "rsuite/lib/Button"
@@ -9,6 +8,7 @@ import Icon from "rsuite/lib/Icon"
 import { IParsedData } from "./Components/DragLoader/types"
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 
+import "./rsuite-default.css"
 import "./globalStyles/index.scss"
 import { evaluate } from "./Scripts/evaluate"
 
@@ -90,7 +90,10 @@ class App extends Component<IProps, IState> {
 
           </ButtonGroup>
         </div>
-        <ConfigPanel configHandler={(value) => this.setState({ isProfileConfigOpen: value })} isProfileConfigOpen={this.state.isProfileConfigOpen} />
+        <ConfigPanel 
+          configHandler={(value) => this.setState({ isProfileConfigOpen: value })} 
+          isProfileConfigOpen={this.state.isProfileConfigOpen} 
+        />
       </div>
     )
   }
