@@ -18,7 +18,7 @@ import { FLEETS_TEMPLATE, Fleet } from "./template"
 
 import "./styles/index.scss"
 
-const FLEET_FILE = "flotas"
+export const FLEET_FILE = "flotas"
 
 interface IFleetPanel {
   isFleetPanelOpen: boolean,

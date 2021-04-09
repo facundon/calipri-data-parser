@@ -18,7 +18,18 @@ import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
 import { TEMPLATE, Dimension } from "./template"
 import "./styles/index.scss"
 
+import { FLEET_FILE } from "../FleetPanel"
+import { Fleet } from "../FleetPanel/template"
+
+
 export const PROFILES_FOLDER = "perfiles"
+const ITEMS_WITH_FLEET = [
+  "Diametro",
+  "Dif. Diametro de Rueda - Mismo Bogie",
+  "Dif. Diametro de Rueda - Mismo Coche",
+  "Dif. Diametro de Rueda - Mismo Modulo",
+]
+
 
 interface IProfilePanel {
   profilePanelHandler: (value: boolean) => void,
@@ -70,6 +81,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const [showAddItem, setShowAddItem] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
 
+  // load all profiles on folder to display names
   useEffect(() => {
     const loadProfiles = async() => {
       setLoading(true)
@@ -85,6 +97,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     loadProfiles()
   }, [])
 
+  // load profile data
   useEffect(() => {
     const dataLoad = async() => {
       setLoading(true)
@@ -96,6 +109,40 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     }
     dataLoad()
   }, [activeProfile])
+
+  // get profile fleets
+  useEffect(() => {
+    if (isProfilePanelOpen) {
+      const loadFleets = async() => {
+        setLoading(true)
+        const loadedFleets: Fleet[] | false = await load(FLEET_FILE)
+        if (loadedFleets) {
+          const activeFleets = loadedFleets.filter(fleet => fleet.profiles.includes(activeProfile))
+          if (activeFleets.length === 0) Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000) 
+          const nextData: Dimension[] = Object.assign([], activeData)
+          nextData.forEach((dim, index) => {
+            if (ITEMS_WITH_FLEET.includes(dim.name)) {
+              const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => (
+                {
+                  id:  `${dim.id}-${fleetIndex + 1}`,
+                  name: fleet.fleet,
+                  maxVal: "-",
+                  minVal: "-",
+                  status: null,
+                  children: [],
+                }
+              ))
+              nextData[index].children = []
+              nextData[index].children.push(...childFleet)
+              setActiveData(nextData)
+            }
+          })
+        }
+        setLoading(false)
+      }
+      loadFleets()
+    }
+  }, [isProfilePanelOpen, activeProfile])
 
   function getActiveDataWithoutParent() {
     const dataWithoutParent: Dimension[] = Object.assign([], activeData)
