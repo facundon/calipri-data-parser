@@ -6,6 +6,8 @@ import Modal from "rsuite/lib/Modal"
 import Alert from "rsuite/lib/Alert"
 import Input from "rsuite/lib/Input"
 import IconButton from "rsuite/lib/IconButton"
+import Whisper from "rsuite/lib/Whisper"
+import Tooltip from "rsuite/lib/Tooltip"
 
 import TagCell from "../TagCell"
 import confirmService from "../confirmService"
@@ -38,7 +40,6 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
       // If there is no empty space, add a newLastId to the end of the array
       newLastId = parseInt(ids[ids.length - 1]) + 1 
     }
-    console.log(newLastId)
     return newLastId.toString()
   }
   
@@ -60,6 +61,12 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     }
     loadProfiles()
   }, [])
+
+  const reset = () => {
+    setError(false)
+    setNewFleetName("")
+    setEditing(false)
+  }
 
   const handleManageProfile = (profile: string, fleetId: string, action: "add" | "remove") => {
     const nextFleets: Fleet[] = Object.assign([], fleets)
@@ -87,7 +94,12 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
 
   const handleAddFleet = () => {
-    if (editing) {
+    if (editing && newFleetName !== "") {
+      const fleetsNames = fleets.map(fleet => fleet.fleet)
+      if (fleetsNames.includes(newFleetName)) {
+        setError(true)
+        return
+      }
       const newFleet: Fleet = {
         id: getNewId(),
         fleet: newFleetName,
@@ -96,9 +108,9 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
       const nextFleets = Object.assign([], fleets)
       nextFleets.push(newFleet)
       setFleets(nextFleets)
-      setEditing(false)
+      reset()
     } else {
-      setEditing(true)
+      setEditing(prev => !prev)
     }
   }
 
@@ -131,14 +143,16 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
       if (confirm) {
         fleetPanelHandler(false)
         setFleets(savedData)
+        reset()
       }
     } else {
       fleetPanelHandler(false)
+      reset()
     }
   }
 
   return (
-    <Modal size={"sm"} show={isFleetPanelOpen} className="fleet-form">
+    <Modal size={"sm"} show={isFleetPanelOpen} className="config-form fleet-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Flotas</Modal.Title>
       </Modal.Header>
@@ -147,9 +161,9 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         <Table
           shouldUpdateScroll={false}
           rowKey="id"
-          height={600}
           data={fleets}
           loading={loading}
+          autoHeight
         >
           <Column width={30} align="center" >
             <HeaderCell></HeaderCell>
@@ -167,20 +181,30 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         <div className="add-profile-wrapper">
           <IconButton 
             className={`add-fleet${editing ? "-moved" : ""}`}
-            icon={<Icon icon="plus"/>}
+            icon={<Icon icon={editing ? "check" : "plus"}/>}
             color="green"
-            appearance={"subtle"}
+            appearance={editing ? "primary" : "subtle"}
             circle
             onClick={handleAddFleet}
           />
           {editing &&
-          <Input
-            placeholder="Nueva Flota"
-            maxLength={10}
-            autoFocus
-            onChange={val => setNewFleetName(val)} 
-            onPressEnter={handleAddFleet}
-          />
+          <Whisper
+            open={error}
+            trigger="none"
+            placement="bottomStart"
+            speaker={<Tooltip className="modal-form">Esa flota ya existe</Tooltip>}
+          >
+            <Input
+              placeholder="Nueva Flota"
+              maxLength={10}
+              autoFocus
+              onChange={val => {
+                setNewFleetName(val)
+                setError(false)
+              }} 
+              onPressEnter={handleAddFleet}
+            />
+          </Whisper>
           }
         </div>
       </Modal.Body>
