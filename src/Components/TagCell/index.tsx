@@ -13,11 +13,12 @@ import { PROFILES_FOLDER } from "../ProfilePanel"
 
 import "./styles/index.scss"
 
-const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, ...props }:
+const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, fleets, ...props }:
    {
      rowData: Fleet,
      manageProfile: (profile: string, id: string, action: "add" | "remove") => void,
      isOpen: boolean,
+     fleets: Fleet[]
     }) => {
   const { Cell } = Table
   const [editing, setEditing] = useState<boolean>(false)
@@ -35,7 +36,7 @@ const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, ...props }
   useEffect(() => {
     setPosibleProfiles(allProfiles.filter(profile => !rowData.profiles.includes(profile)))
     rowData.profiles.length === 0 && setEditing(true)
-  }, [allProfiles, rowData.profiles])
+  }, [allProfiles, rowData.profiles, fleets])
 
   return (
     <Cell {...props}>

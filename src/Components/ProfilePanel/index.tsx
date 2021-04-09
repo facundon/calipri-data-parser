@@ -301,7 +301,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   }
 
   return (
-    <Modal full show={isProfilePanelOpen} className="config-form">
+    <Modal size="lg" show={isProfilePanelOpen} className="config-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Perfiles de Rueda</Modal.Title>
       </Modal.Header>

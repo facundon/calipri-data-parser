@@ -177,7 +177,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           </Column>
           <Column flexGrow={4}>
             <HeaderCell>Perfiles</HeaderCell>
-            <TagCell dataKey="profiles" manageProfile={handleManageProfile} isOpen={isFleetPanelOpen}/>
+            <TagCell dataKey="profiles" manageProfile={handleManageProfile} isOpen={isFleetPanelOpen} fleets={fleets}/>
           </Column>
         </Table>
         <div className="add-profile-wrapper">
