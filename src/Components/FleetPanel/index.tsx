@@ -2,14 +2,21 @@ import React, { useState, useEffect } from "react"
 import Table from "rsuite/lib/Table"
 import Button from "rsuite/lib/Button"
 import Icon from "rsuite/lib/Icon"  
-import Loader from "rsuite/lib/Loader"
 import Modal from "rsuite/lib/Modal"
+import Alert from "rsuite/lib/Alert"
+import Input from "rsuite/lib/Input"
+import IconButton from "rsuite/lib/IconButton"
+
 import TagCell from "../TagCell"
 import confirmService from "../confirmService"
-import Alert from "rsuite/lib/Alert"
+import ManageCell from "../ManageCell"
 
 import { save, load, getFiles } from "../../Scripts/storage"
 import { FLEETS_TEMPLATE, Fleet } from "./template"
+
+import "./styles/index.scss"
+
+const FLEET_FILE = "flotas"
 
 interface IFleetPanel {
   isFleetPanelOpen: boolean,
@@ -20,18 +27,32 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   const [fleets, setFleets] = useState<Fleet[]>(FLEETS_TEMPLATE)
   const { Column, Cell, HeaderCell } = Table
   const [loading, setLoading] = useState<boolean>(false)
+  const [editing, setEditing] = useState<boolean>(false)
+  const [newFleetName, setNewFleetName] = useState<string>("")
+  const [error, setError] = useState<boolean>(false)
 
+  function getNewId() {
+    const ids = fleets.map(fleet => fleet.id)
+    let newLastId = ids.findIndex((val, index) => parseInt(val) !== index + 1) + 1 
+    if (newLastId === -1 || newLastId === 0) {
+      // If there is no empty space, add a newLastId to the end of the array
+      newLastId = parseInt(ids[ids.length - 1]) + 1 
+    }
+    console.log(newLastId)
+    return newLastId.toString()
+  }
+  
   useEffect(() => {
     const loadProfiles = async() => {
       setLoading(true)
-      const loadedFleets = await load("flotas")
+      const loadedFleets = await load(FLEET_FILE)
       if (loadedFleets) {
         setFleets(loadedFleets)
       } else {
         Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
         const files = await getFiles()
-        if (!files.includes("flotas")) {
-          await save("flotas", FLEETS_TEMPLATE) &&
+        if (!files.includes(FLEET_FILE)) {
+          await save(FLEET_FILE, FLEETS_TEMPLATE) &&
             Alert.info("Se creo un archivo de configuración para las Flotas", 7000)
         }
       }
@@ -58,6 +79,29 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     setFleets(nextFleets)
   }
 
+  const handleRemoveFleet = (fleetId: string) => {
+    const nextFleets: Fleet[] = Object.assign([], fleets)
+    const fleetIndex = nextFleets.findIndex(fleet => fleet.id === fleetId)
+    nextFleets.splice(fleetIndex, 1)
+    setFleets(nextFleets)
+  }
+
+  const handleAddFleet = () => {
+    if (editing) {
+      const newFleet: Fleet = {
+        id: getNewId(),
+        fleet: newFleetName,
+        profiles: ["ORE"]
+      }
+      const nextFleets = Object.assign([], fleets)
+      nextFleets.push(newFleet)
+      setFleets(nextFleets)
+      setEditing(false)
+    } else {
+      setEditing(true)
+    }
+  }
+
   const handleSave = async() => {
     const confirm = await confirmService.show({
       message: "Seguro que desea guardar los cambios realizados?",
@@ -66,7 +110,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     })
     if (confirm) {
       setLoading(true)
-      const saved = await save("flotas", fleets)
+      const saved = await save(FLEET_FILE, fleets)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
       fleetPanelHandler(false)
@@ -75,7 +119,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
 
   const handleDiscard = async() => {
     setLoading(true)
-    const savedData = await load("flotas")
+    const savedData = await load(FLEET_FILE)
     setLoading(false)
     if (savedData && JSON.stringify(savedData) !== JSON.stringify(fleets)) {
       const confirm = await confirmService.show({
@@ -94,7 +138,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
 
   return (
-    <Modal size={"sm"} show={isFleetPanelOpen} className="config-form">
+    <Modal size={"sm"} show={isFleetPanelOpen} className="fleet-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Flotas</Modal.Title>
       </Modal.Header>
@@ -105,25 +149,40 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           rowKey="id"
           height={600}
           data={fleets}
+          loading={loading}
         >
+          <Column width={30} align="center" >
+            <HeaderCell></HeaderCell>
+            <ManageCell noTree dataKey="id" onClick={handleRemoveFleet} />
+          </Column>
           <Column flexGrow={2} fixed align="center">
             <HeaderCell>Flota</HeaderCell>
             <Cell dataKey="fleet" className="parameter-cell" />
           </Column>
           <Column flexGrow={6}>
             <HeaderCell>Perfiles</HeaderCell>
-            <TagCell dataKey="profiles" manageProfile={handleManageProfile}/>
+            <TagCell dataKey="profiles" manageProfile={handleManageProfile} isOpen={isFleetPanelOpen}/>
           </Column>
         </Table>
-        {loading &&
-          <Loader
-            center
-            size="md"
-            backdrop
-            content="Cargando..."
-            vertical
+        <div className="add-profile-wrapper">
+          <IconButton 
+            className={`add-fleet${editing ? "-moved" : ""}`}
+            icon={<Icon icon="plus"/>}
+            color="green"
+            appearance={"subtle"}
+            circle
+            onClick={handleAddFleet}
           />
-        }
+          {editing &&
+          <Input
+            placeholder="Nueva Flota"
+            maxLength={10}
+            autoFocus
+            onChange={val => setNewFleetName(val)} 
+            onPressEnter={handleAddFleet}
+          />
+          }
+        </div>
       </Modal.Body>
 
       <Modal.Footer>

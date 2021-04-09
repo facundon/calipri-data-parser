@@ -1,0 +1,21 @@
+.fleet-form {
+  .add-profile-wrapper {
+    margin-top: 8px;
+  }
+  .rs{
+    &-input {
+      width: 115px;
+      margin-left: 15px;
+      display: inline-block;
+    }
+  }
+  .add-fleet {
+    left: 76px;
+    transition: ease-in 0.2s;
+    &-moved {
+      transform: translateX(-70px);
+      transition: ease-in 0.2s;
+      left: 76px;
+    }
+  }
+}

@@ -13,27 +13,29 @@ import { PROFILES_FOLDER } from "../ProfilePanel"
 
 import "./styles/index.scss"
 
-const TagCell: React.ElementType = ({ rowData, manageProfile, ...props }:
+const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, ...props }:
    {
      rowData: Fleet,
-     manageProfile: (profile: string, id: string, action: "add" | "remove") => void, 
+     manageProfile: (profile: string, id: string, action: "add" | "remove") => void,
+     isOpen: boolean,
     }) => {
   const { Cell } = Table
   const [editing, setEditing] = useState<boolean>(false)
   const [posibleProfiles, setPosibleProfiles] = useState<string[]>(["loading"])
+  const [allProfiles, setAllProfiles] = useState<string[]>([])
 
   useEffect(() => {
     async function loadFiles() {
-      const rawProfiles = await getFiles(PROFILES_FOLDER)
-      const allProfiles = rawProfiles.map(profile => profile.slice(0, profile.indexOf(".json")))
-      setPosibleProfiles(allProfiles.filter(profile => !rowData.profiles.includes(profile)))
+      const rawProfiles = await getFiles(PROFILES_FOLDER) 
+      setAllProfiles(rawProfiles.map(profile => profile.slice(0, profile.indexOf(".json")).toUpperCase()))
     }
     loadFiles()
-  }, [rowData])
+  }, [isOpen])
 
   useEffect(() => {
+    setPosibleProfiles(allProfiles.filter(profile => !rowData.profiles.includes(profile)))
     rowData.profiles.length === 0 && setEditing(true)
-  }, [rowData])
+  }, [allProfiles, rowData.profiles])
 
   return (
     <Cell {...props}>

@@ -12,7 +12,6 @@ import ManageCell from "../ManageCell"
 import confirmService from "../confirmService/index"
 import AddItemModal from "../AddItemModal"
 import Alert from "rsuite/lib/Alert"
-import Loader from "rsuite/lib/Loader"
 
 import { normalize } from "../../Scripts/utils"
 import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
@@ -76,7 +75,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       setLoading(true)
       const files = await getFiles(PROFILES_FOLDER)
       if (files.length !== 0) {
-        setProfiles(files.map((file: string) => file.replace(".json", "")))
+        setProfiles(files.map((file: string) => file.replace(".json", "").toUpperCase()))
       } else {
         await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
           Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
@@ -315,6 +314,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
         </Nav>
         <Table
           isTree
+          loading={loading}
           shouldUpdateScroll={false}
           rowKey="id"
           height={600}
@@ -347,15 +347,6 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
             <ActionEditCell dataKey="id" onClick={handleEditState}/>
           </Column>
         </Table>
-        {loading &&
-          <Loader
-            center
-            size="md"
-            backdrop
-            content="Cargando..."
-            vertical
-          />
-        }
       </Modal.Body>
 
       <Modal.Footer>

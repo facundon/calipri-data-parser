@@ -21,7 +21,13 @@ const excludeList = [
   "Dif. Diametro de Rueda - Mismo Eje"
 ]
 
-const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, ...props }: {rowData: Dimension, dataKey:DataKey, onClick: any}) => {
+const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, noTree = false, ...props }: 
+  {
+    rowData: Dimension,
+    dataKey:DataKey,
+    onClick: any,
+    noTree: boolean,
+  }) => {
   const { Cell } = Table
   const editable = rowData.id.split("-").length !== 1
   const onlyRemove = rowData.id.split("-").length === 3
@@ -35,7 +41,7 @@ const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, ...props }: 
   return (
     !isExcluded
       ? <Cell {...props}>
-        {onlyRemove || (editable && !onlyAdd)
+        {onlyRemove || (editable && !onlyAdd) || noTree
           ? <Whisper placement="left" trigger="hover" speaker={tooltip("Remover Item")}>
             <Icon onClick={() => handleAction("remove")} icon="minus-square-o" className="action-icon remove" />
           </Whisper>
