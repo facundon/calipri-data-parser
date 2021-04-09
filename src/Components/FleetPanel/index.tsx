@@ -44,23 +44,25 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
   
   useEffect(() => {
-    const loadProfiles = async() => {
-      setLoading(true)
-      const loadedFleets = await load(FLEET_FILE)
-      if (loadedFleets) {
-        setFleets(loadedFleets)
-      } else {
-        Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
-        const files = await getFiles()
-        if (!files.includes(FLEET_FILE)) {
-          await save(FLEET_FILE, FLEETS_TEMPLATE) &&
+    if (isFleetPanelOpen) {
+      const loadProfiles = async() => {
+        setLoading(true)
+        const loadedFleets = await load(FLEET_FILE)
+        if (loadedFleets) {
+          setFleets(loadedFleets)
+        } else {
+          Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
+          const files = await getFiles()
+          if (!files.includes(FLEET_FILE)) {
+            await save(FLEET_FILE, FLEETS_TEMPLATE) &&
             Alert.info("Se creo un archivo de configuración para las Flotas", 7000)
+          }
         }
+        setLoading(false)
       }
-      setLoading(false)
+      loadProfiles()
     }
-    loadProfiles()
-  }, [])
+  }, [isFleetPanelOpen])
 
   const reset = () => {
     setError(false)
@@ -173,7 +175,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
             <HeaderCell>Flota</HeaderCell>
             <Cell dataKey="fleet" className="parameter-cell" />
           </Column>
-          <Column flexGrow={6}>
+          <Column flexGrow={4}>
             <HeaderCell>Perfiles</HeaderCell>
             <TagCell dataKey="profiles" manageProfile={handleManageProfile} isOpen={isFleetPanelOpen}/>
           </Column>
@@ -181,8 +183,8 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         <div className="add-profile-wrapper">
           <IconButton 
             className={`add-fleet${editing ? "-moved" : ""}`}
-            icon={<Icon icon={editing ? "check" : "plus"}/>}
-            color="green"
+            icon={<Icon icon={editing ? ( newFleetName.length === 0 ? "undo" : "check") : "plus"}/>}
+            color={newFleetName.length === 0 && editing ? "red" : "green"}
             appearance={editing ? "primary" : "subtle"}
             circle
             onClick={handleAddFleet}
