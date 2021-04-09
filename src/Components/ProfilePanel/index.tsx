@@ -252,6 +252,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       if (deleted) {
         const removeIndex = profiles.indexOf(profileName.toUpperCase())
         removeIndex > -1 && profiles.splice(removeIndex, 1)
+        setProfiles([...profiles])
         Alert.info(`Se elimino el perfil ${profileName}`, 7000)
       } else {
         Alert.error(`No se pudo eliminar el perfil ${profileName}`, 7000)
