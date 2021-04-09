@@ -12,15 +12,6 @@ import "./styles/index.scss"
 
 const tooltip = (text: string) => <Tooltip>{text}</Tooltip>
 
-const excludeList = [
-  "Alto",
-  "Ancho",
-  "qR",
-  "Trocha",
-  "Dif. Ancho de Pestaña",
-  "Dif. Diametro de Rueda - Mismo Eje"
-]
-
 const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, noTree = false, ...props }: 
   {
     rowData: Dimension,
@@ -29,25 +20,24 @@ const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, noTree = fal
     noTree: boolean,
   }) => {
   const { Cell } = Table
-  const editable = rowData.id.split("-").length !== 1
   const onlyRemove = rowData.id.split("-").length === 3
-  const onlyAdd = rowData.id.indexOf("-") === -1 && rowData.children
-  const isExcluded = excludeList.includes(rowData.name)
+  const onlyAdd = rowData.id.split("-").length === 2
+  const excluded = rowData.id.indexOf("-") === -1
 
   const handleAction = (action : "remove" | "add") => {
     onClick && onClick(rowData.id, action)
   }
 
   return (
-    !isExcluded
+    !excluded || noTree
       ? <Cell {...props}>
-        {onlyRemove || (editable && !onlyAdd) || noTree
+        {onlyRemove || noTree
           ? <Whisper placement="left" trigger="hover" speaker={tooltip("Remover Item")}>
             <Icon onClick={() => handleAction("remove")} icon="minus-square-o" className="action-icon remove" />
           </Whisper>
           : null}
-        {!onlyAdd && !onlyRemove && editable ? <Divider vertical style={{ margin: "0 4px" }}/> : null}
-        {onlyAdd || (editable && !onlyRemove)
+        {!onlyAdd && !onlyRemove ? <Divider vertical style={{ margin: "0 4px" }}/> : null}
+        {onlyAdd
           ? <Whisper placement="top" trigger="hover" speaker={tooltip("Agregar Sub-Item")}>
             <Icon onClick={() => handleAction("add")} icon="plus-square-o" className="action-icon add" />
           </Whisper>

@@ -110,42 +110,8 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     dataLoad()
   }, [activeProfile])
 
-  // get profile fleets
-  useEffect(() => {
-    if (isProfilePanelOpen) {
-      const loadFleets = async() => {
-        setLoading(true)
-        const loadedFleets: Fleet[] | false = await load(FLEET_FILE)
-        if (loadedFleets) {
-          const activeFleets = loadedFleets.filter(fleet => fleet.profiles.includes(activeProfile))
-          if (activeFleets.length === 0) Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000) 
-          const nextData: Dimension[] = Object.assign([], activeData)
-          nextData.forEach((dim, index) => {
-            if (ITEMS_WITH_FLEET.includes(dim.name)) {
-              const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => (
-                {
-                  id:  `${dim.id}-${fleetIndex + 1}`,
-                  name: fleet.fleet,
-                  maxVal: "-",
-                  minVal: "-",
-                  status: null,
-                  children: [],
-                }
-              ))
-              nextData[index].children = []
-              nextData[index].children.push(...childFleet)
-              setActiveData(nextData)
-            }
-          })
-        }
-        setLoading(false)
-      }
-      loadFleets()
-    }
-  }, [isProfilePanelOpen, activeProfile])
-
-  function getActiveDataWithoutParent() {
-    const dataWithoutParent: Dimension[] = Object.assign([], activeData)
+  function getActiveDataWithoutParent(data = activeData) {
+    const dataWithoutParent: Dimension[] = Object.assign([], data)
     dataWithoutParent.forEach((val, index) => {
       delete dataWithoutParent[index]._parent
       dataWithoutParent[index].status = null
@@ -186,6 +152,46 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       })
     })
   }
+
+  // get profile fleets
+  useEffect(() => {
+    if (isProfilePanelOpen) {
+      const loadFleets = async() => {
+        setLoading(true)
+        const loadedFleets: Fleet[] | false = await load(FLEET_FILE)
+        if (loadedFleets) {
+          const activeFleets = loadedFleets.filter(fleet => fleet.profiles.includes(activeProfile))
+          activeFleets.length === 0 &&
+            Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000) 
+          const nextData: Dimension[] = Object.assign([], activeData)
+          nextData.forEach((dim, index) => {
+            if (ITEMS_WITH_FLEET.includes(dim.name)) {
+              const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => {
+                const currentChild = dim.children.find(item => item.name === fleet.fleet)
+                currentChild?.children.forEach((_, childIndex) => {
+                  currentChild.children[childIndex].id = `${dim.id}-${fleetIndex + 1}-${childIndex + 1}`
+                })
+                return (
+                  {
+                    id: `${dim.id}-${fleetIndex + 1}`,
+                    name: fleet.fleet,
+                    maxVal: currentChild?.maxVal || "-",
+                    minVal: currentChild?.minVal || "-",
+                    status: null,
+                    children: currentChild?.children || [],
+                  }
+                )})
+              nextData[index].children = []
+              nextData[index].children = childFleet
+            }
+          })
+          setActiveData(nextData)
+        }
+        setLoading(false)
+      }
+      loadFleets()
+    }
+  }, [isProfilePanelOpen, activeProfile])
 
   const handleManage = async(id: string, action: "remove" | "add") => {
     const [activeItem, nextData] = findActiveItem(id)
