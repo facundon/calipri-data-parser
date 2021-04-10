@@ -10,6 +10,7 @@ import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 
 import TagCell from "../TagCell"
+import SingleTagCell from "../SingleTagCell"
 import confirmService from "../confirmService"
 import ManageCell from "../ManageCell"
 
@@ -79,17 +80,20 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     setEditing(false)
   }
 
-  const handleManageProfile = (profile: string, fleetId: string, action: "add" | "remove") => {
+  const handleManageFleetProps = (data: string, fleetId: string, action: "add" | "remove" | "update") => {
     const nextFleets: Fleet[] = Object.assign([], fleets)
     nextFleets.forEach((fleet, index) => {
       if (fleet.id === fleetId) {
         switch (action) {
         case "add":
-          nextFleets[index].profiles.push(profile)
+          nextFleets[index].profiles.push(data)
           break
         case "remove":
-          const profileIndex = fleet.profiles.indexOf(profile)
+          const profileIndex = fleet.profiles.indexOf(data)
           nextFleets[index].profiles.splice(profileIndex, 1)
+          break
+        case "update":
+          nextFleets[index].reference = data
           break
         }
       }
@@ -114,7 +118,8 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
       const newFleet: Fleet = {
         id: getNewId(),
         fleet: newFleetName,
-        profiles: ["ORE"]
+        profiles: ["ORE"],
+        reference: "R",
       }
       const nextFleets = Object.assign([], fleets)
       nextFleets.push(newFleet)
@@ -188,14 +193,14 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
             <HeaderCell>Perfiles</HeaderCell>
             <TagCell 
               dataKey="profiles"
-              manageProfile={handleManageProfile}
+              manageProfile={handleManageFleetProps}
               isOpen={isFleetPanelOpen}
               fleets={fleets}
             />
           </Column>
-          <Column flexGrow={2}>
+          <Column flexGrow={2} align="center">
             <HeaderCell>Referencia Remolque</HeaderCell>
-            <Cell dataKey="reference"/>
+            <SingleTagCell dataKey="reference" updateReference={handleManageFleetProps} />
           </Column>
         </Table>
         <div className="add-profile-wrapper">

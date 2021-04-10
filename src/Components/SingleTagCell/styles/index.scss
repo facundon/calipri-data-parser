@@ -1,0 +1,12 @@
+.single-tag {
+  &-input {
+    transform: translateY(-6px);
+    font-size: 12px;
+  }
+  &-button { 
+    transform: translateY(-6px);
+  }
+  &-tag {
+    transform: translateY(-6px);
+  }
+}
