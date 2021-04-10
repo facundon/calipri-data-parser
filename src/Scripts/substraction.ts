@@ -4,7 +4,7 @@ import { normalize } from "./utils"
 type SubstractionStructure = {
   value: number,
   profile: string,
-  type: string | null,
+  vehicle: string | null,
 }
 
 export type SubstractionKinds = {
@@ -21,14 +21,14 @@ interface ISubstraction {
 
 const substraction = (data: string[], profiles: string[], step: number, vehicles?: string[]) => (
   data.map(
-    (val, index, arr) => {
+    (_, index, arr) => {
       if (index % step === 0) {
         const dataArr = arr.slice(index, index + step).map(val => normalize(val))
         const rawSubstraction = Math.max.apply(null, dataArr) - Math.min.apply(null, dataArr)
         return ({
           value: Math.abs(Math.round(rawSubstraction * 100) / 100),
           profile: profiles[index],
-          type: vehicles ? vehicles[index] : null
+          vehicle: vehicles ? vehicles[index] : null
         })
       } else { return (null) }
     }

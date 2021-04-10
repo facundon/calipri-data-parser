@@ -17,6 +17,7 @@ import { save, load, getFiles } from "../../Scripts/storage"
 import { FLEETS_TEMPLATE, Fleet } from "./template"
 
 import "./styles/index.scss"
+import { PROFILES_FOLDER } from "../ProfilePanel"
 
 export const FLEET_FILE = "flotas"
 
@@ -47,15 +48,23 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     if (isFleetPanelOpen) {
       const loadProfiles = async() => {
         setLoading(true)
-        const loadedFleets = await load(FLEET_FILE)
-        if (loadedFleets) {
-          setFleets(loadedFleets)
+        const loadedFleets: Fleet[] = await load(FLEET_FILE)
+        let profiles = await getFiles(PROFILES_FOLDER)
+        profiles = profiles.map(profile => profile.slice(0, profile.indexOf(".json")).toUpperCase())
+        if (loadedFleets && profiles) {
+          const posibleFleets: Fleet[] = []
+          loadedFleets.forEach(fleet => {
+            const nextProfiles = fleet.profiles.filter(profile => profiles.includes(profile))
+            posibleFleets.push({ ...fleet, profiles: nextProfiles })
+          })
+          setFleets(posibleFleets)
+          // TODO: need to save here without crashing
         } else {
           Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
           const files = await getFiles()
           if (!files.includes(FLEET_FILE)) {
             await save(FLEET_FILE, FLEETS_TEMPLATE) &&
-            Alert.info("Se creo un archivo de configuración para las Flotas", 7000)
+              Alert.info("Se creo un archivo de configuración para las Flotas", 7000)
           }
         }
         setLoading(false)
@@ -154,7 +163,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
 
   return (
-    <Modal size={"sm"} show={isFleetPanelOpen} className="config-form fleet-form">
+    <Modal size={"md"} show={isFleetPanelOpen} className="config-form fleet-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Flotas</Modal.Title>
       </Modal.Header>
@@ -177,7 +186,16 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           </Column>
           <Column flexGrow={4}>
             <HeaderCell>Perfiles</HeaderCell>
-            <TagCell dataKey="profiles" manageProfile={handleManageProfile} isOpen={isFleetPanelOpen} fleets={fleets}/>
+            <TagCell 
+              dataKey="profiles"
+              manageProfile={handleManageProfile}
+              isOpen={isFleetPanelOpen}
+              fleets={fleets}
+            />
+          </Column>
+          <Column flexGrow={2}>
+            <HeaderCell>Referencia Remolque</HeaderCell>
+            <Cell dataKey="reference"/>
           </Column>
         </Table>
         <div className="add-profile-wrapper">

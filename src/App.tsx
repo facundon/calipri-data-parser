@@ -78,8 +78,12 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
+              <Dropdown.Item onSelect={() => this.setState({ isFleetConfigOpen: true })}>
+                <Icon icon="map-marker" size="lg" />
+                Cabeceras
+              </Dropdown.Item>
               <Dropdown.Item onSelect={() => this.setState({ isProfilePanelOpen: true })}>
-                <Icon icon="gear" size="lg" />
+                <Icon icon="target" size="lg" />
                 Perfiles
               </Dropdown.Item>
               <Dropdown.Item onSelect={() => this.setState({ isFleetConfigOpen: true })}>

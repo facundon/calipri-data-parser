@@ -13,17 +13,21 @@ import { PROFILES_FOLDER } from "../ProfilePanel"
 
 import "./styles/index.scss"
 
+const colors = ["orange", "cyan", "violet", "red", "yellow", "green", "blue"]
+type MapedColors = {[profile: string]: string}
+
 const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, fleets, ...props }:
    {
      rowData: Fleet,
      manageProfile: (profile: string, id: string, action: "add" | "remove") => void,
      isOpen: boolean,
-     fleets: Fleet[]
+     fleets: Fleet[],
     }) => {
   const { Cell } = Table
   const [editing, setEditing] = useState<boolean>(false)
   const [posibleProfiles, setPosibleProfiles] = useState<string[]>(["loading"])
   const [allProfiles, setAllProfiles] = useState<string[]>([])
+  const [mapedColors, setMapedColors] = useState<MapedColors>({})
 
   useEffect(() => {
     async function loadFiles() {
@@ -36,6 +40,12 @@ const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, fleets, ..
   useEffect(() => {
     setPosibleProfiles(allProfiles.filter(profile => !rowData.profiles.includes(profile)))
     rowData.profiles.length === 0 && setEditing(true)
+    const asignedColors: MapedColors = {}
+    allProfiles.forEach((profile, index) => {
+      if (index > 6) index = 0 
+      asignedColors[profile] = colors[index]
+    })
+    setMapedColors(asignedColors)
   }, [allProfiles, rowData.profiles, fleets])
 
   return (
@@ -44,7 +54,7 @@ const TagCell: React.ElementType = ({ rowData, manageProfile, isOpen, fleets, ..
         {rowData.profiles.map(profile => 
           <Tag 
             key={rowData.id + profile} 
-            color="violet"
+            color={mapedColors[profile]}
             closable
             onClose={() => manageProfile(profile, rowData.id, "remove")}
           >

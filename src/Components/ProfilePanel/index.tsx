@@ -186,6 +186,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
             }
           })
           setActiveData(nextData)
+          // TODO: need to save data here without crashing 
         }
         setLoading(false)
       }
@@ -306,6 +307,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
         const removeIndex = profiles.indexOf(profileName.toUpperCase())
         removeIndex > -1 && profiles.splice(removeIndex, 1)
         setProfiles([...profiles])
+        setActiveProfile(profiles[0])
         Alert.info(`Se elimino el perfil ${profileName}`, 7000)
       } else {
         Alert.error(`No se pudo eliminar el perfil ${profileName}`, 7000)

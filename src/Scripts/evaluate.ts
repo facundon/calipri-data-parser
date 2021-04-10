@@ -1,68 +1,57 @@
 import Alert from "rsuite/lib/Alert"
 import { IParsedData, Wheel } from "../Components/DragLoader/types"
+import { Dimension } from "../Components/ProfilePanel/template"
 import { load } from "./storage"
 import { SubstractionKinds } from "./substraction"
 
 type Profiles = {
   [profile: string]: {
     Alto: {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     Ancho: {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     qR: {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     Diametro: {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    } | {
       [key: string]: {
-        minVal: number | "-" | null,
-        maxVal: number | "-" | null,
+        minVal: number | "-",
+        maxVal: number | "-",
       }
     }
     Trocha: {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     "Dif. Ancho de Pestaña": {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    }
-    "Dif. Diametro de Rueda - Mismo Bogie": {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    }
-    "Dif. Diametro de Rueda - Mismo Coche": {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    } | {
-      [key: string]: {
-        minVal: number | "-" | null,
-        maxVal: number | "-" | null,
-      }
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     "Dif. Diametro de Rueda - Mismo Eje": {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    } | {
+      minVal: number | "-",
+      maxVal: number | "-",
+    }
+    "Dif. Diametro de Rueda - Mismo Bogie": {
       [key: string]: {
-        minVal: number | "-" | null,
-        maxVal: number | "-" | null,
+        minVal: number | "-",
+        maxVal: number | "-",
+      }
+    }
+    "Dif. Diametro de Rueda - Mismo Coche": {
+      [key: string]: {
+        minVal: number | "-",
+        maxVal: number | "-",
       }
     }
     "Dif. Diametro de Rueda - Mismo Modulo": {
-      minVal: number | "-" | null,
-      maxVal: number | "-" | null,
-    } | {
       [key: string]: {
-        minVal: number | "-" | null,
-        maxVal: number | "-" | null,
+        minVal: number | "-",
+        maxVal: number | "-",
       }
     }
   }
@@ -113,19 +102,30 @@ interface IEvaluateSubstractions {
 }
 
 const getProfilesReferences = async(profiles: string[], fleet: string): Promise<Profiles | null> => {
-  const loadedProfiles: Profiles = {}
+  const loadedProfiles: any = {}
   for (const profile of profiles) {
-    const loadedData = await load(profile, "perfiles")
+    const loadedData: Dimension[] = await load(profile, "perfiles")
     if (loadedData) {
-      const fleetExists = loadedData.some(item => item.children.find(child => child.name.toUpperCase() === fleet))
+      const fleetExists = loadedData.some(item => item.children.find(child => child.name.toUpperCase() === fleet.toUpperCase()))
       if (!fleetExists) {
         Alert.error(`No se encontraron valores de referencia para la flota ${fleet} en el perfil ${profile}`, 7000)
         return null
       }
-      loadedProfiles[profile] = {}
+      loadedProfiles[profile] = {
+        "Dif. Ancho de Pestaña": {minVal: "-", maxVal: "-"},
+        "Dif. Diametro de Rueda - Mismo Bogie": {},
+        "Dif. Diametro de Rueda - Mismo Coche": {},
+        "Dif. Diametro de Rueda - Mismo Eje": {minVal: "-", maxVal: "-"},
+        "Dif. Diametro de Rueda - Mismo Modulo": {},
+        Alto: {maxVal: "-", minVal: "-"},
+        Ancho: {maxVal: "-", minVal: "-"},
+        Diametro: {},
+        Trocha: {maxVal: "-", minVal: "-"},
+        qR: {maxVal: "-", minVal: "-"},
+      }
       loadedData.forEach(item => {
-        const fleetData = item.children.filter(child => child.name.toUpperCase() === fleet)
-        if (fleetData.length && !fleetData[0].maxVal && !fleetData[0].minVal) {
+        const fleetData = item.children.filter(child => child.name.toUpperCase() === fleet.toUpperCase())
+        if (fleetData.length && typeof fleetData[0].maxVal === "string"  && typeof fleetData[0].minVal === "string") {
           loadedProfiles[profile][item.name] = {}
           fleetData[0].children.forEach(child => {
             loadedProfiles[profile][item.name][child.name.toUpperCase()] = { maxVal: child.maxVal, minVal: child.minVal }
@@ -144,10 +144,19 @@ const getProfilesReferences = async(profiles: string[], fleet: string): Promise<
   return loadedProfiles
 }
 
+const getVehicleTypeByFleet = (vehicle) => {
+  
+}
+
 const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesReferences) => {
   const evaluatedShaft: {value: number, damnation: boolean}[] = substractions.shaft.map(item => {
     let damnation = false
-    if (item!.value > profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Eje"].maxVal!) {
+    let reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Eje"].maxVal
+    if (typeof reference === "string") {
+      Alert.warning(`Falta valor de referencia "Dif. Diametro de Rueda - Mismo Eje" para perfil ${item!.profile}`, 10000)
+      reference = 0
+    }
+    if (item!.value > reference) {
       damnation = true
     }
     return ({
@@ -157,7 +166,12 @@ const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesRe
   })
   const evaluatedWidth: {value: number, damnation: boolean}[] = substractions.width.map(item => {
     let damnation = false
-    if (item!.value > profilesReferences[item!.profile]["Dif. Ancho de Pestaña"].maxVal!) {
+    let reference = profilesReferences[item!.profile]["Dif. Ancho de Pestaña"].maxVal
+    if (typeof reference === "string") {
+      Alert.warning(`Falta valor de referencia "Dif. Ancho de Pestaña" para perfil ${item!.profile}`, 10000)
+      reference = 0
+    }
+    if (item!.value > reference) {
       damnation = true
     }
     return ({
@@ -167,10 +181,14 @@ const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesRe
   })
   const evaluatedBogie: {value: number, damnation: boolean}[] = substractions.bogie.map(item => {
     let damnation = false
-    const reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Bogie"]
-    // if (!reference.maxVal || reference.maxVal === "-") {
-    //   reference = reference[].maxVal
-    // }
+    let reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Bogie"]
+    try {
+      reference = reference.maxVal
+    } catch (error) {
+      const refType: string = getVehicleTypeByFleet(item?.vehicle)
+      reference = reference[refType].maxVal
+    }
+    console.log(item)
     if (item!.value > reference) {
       damnation = true
     }
@@ -204,30 +222,24 @@ const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesRe
 const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences) => {
   const evaluatedWheels: EvaluatedWheel[] = wheels.map(wheel => {
     const damnation: Damnation = []
-    if (profilesReferences[wheel.profile].Alto.maxVal! < wheel.height || wheel.height < profilesReferences[wheel.profile].Alto.minVal!) {
+    if (profilesReferences[wheel.profile].Alto.maxVal! < wheel.height || wheel.height < profilesReferences[wheel.profile].Alto.minVal) {
       damnation.push("height")
     }
-    if (profilesReferences[wheel.profile].Ancho.maxVal! < wheel.width || wheel.width < profilesReferences[wheel.profile].Ancho.minVal!) {
+    if (profilesReferences[wheel.profile].Ancho.maxVal! < wheel.width || wheel.width < profilesReferences[wheel.profile].Ancho.minVal) {
       damnation.push("width")
     }
-    if (profilesReferences[wheel.profile].qR.maxVal! < wheel.qr || wheel.qr < profilesReferences[wheel.profile].qR.minVal!) {
+    if (profilesReferences[wheel.profile].qR.maxVal! < wheel.qr || wheel.qr < profilesReferences[wheel.profile].qR.minVal) {
       damnation.push("qr")
     }
-    if (profilesReferences[wheel.profile].Trocha.maxVal! < wheel.gauge || wheel.gauge < profilesReferences[wheel.profile].Trocha.minVal!) {
+    if (profilesReferences[wheel.profile].Trocha.maxVal! < wheel.gauge || wheel.gauge < profilesReferences[wheel.profile].Trocha.minVal) {
       damnation.push("gauge")
     }
-    if (profilesReferences[wheel.profile].Diametro.minVal === "-" || !profilesReferences[wheel.profile].Diametro.minVal) {
-      try {
-        if (wheel.diameter < profilesReferences[wheel.profile].Diametro[wheel.type.toUpperCase()].minVal) {
-          damnation.push("diameter")
-        }
-      } catch (error) {
-        Alert.error(`No se encontro el tipo de rueda ${wheel.type} en la configuración del perfil ${wheel.profile}`, 7000)
-      }
-    } else {
-      if (wheel.diameter < profilesReferences[wheel.profile].Diametro.minVal!) {
+    try {
+      if (wheel.diameter < profilesReferences[wheel.profile].Diametro[wheel.type.toUpperCase()].minVal) {
         damnation.push("diameter")
       }
+    } catch (error) {
+      Alert.error(`No se encontro el tipo de rueda ${wheel.type} en la configuración del perfil ${wheel.profile}`, 7000)
     }
     return ({ ...wheel, damnation })
   })
