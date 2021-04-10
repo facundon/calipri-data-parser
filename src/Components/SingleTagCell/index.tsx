@@ -12,11 +12,9 @@ import Input from "rsuite/lib/Input"
 import "./styles/index.scss"
 
 
-const SingleTagCell: React.ElementType = ({ rowData, updateReference, isOpen, fleets, ...props }: {
+const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }: {
     rowData: Fleet,
     updateReference: (ref: string, id: string, action: "update") => void,
-    isOpen: boolean,
-    fleets: Fleet[],
   }) => {
   const { Cell } = Table
   const [ref, setRef] = useState<string>("")
@@ -60,7 +58,7 @@ const SingleTagCell: React.ElementType = ({ rowData, updateReference, isOpen, fl
             placeholder={ref || "R"}
           />
         </Whisper>
-        : <Tag key={rowData.id} className="single-tag-tag">{ref}</Tag>
+        : <Tag key={rowData.id} className="single-tag-tag">{rowData.reference}</Tag>
       }
       <IconButton 
         style={{marginLeft: "10px"}}

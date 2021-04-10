@@ -110,8 +110,8 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
 
   const handleAddFleet = () => {
     if (editing && newFleetName !== "") {
-      const fleetsNames = fleets.map(fleet => fleet.fleet)
-      if (fleetsNames.includes(newFleetName)) {
+      const fleetsNames = fleets.map(fleet => fleet.fleet.toUpperCase())
+      if (fleetsNames.includes(newFleetName.toUpperCase())) {
         setError(true)
         return
       }
@@ -198,7 +198,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
               fleets={fleets}
             />
           </Column>
-          <Column flexGrow={2} align="center">
+          <Column flexGrow={2} align="right">
             <HeaderCell>Referencia Remolque</HeaderCell>
             <SingleTagCell dataKey="reference" updateReference={handleManageFleetProps} />
           </Column>
@@ -206,8 +206,8 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         <div className="add-profile-wrapper">
           <IconButton 
             className={`add-fleet${editing ? "-moved" : ""}`}
-            icon={<Icon icon={editing ? ( newFleetName.length === 0 ? "undo" : "check") : "plus"}/>}
-            color={newFleetName.length === 0 && editing ? "red" : "green"}
+            icon={<Icon icon={editing ? ( newFleetName.length === 0 ? "undo" : error ? "close" : "check") : "plus"}/>}
+            color={newFleetName.length === 0 && editing ? "orange" : error ? "red" : "green"}
             appearance={editing ? "primary" : "subtle"}
             circle
             onClick={handleAddFleet}

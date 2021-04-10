@@ -20,6 +20,7 @@ interface IState {
   isPrinting: boolean,
   isProfilePanelOpen: boolean,
   isFleetConfigOpen: boolean,
+  isTerminalConfigOpen: boolean,
   parsedData: IParsedData
 }
 
@@ -31,6 +32,7 @@ class App extends Component<IProps, IState> {
       isPrinting: false,
       isProfilePanelOpen: false,
       isFleetConfigOpen: false,
+      isTerminalConfigOpen: false,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
   }
@@ -78,7 +80,7 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
-              <Dropdown.Item onSelect={() => this.setState({ isFleetConfigOpen: true })}>
+              <Dropdown.Item onSelect={() => this.setState({ isTerminalConfigOpen: true })}>
                 <Icon icon="map-marker" size="lg" />
                 Cabeceras
               </Dropdown.Item>
@@ -95,7 +97,7 @@ class App extends Component<IProps, IState> {
           </ButtonGroup>
         </div>
         <ProfilePanel 
-          profilePanelHandler={value => this.setState({ isProfilePanelOpen: value })} 
+          profilePanelHandler={val => this.setState({ isProfilePanelOpen: val })} 
           isProfilePanelOpen={this.state.isProfilePanelOpen} 
         />
         <FleetPanel
