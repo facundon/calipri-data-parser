@@ -4,18 +4,18 @@
   }
   .rs{ 
     &-input {
-      width: 135px;
+      width: 110px;
       margin-left: 17px;
       display: inline-block;
     }
   }
   .add-fleet {
-    left: 96px;
+    left: 76px;
     transition: ease-in 0.2s;
     &-moved {
-      transform: translateX(-90px);
+      transform: translateX(-70px);
       transition: ease-in 0.2s;
-      left: 96px;
+      left: 76px;
     }
   }
 }

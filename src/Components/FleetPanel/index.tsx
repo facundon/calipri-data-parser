@@ -9,6 +9,7 @@ import IconButton from "rsuite/lib/IconButton"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 
+import { isEqual } from "lodash"
 import TagCell from "../TagCell"
 import SingleTagCell from "../SingleTagCell"
 import confirmService from "../confirmService"
@@ -149,7 +150,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     setLoading(true)
     const savedData = await load(FLEET_FILE)
     setLoading(false)
-    if (savedData && JSON.stringify(savedData) !== JSON.stringify(fleets)) {
+    if (savedData && !isEqual(savedData, fleets)) {
       const confirm = await confirmService.show({
         message: "Seguro que desea descartar los cambios realizados?",
         actionIcon: "trash2",
@@ -168,7 +169,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
 
   return (
-    <Modal size={"md"} show={isFleetPanelOpen} className="config-form fleet-form">
+    <Modal size={"sm"} show={isFleetPanelOpen} className="config-form fleet-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Flotas</Modal.Title>
       </Modal.Header>
