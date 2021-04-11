@@ -78,9 +78,10 @@ const AddItemModal: React.FC<IAddItemModal> = ({
         >
           <Input
             placeholder="Nuevo Item"
-            maxLength={10}
+            maxLength={20}
             autoFocus
             onChange={val => setItemName(val)}
+            onPressEnter={handleSave}
           />
         </Whisper>
         <Divider />
@@ -90,6 +91,7 @@ const AddItemModal: React.FC<IAddItemModal> = ({
             defaultValue={"0"}
             disabled={withChildren}
             onChange={(value: string) => setValues(prev => ({ min: value, max: prev.max }))}
+            onPressEnter={handleSave}
           />
         </div>
         <div className="input-wrapper">
@@ -98,6 +100,7 @@ const AddItemModal: React.FC<IAddItemModal> = ({
             defaultValue={"0"}
             disabled={withChildren}
             onChange={(value: string) => setValues(prev => ({ min: prev.min, max: value }))}
+            onPressEnter={handleSave}
           />
         </div>
       </Modal.Body>
@@ -107,7 +110,7 @@ const AddItemModal: React.FC<IAddItemModal> = ({
           value="subitems"
           defaultChecked={data.id.split("-").length !== 2}
           disabled={data.id.split("-").length === 2}
-          onChange={(value, checked) => {
+          onChange={(_, checked) => {
             setWithChildren(checked)
             checked && setValues({ min: null, max: null })
           }}

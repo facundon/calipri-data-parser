@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-use-before-define
-import * as React from "react"
+import React from "react"
 import Table from "rsuite/lib/Table"
 import InputNumber, { InputNumberProps } from "rsuite/lib/InputNumber"
 import InputGroup from "rsuite/lib/InputGroup"
@@ -11,13 +11,13 @@ export type DataKey =
   | "minVal"
   | "maxVal"
 
-export const InputWithButtons: React.FC<InputNumberProps> = ({onPressEnter, id, disabled,...props}) => {
+export const InputWithButtons: React.FC<InputNumberProps> = ({onPressEnter, id, disabled, unchangedValues, ...props}) => {
   const inputRef: React.Ref<InputNumberProps> = React.createRef()
   const handleMinus = () => {
-    disabled && inputRef.current!.handleMinus()
+    !disabled && inputRef.current!.handleMinus()
   }
   const handlePlus = () => {
-    disabled && inputRef.current!.handlePlus()
+    !disabled && inputRef.current!.handlePlus()
   }
   return (
     <InputGroup>
@@ -29,7 +29,9 @@ export const InputWithButtons: React.FC<InputNumberProps> = ({onPressEnter, id, 
         step={1}
         maxLength={5}
         min={0}
-        onKeyDown={(e: React.KeyboardEvent) => e.key === "Enter" && onPressEnter && onPressEnter(id, false, null)}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          e.key === "Enter" && onPressEnter && onPressEnter(id, false, null)
+        }}
       />
       <InputGroup.Button disabled={disabled} onClick={handlePlus} appearance="subtle" color="orange">+</InputGroup.Button>
     </InputGroup>
