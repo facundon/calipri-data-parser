@@ -11,7 +11,7 @@ export type DataKey =
   | "minVal"
   | "maxVal"
 
-export const InputWithButtons: React.FC<InputNumberProps> = ({onPressEnter, id, disabled, unchangedValues, ...props}) => {
+export const InputWithButtons: React.FC<InputNumberProps> = ({onPressEnter, id, disabled, ...props}) => {
   const inputRef: React.Ref<InputNumberProps> = React.createRef()
   const handleMinus = () => {
     !disabled && inputRef.current!.handleMinus()

@@ -96,20 +96,8 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       setLoading(false)
     }
     loadProfiles()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  // load profile data
-  useEffect(() => {
-    const dataLoad = async() => {
-      setLoading(true)
-      const nextData = await load(activeProfile, PROFILES_FOLDER)
-      setLoading(false)
-      nextData
-        ? setActiveData(nextData)
-        : Alert.error(`No se pudo cargar la configuración del perfil ${activeProfile}`, 7000)
-    }
-    dataLoad()
-  }, [activeProfile])
 
   function getActiveDataWithoutParent(data = activeData) {
     const dataWithoutParent: Dimension[] = Object.assign([], data)
@@ -154,17 +142,23 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     })
   }
 
-  // get profile fleets
+  // get profile fleets & load profile data
   useEffect(() => {
     if (isProfilePanelOpen) {
-      const loadFleets = async() => {
-        setLoading(true)
+      setLoading(true)
+      const loadFleets = async() => { 
+        const nextData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
+        if (nextData) {
+          setActiveData(nextData)
+        } else {
+          Alert.error(`No se pudo cargar la configuración del perfil ${activeProfile}`, 7000)
+          return null
+        }
         const loadedFleets: Fleet[] | false = await load(FLEET_FILE)
         if (loadedFleets) {
           const activeFleets = loadedFleets.filter(fleet => fleet.profiles.includes(activeProfile))
           activeFleets.length === 0 &&
             Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000) 
-          const nextData: Dimension[] = Object.assign([], activeData)
           nextData.forEach((dim, index) => {
             if (ITEMS_WITH_FLEET.includes(dim.name)) {
               const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => {
@@ -189,9 +183,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           setActiveData(nextData)
           // TODO: need to save data here without crashing 
         }
-        setLoading(false)
       }
       loadFleets()
+      setLoading(false)
     }
   }, [isProfilePanelOpen, activeProfile])
 
