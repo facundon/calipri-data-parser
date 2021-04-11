@@ -176,8 +176,8 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
                   {
                     id: `${dim.id}-${fleetIndex + 1}`,
                     name: fleet.fleet,
-                    maxVal: currentChild?.maxVal || "-",
-                    minVal: currentChild?.minVal || "-",
+                    minVal: currentChild?.minVal || null,
+                    maxVal: currentChild?.maxVal || null,
                     status: null,
                     children: currentChild?.children || [],
                   }
