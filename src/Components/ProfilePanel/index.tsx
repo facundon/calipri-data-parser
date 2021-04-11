@@ -13,6 +13,7 @@ import confirmService from "../confirmService/index"
 import AddItemModal from "../AddItemModal"
 import Alert from "rsuite/lib/Alert"
 
+import { isEqual } from "lodash"
 import { normalize } from "../../Scripts/utils"
 import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
 import { TEMPLATE, Dimension } from "./template"
@@ -20,7 +21,6 @@ import "./styles/index.scss"
 
 import { FLEET_FILE } from "../FleetPanel"
 import { Fleet } from "../FleetPanel/template"
-
 
 export const PROFILES_FOLDER = "perfiles"
 const ITEMS_WITH_FLEET = [
@@ -328,9 +328,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
 
   const handleDiscard = async(event: React.SyntheticEvent | string) => {
     setLoading(true)
-    const savedData = await load(activeProfile, PROFILES_FOLDER)
+    const savedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
     setLoading(false)
-    if (savedData && JSON.stringify(savedData) !== JSON.stringify(getActiveDataWithoutParent())) {
+    if (savedData && !isEqual(savedData, getActiveDataWithoutParent())) {
       const confirm = await confirmService.show({
         message: `Seguro que desea descartar los cambios realizados al perfil ${activeProfile}?`,
         actionIcon: "trash2",

@@ -146,9 +146,10 @@ const getVehicleTypeByFleet = (vehicle: string, fleet: string, loadedFleets: Fle
     Alert.error(`No se encontro la flota ${fleet} en las flotas listadas`, 10000)
     return null
   }
-  return (
-    vehicle?.includes(fleetObj.reference) ? "REMOLQUE" : "MOTRIZ"
-  )
+  if (fleet.toUpperCase() === "CAF6000") {
+    return vehicle?.indexOf(fleetObj.reference) === 1 ? "REMOLQUE" : "MOTRIZ"
+  }
+  return vehicle?.includes(fleetObj.reference) ? "REMOLQUE" : "MOTRIZ"
 }
 
 type SubRef = {[x: string]: {minVal: number | "-", maxVal: number | "-"}}
