@@ -1,4 +1,5 @@
 import Alert from "rsuite/lib/Alert"
+import { PropertyName } from "typescript"
 import { IParsedData, Wheel } from "../Components/DragLoader/types"
 import { FLEET_FILE } from "../Components/FleetPanel"
 import { Fleet } from "../Components/FleetPanel/template"
@@ -120,7 +121,7 @@ const getProfilesReferences = async(profiles: string[], fleet: string): Promise<
       }
       loadedData.forEach(item => {
         const fleetData = item.children.filter(child => child.name.toUpperCase() === fleet.toUpperCase())
-        if (fleetData.length && typeof fleetData[0].maxVal === "string"  && typeof fleetData[0].minVal === "string") {
+        if (fleetData.length && !fleetData[0].maxVal && !fleetData[0].minVal) {
           loadedProfiles[profile][item.name] = {}
           fleetData[0].children.forEach(child => {
             loadedProfiles[profile][item.name][child.name.toUpperCase()] = { maxVal: child.maxVal, minVal: child.minVal }
@@ -158,8 +159,8 @@ const checkSubItems = (reference: any, refType: string | null, profile: string, 
   let newReference = reference?.maxVal
   if (!newReference) {
     if (!refType) return 0
-    newReference = reference[refType]?.maxVal
-    if (newReference = "-" || !newReference) {
+    newReference = reference[refType].maxVal
+    if (newReference === "-" || !newReference) {
       Alert.warning(`Falta valor de referencia "${item}" para perfil ${profile}`, 10000)
       newReference = 0
     }
@@ -169,57 +170,40 @@ const checkSubItems = (reference: any, refType: string | null, profile: string, 
 
 const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profilesReferences: any, fleet) => {
   const loadedFleets: Fleet[] = await load(FLEET_FILE)
-  const evaluateItem = (item: any, subItem: any) => {
+  const evaluateItem = (dimension: any, subItem: any) => {
     let damnation = false
-    let reference: any = profilesReferences[item!.profile][subItem]
-    const refType: string | null = getVehicleTypeByFleet(item?.vehicle!, fleet, loadedFleets)
-    reference = checkSubItems(reference, refType, item!.profile, subItem)
-    if (item!.value > reference) {
+    let reference: any = profilesReferences[dimension!.profile][subItem]
+    const refType: string | null = getVehicleTypeByFleet(dimension?.vehicle!, fleet, loadedFleets)
+    reference = checkSubItems(reference, refType, dimension!.profile, subItem)
+    if (dimension!.value > reference) {
       damnation = true
     }
     return ({
-      value: item!.value,
+      value: dimension!.value,
       damnation: damnation,
     })
   }
-  const evaluatedWidth: {value: number, damnation: boolean}[] = substractions.width.map(item =>
-    evaluateItem(item, "Dif. Ancho de Pestaña")
-  )
-  const evaluatedShaft: {value: number, damnation: boolean}[] = substractions.shaft.map(item => 
-    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Eje")
-  )
-  const evaluatedBogie: {value: number, damnation: boolean}[] = substractions.bogie.map(item =>
-    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Bogie")
-  )
-  const evaluatedVehicle: {value: number, damnation: boolean}[] = substractions.vehicle.map(item => 
-    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Coche")
-  )
   return ({
-    width: evaluatedWidth,
-    shaft: evaluatedShaft,
-    bogie: evaluatedBogie,
-    vehicle: evaluatedVehicle,
+    width: substractions.width.map(dimension => evaluateItem(dimension, "Dif. Ancho de Pestaña")),
+    shaft: substractions.shaft.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Eje")),
+    bogie: substractions.bogie.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Bogie")),
+    vehicle: substractions.vehicle.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Coche")),
   })
 }
 
-const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences) => {
+const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences: any) => {
+  const isDamned = (reference: string, value: number, profile: string) => (
+    profilesReferences[profile][reference].maxVal < value || value < profilesReferences[profile][reference].minVal
+      ? true
+      : false
+  )
   const evaluatedWheels: EvaluatedWheel[] = wheels.map(wheel => {
     const damnation: Damnation = []
-    if (profilesReferences[wheel.profile].Alto.maxVal < wheel.height || wheel.height < profilesReferences[wheel.profile].Alto.minVal) {
-      damnation.push("height")
-    }
-    if (profilesReferences[wheel.profile].Ancho.maxVal < wheel.width || wheel.width < profilesReferences[wheel.profile].Ancho.minVal) {
-      damnation.push("width")
-    }
-    if (profilesReferences[wheel.profile].qR.maxVal < wheel.qr || wheel.qr < profilesReferences[wheel.profile].qR.minVal) {
-      damnation.push("qr")
-    }
-    if (profilesReferences[wheel.profile].Trocha.maxVal < wheel.gauge || wheel.gauge < profilesReferences[wheel.profile].Trocha.minVal) {
-      damnation.push("gauge")
-    }
-    if (wheel.diameter < profilesReferences[wheel.profile].Diametro.minVal) {
-      damnation.push("diameter")
-    }
+    if (isDamned("Alto", wheel.height, wheel.profile)) damnation.push("height")
+    if (isDamned("Ancho", wheel.width, wheel.profile)) damnation.push("width")
+    if (isDamned("qR", wheel.qr, wheel.profile)) damnation.push("qr")
+    if (isDamned("Trocha", wheel.gauge, wheel.profile)) damnation.push("gauge")
+    if (wheel.diameter < profilesReferences[wheel.profile].Diametro.minVal) damnation.push("diameter")
     return ({ ...wheel, damnation })
   })
   return evaluatedWheels
