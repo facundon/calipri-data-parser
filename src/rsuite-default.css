@@ -2123,7 +2123,7 @@ a.rs-btn {
 .rs-btn-default.rs-btn-yellow {
   /* stylelint-disable-next-line */
   color: #fff;
-  background-color: #ffca28;
+  background-color: #f9db6d;
 }
 .rs-btn-default.rs-btn-yellow.rs-btn-icon.rs-btn-icon-with-text > .rs-icon {
   background: #f5c31d;
@@ -2134,7 +2134,7 @@ a.rs-btn {
 .rs-btn-default.rs-btn-yellow.rs-btn-loading:active,
 .rs-btn-default.rs-btn-yellow.rs-btn-loading:hover:active {
   color: #fff;
-  background-color: #ffca28;
+  background-color: #f9db6d;
 }
 .rs-btn-default.rs-btn-yellow:focus,
 .rs-btn-default.rs-btn-yellow.rs-btn-focus {
@@ -2196,7 +2196,7 @@ a.rs-btn {
 .rs-btn-default.rs-btn-yellow.rs-btn-disabled:hover,
 .rs-btn-default.rs-btn-yellow.rs-btn-disabled:focus,
 .rs-btn-default.rs-btn-yellow.rs-btn-disabled.focus {
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-btn-default.rs-btn-yellow.rs-btn-default.rs-btn-disabled,
 .rs-dropdown-disabled .rs-btn-default.rs-btn-yellow.rs-btn-default {
@@ -2788,7 +2788,7 @@ a.rs-btn {
 .rs-btn-primary.rs-btn-yellow {
   /* stylelint-disable-next-line */
   color: #fff;
-  background-color: #ffca28;
+  background-color: #f9db6d;
 }
 .rs-btn-primary.rs-btn-yellow.rs-btn-icon.rs-btn-icon-with-text > .rs-icon {
   background: #f5c31d;
@@ -2799,7 +2799,7 @@ a.rs-btn {
 .rs-btn-primary.rs-btn-yellow.rs-btn-loading:active,
 .rs-btn-primary.rs-btn-yellow.rs-btn-loading:hover:active {
   color: #fff;
-  background-color: #ffca28;
+  background-color: #f9db6d;
 }
 .rs-btn-primary.rs-btn-yellow:focus,
 .rs-btn-primary.rs-btn-yellow.rs-btn-focus {
@@ -2861,7 +2861,7 @@ a.rs-btn {
 .rs-btn-primary.rs-btn-yellow.rs-btn-disabled:hover,
 .rs-btn-primary.rs-btn-yellow.rs-btn-disabled:focus,
 .rs-btn-primary.rs-btn-yellow.rs-btn-disabled.focus {
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-btn-primary.rs-btn-yellow.rs-btn-default.rs-btn-disabled,
 .rs-dropdown-disabled .rs-btn-primary.rs-btn-yellow.rs-btn-default {
@@ -3775,7 +3775,7 @@ a.rs-btn {
 .rs-btn-subtle.rs-btn-yellow.rs-btn-focus,
 .rs-btn-subtle.rs-btn-yellow:hover {
   color: #fff;
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-btn-subtle.rs-btn-yellow:active,
 .rs-btn-subtle.rs-btn-yellow.rs-btn-active,
@@ -5980,7 +5980,7 @@ a.rs-btn {
 .rs-calendar-header-backward.rs-btn-yellow:hover,
 .rs-calendar-header-forward.rs-btn-yellow:hover {
   color: #fff;
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-calendar-header-title.rs-btn-yellow:active,
 .rs-calendar-header-meridian.rs-btn-yellow:active,
@@ -13986,7 +13986,7 @@ textarea.rs-input-sm {
 .rs-input-group.rs-input-group-inside .rs-input-group-btn.rs-btn-yellow.rs-btn-focus,
 .rs-input-group.rs-input-group-inside .rs-input-group-btn.rs-btn-yellow:hover {
   color: #fff;
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-input-group.rs-input-group-inside .rs-input-group-btn.rs-btn-yellow:active,
 .rs-input-group.rs-input-group-inside .rs-input-group-btn.rs-btn-yellow.rs-btn-active,
@@ -16811,7 +16811,7 @@ textarea.rs-picker-search-input {
 .rs-picker-subtle .rs-btn.rs-btn-yellow:hover,
 .rs-picker-subtle .rs-picker-toggle.rs-btn-yellow:hover {
   color: #fff;
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-picker-subtle .rs-btn.rs-btn-yellow:active,
 .rs-picker-subtle .rs-picker-toggle.rs-btn-yellow:active,
@@ -20163,7 +20163,7 @@ textarea.rs-picker-menu .rs-picker-search-bar .rs-picker-search-bar-input {
 }
 .rs-tag-yellow {
   color: #fff;
-  background-color: #ffca28;
+  background-color: #f9db6d;
 }
 .rs-tag-green {
   color: #fff;
@@ -21437,7 +21437,7 @@ textarea.rs-picker-menu .rs-picker-search-bar .rs-picker-search-bar-input {
 .rs-uploader-picture .rs-uploader-trigger-btn.rs-btn-yellow.rs-btn-focus,
 .rs-uploader-picture .rs-uploader-trigger-btn.rs-btn-yellow:hover {
   color: #fff;
-  background: #ffca28;
+  background: #f9db6d;
 }
 .rs-uploader-picture .rs-uploader-trigger-btn.rs-btn-yellow:active,
 .rs-uploader-picture .rs-uploader-trigger-btn.rs-btn-yellow.rs-btn-active,
@@ -22146,7 +22146,7 @@ textarea.rs-picker-menu .rs-picker-search-bar .rs-picker-search-bar-input {
 .rs-rate {
   position: relative;
   display: inline-block;
-  color: #ffca28;
+  color: #f9db6d;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -22229,7 +22229,7 @@ textarea.rs-picker-menu .rs-picker-search-bar .rs-picker-search-bar-input {
   color: #ff9800;
 }
 .rs-rate-yellow {
-  color: #ffca28;
+  color: #f9db6d;
 }
 .rs-rate-green {
   color: #4caf50;

@@ -72,7 +72,7 @@ class App extends Component<IProps, IState> {
               placement="topStart"
               renderTitle={(children) =>
                 <Button
-                  color="cyan"
+                  color="yellow"
                   appearance="subtle"
                 >
                   <Icon icon="sliders" size="2x" />

@@ -62,6 +62,9 @@ body {
   }
 
   .btn-group {
+    .rs-btn-subtle.rs-btn-yellow:focus, .rs-btn-subtle.rs-btn-yellow.rs-btn-focus, .rs-btn-subtle.rs-btn-yellow:hover {
+      color: rgba(8, 8, 8, 0.705);
+    }
     .rs {
       &-btn {
         display: flex;

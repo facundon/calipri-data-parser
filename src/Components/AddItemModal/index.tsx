@@ -5,7 +5,7 @@ import Button from "rsuite/lib/Button"
 import Icon from "rsuite/lib/Icon"
 import Checkbox from "rsuite/lib/Checkbox"
 import Divider from "rsuite/lib/Divider"
-import Input from "rsuite/lib/Input"
+import InputPicker from "rsuite/lib/InputPicker"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 import { InputWithButtons } from "../EditCell"
@@ -30,18 +30,28 @@ const AddItemModal: React.FC<IAddItemModal> = ({
   validationMessage,
   data,
 }) => {
-  const [itemName, setItemName] = useState<string>("")
+  const names = [
+    {
+      value: "Motriz",
+      label: "Motriz",
+    },
+    {
+      value: data.id.split("-")[0] === "10" ? "Motriz - Remolque" : "Remolque",
+      label: data.id.split("-")[0] === "10" ? "Motriz - Remolque" : "Remolque",
+    }
+  ]
+  const [itemName, setItemName] = useState<string>(names[0].label)
   const [error, setError] = useState<boolean>(false)
   const [values, setValues] = useState<{min: string | null, max: string | null}>({ min: null, max: null })
   const [withChildren, setWithChildren] = useState<boolean>(data.id.split("-").length !== 2)
-
+  
   useEffect(() => {
     setWithChildren(data.id.split("-").length !== 2)
   }, [data])
 
   const reset = () => {
     setError(false)
-    setItemName("")
+    setItemName(names[0].label)
     setWithChildren(data.id.split("-").length !== 2)
     setValues({ min: null, max: null })
     setShow(false)
@@ -76,12 +86,13 @@ const AddItemModal: React.FC<IAddItemModal> = ({
           placement="bottomStart"
           speaker={<Tooltip className="modal-form">{validationMessage}</Tooltip>}
         >
-          <Input
-            placeholder="Nuevo Item"
-            maxLength={20}
-            autoFocus
-            onChange={val => setItemName(val)}
+          <InputPicker
+            data={names}
+            onChange={val => val && setItemName(val)}
+            block
             onPressEnter={handleSave}
+            placeholder="Seleccionar"
+            defaultValue={names[0].label}
           />
         </Whisper>
         <Divider />
@@ -89,6 +100,7 @@ const AddItemModal: React.FC<IAddItemModal> = ({
           <p>Mínimo</p>
           <InputWithButtons
             defaultValue={"0"}
+            autoFocus
             disabled={withChildren}
             onChange={(value: string) => setValues(prev => ({ min: value, max: prev.max }))}
             onPressEnter={handleSave}
