@@ -1,5 +1,8 @@
 import Alert from "rsuite/lib/Alert"
 import { IParsedData, Wheel } from "../Components/DragLoader/types"
+import { FLEET_FILE } from "../Components/FleetPanel"
+import { Fleet } from "../Components/FleetPanel/template"
+import { PROFILES_FOLDER } from "../Components/ProfilePanel"
 import { Dimension } from "../Components/ProfilePanel/template"
 import { load } from "./storage"
 import { SubstractionKinds } from "./substraction"
@@ -19,10 +22,8 @@ type Profiles = {
       maxVal: number | "-",
     }
     Diametro: {
-      [key: string]: {
-        minVal: number | "-",
-        maxVal: number | "-",
-      }
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     Trocha: {
       minVal: number | "-",
@@ -37,22 +38,16 @@ type Profiles = {
       maxVal: number | "-",
     }
     "Dif. Diametro de Rueda - Mismo Bogie": {
-      [key: string]: {
-        minVal: number | "-",
-        maxVal: number | "-",
-      }
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     "Dif. Diametro de Rueda - Mismo Coche": {
-      [key: string]: {
-        minVal: number | "-",
-        maxVal: number | "-",
-      }
+      minVal: number | "-",
+      maxVal: number | "-",
     }
     "Dif. Diametro de Rueda - Mismo Modulo": {
-      [key: string]: {
-        minVal: number | "-",
-        maxVal: number | "-",
-      }
+      minVal: number | "-",
+      maxVal: number | "-",
     }
   }
 }
@@ -87,10 +82,10 @@ interface EvaluatedSubstractions {
 }
 
 interface IEvaluate {
-  (parsedData: IParsedData): {
+  (parsedData: IParsedData): Promise<{
     wheels: EvaluatedWheel[],
     substractions: EvaluatedSubstractions,
-  } | null
+  } | null>
 }
 
 interface IEvaluateWheel {
@@ -98,13 +93,13 @@ interface IEvaluateWheel {
 }
 
 interface IEvaluateSubstractions {
-  (substractions: SubstractionKinds, profilesReferences: Profiles) : EvaluatedSubstractions
+  (substractions: SubstractionKinds, profilesReferences: Profiles, fleet: string) : Promise<EvaluatedSubstractions>
 }
 
 const getProfilesReferences = async(profiles: string[], fleet: string): Promise<Profiles | null> => {
   const loadedProfiles: any = {}
   for (const profile of profiles) {
-    const loadedData: Dimension[] = await load(profile, "perfiles")
+    const loadedData: Dimension[] = await load(profile, PROFILES_FOLDER)
     if (loadedData) {
       const fleetExists = loadedData.some(item => item.children.find(child => child.name.toUpperCase() === fleet.toUpperCase()))
       if (!fleetExists) {
@@ -115,7 +110,7 @@ const getProfilesReferences = async(profiles: string[], fleet: string): Promise<
         "Dif. Ancho de Pestaña": {minVal: "-", maxVal: "-"},
         "Dif. Diametro de Rueda - Mismo Bogie": {},
         "Dif. Diametro de Rueda - Mismo Coche": {},
-        "Dif. Diametro de Rueda - Mismo Eje": {minVal: "-", maxVal: "-"},
+        "Dif. Diametro de Rueda - Mismo Eje": {},
         "Dif. Diametro de Rueda - Mismo Modulo": {},
         Alto: {maxVal: "-", minVal: "-"},
         Ancho: {maxVal: "-", minVal: "-"},
@@ -144,18 +139,41 @@ const getProfilesReferences = async(profiles: string[], fleet: string): Promise<
   return loadedProfiles
 }
 
-const getVehicleTypeByFleet = (vehicle) => {
-  
+const getVehicleTypeByFleet = (vehicle: string, fleet: string, loadedFleets: Fleet[]) => {
+  const fleetObj = loadedFleets.find(item => item.fleet.toUpperCase() === fleet.toUpperCase())
+  if (!fleetObj) {
+    Alert.error(`No se encontro la flota ${fleet} en las flotas listadas`, 10000)
+    return null
+  }
+  return (
+    vehicle?.includes(fleetObj.reference) ? "REMOLQUE" : "MOTRIZ"
+  )
 }
 
-const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesReferences) => {
-  const evaluatedShaft: {value: number, damnation: boolean}[] = substractions.shaft.map(item => {
-    let damnation = false
-    let reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Eje"].maxVal
-    if (typeof reference === "string") {
-      Alert.warning(`Falta valor de referencia "Dif. Diametro de Rueda - Mismo Eje" para perfil ${item!.profile}`, 10000)
-      reference = 0
+type SubRef = {[x: string]: {minVal: number | "-", maxVal: number | "-"}}
+type MainRef = {minVal: number | null, maxVal: number | null}
+type Reference = MainRef | SubRef 
+
+const checkSubItems = (reference: any, refType: string | null, profile: string, item: string) => {
+  let newReference = reference?.maxVal
+  if (!newReference) {
+    if (!refType) return 0
+    newReference = reference[refType]?.maxVal
+    if (newReference = "-" || !newReference) {
+      Alert.warning(`Falta valor de referencia "${item}" para perfil ${profile}`, 10000)
+      newReference = 0
     }
+  }
+  return newReference
+}
+
+const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profilesReferences: any, fleet) => {
+  const loadedFleets: Fleet[] = await load(FLEET_FILE)
+  const evaluateItem = (item: any, subItem: any) => {
+    let damnation = false
+    let reference: any = profilesReferences[item!.profile][subItem]
+    const refType: string | null = getVehicleTypeByFleet(item?.vehicle!, fleet, loadedFleets)
+    reference = checkSubItems(reference, refType, item!.profile, subItem)
     if (item!.value > reference) {
       damnation = true
     }
@@ -163,54 +181,19 @@ const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesRe
       value: item!.value,
       damnation: damnation,
     })
-  })
-  const evaluatedWidth: {value: number, damnation: boolean}[] = substractions.width.map(item => {
-    let damnation = false
-    let reference = profilesReferences[item!.profile]["Dif. Ancho de Pestaña"].maxVal
-    if (typeof reference === "string") {
-      Alert.warning(`Falta valor de referencia "Dif. Ancho de Pestaña" para perfil ${item!.profile}`, 10000)
-      reference = 0
-    }
-    if (item!.value > reference) {
-      damnation = true
-    }
-    return ({
-      value: item!.value,
-      damnation: damnation,
-    })
-  })
-  const evaluatedBogie: {value: number, damnation: boolean}[] = substractions.bogie.map(item => {
-    let damnation = false
-    let reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Bogie"]
-    try {
-      reference = reference.maxVal
-    } catch (error) {
-      const refType: string = getVehicleTypeByFleet(item?.vehicle)
-      reference = reference[refType].maxVal
-    }
-    console.log(item)
-    if (item!.value > reference) {
-      damnation = true
-    }
-    return ({
-      value: item!.value,
-      damnation: damnation,
-    })
-  })
-  const evaluatedVehicle: {value: number, damnation: boolean}[] = substractions.vehicle.map(item => {
-    let damnation = false
-    const reference = profilesReferences[item!.profile]["Dif. Diametro de Rueda - Mismo Coche"]
-    // if (!reference.maxVal || reference.maxVal === "-") {
-    //   reference = reference[].maxVal
-    // }
-    if (item!.value > reference) {
-      damnation = true
-    }
-    return ({
-      value: item!.value,
-      damnation: damnation,
-    })
-  })
+  }
+  const evaluatedWidth: {value: number, damnation: boolean}[] = substractions.width.map(item =>
+    evaluateItem(item, "Dif. Ancho de Pestaña")
+  )
+  const evaluatedShaft: {value: number, damnation: boolean}[] = substractions.shaft.map(item => 
+    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Eje")
+  )
+  const evaluatedBogie: {value: number, damnation: boolean}[] = substractions.bogie.map(item =>
+    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Bogie")
+  )
+  const evaluatedVehicle: {value: number, damnation: boolean}[] = substractions.vehicle.map(item => 
+    evaluateItem(item, "Dif. Diametro de Rueda - Mismo Coche")
+  )
   return ({
     width: evaluatedWidth,
     shaft: evaluatedShaft,
@@ -222,24 +205,20 @@ const evaluateSubstractions: IEvaluateSubstractions = (substractions, profilesRe
 const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences) => {
   const evaluatedWheels: EvaluatedWheel[] = wheels.map(wheel => {
     const damnation: Damnation = []
-    if (profilesReferences[wheel.profile].Alto.maxVal! < wheel.height || wheel.height < profilesReferences[wheel.profile].Alto.minVal) {
+    if (profilesReferences[wheel.profile].Alto.maxVal < wheel.height || wheel.height < profilesReferences[wheel.profile].Alto.minVal) {
       damnation.push("height")
     }
-    if (profilesReferences[wheel.profile].Ancho.maxVal! < wheel.width || wheel.width < profilesReferences[wheel.profile].Ancho.minVal) {
+    if (profilesReferences[wheel.profile].Ancho.maxVal < wheel.width || wheel.width < profilesReferences[wheel.profile].Ancho.minVal) {
       damnation.push("width")
     }
-    if (profilesReferences[wheel.profile].qR.maxVal! < wheel.qr || wheel.qr < profilesReferences[wheel.profile].qR.minVal) {
+    if (profilesReferences[wheel.profile].qR.maxVal < wheel.qr || wheel.qr < profilesReferences[wheel.profile].qR.minVal) {
       damnation.push("qr")
     }
-    if (profilesReferences[wheel.profile].Trocha.maxVal! < wheel.gauge || wheel.gauge < profilesReferences[wheel.profile].Trocha.minVal) {
+    if (profilesReferences[wheel.profile].Trocha.maxVal < wheel.gauge || wheel.gauge < profilesReferences[wheel.profile].Trocha.minVal) {
       damnation.push("gauge")
     }
-    try {
-      if (wheel.diameter < profilesReferences[wheel.profile].Diametro[wheel.type.toUpperCase()].minVal) {
-        damnation.push("diameter")
-      }
-    } catch (error) {
-      Alert.error(`No se encontro el tipo de rueda ${wheel.type} en la configuración del perfil ${wheel.profile}`, 7000)
+    if (wheel.diameter < profilesReferences[wheel.profile].Diametro.minVal) {
+      damnation.push("diameter")
     }
     return ({ ...wheel, damnation })
   })
@@ -259,7 +238,7 @@ export const evaluate: IEvaluate = async(parsedData) => {
   if (profilesReferences) {
     return ({
       wheels: evaluateWheels(wheels, profilesReferences),
-      substractions: evaluateSubstractions(substractions, profilesReferences)
+      substractions: await evaluateSubstractions(substractions, profilesReferences, fleet)
     })
   } else {
     return null

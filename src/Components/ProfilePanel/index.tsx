@@ -25,6 +25,7 @@ import { Fleet } from "../FleetPanel/template"
 export const PROFILES_FOLDER = "perfiles"
 const ITEMS_WITH_FLEET = [
   "Diametro",
+  "Dif. Diametro de Rueda - Mismo Eje",
   "Dif. Diametro de Rueda - Mismo Bogie",
   "Dif. Diametro de Rueda - Mismo Coche",
   "Dif. Diametro de Rueda - Mismo Modulo",
@@ -167,7 +168,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           nextData.forEach((dim, index) => {
             if (ITEMS_WITH_FLEET.includes(dim.name)) {
               const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => {
-                const currentChild = dim.children.find(item => item.name === fleet.fleet)
+                const currentChild = dim.children.find(item => item.name.toUpperCase() === fleet.fleet.toUpperCase())
                 currentChild?.children.forEach((_, childIndex) => {
                   currentChild.children[childIndex].id = `${dim.id}-${fleetIndex + 1}-${childIndex + 1}`
                 })
@@ -392,11 +393,11 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           </Column>
           <Column flexGrow={2} align="center">
             <HeaderCell>Mínimo</HeaderCell>
-            <EditCell dataKey="minVal" onChange={handleEditValue}/>
+            <EditCell dataKey="minVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
           </Column>
           <Column flexGrow={2} align="center">
             <HeaderCell>Máximo</HeaderCell>
-            <EditCell dataKey="maxVal" onChange={handleEditValue}/>
+            <EditCell dataKey="maxVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
           </Column>
           <Column width={120} align="center" fixed="right">
             <HeaderCell>Editar</HeaderCell>

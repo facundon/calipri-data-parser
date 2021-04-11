@@ -84,6 +84,7 @@ const InputModal: React.FC<IInputModal> = ({
               maxLength={10}
               autoFocus
               onChange={handleChange}
+              onPressEnter={handleSave}
             />
             }
             {type === "delete" &&
