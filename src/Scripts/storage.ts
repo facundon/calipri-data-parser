@@ -14,36 +14,37 @@ declare global {
 }
 
 interface ISave {
-  (name: string, data: {} | [], folder?: string) : Promise<boolean>
+  (name: string, data: {} | [], folder?: string, extension?: string) : Promise<boolean>
 }
 
 interface ILoad {
-  (name: string, folder?: string) : Promise<false | any>
+  (name: string, folder?: string, extension?: string) : Promise<false | any>
 }
 
 interface IDelete {
-  (name: string, folder?: string) : Promise<boolean>
+  (name: string, folder?: string, extension?: string) : Promise<boolean>
 }
 interface IGetFiles {
   (folder?: string) : Promise<string[]>
 }
 
-export const save: ISave = async(name, data, folder = "") => {
-  const success = await window.electron.storage.save(`${name.toLowerCase()}.json`, JSON.stringify(data), folder)
+export const save: ISave = async(name, data, folder = "", extension = ".json") => {
+  const success = await window.electron.storage.save(`${name.toLowerCase()}${extension}`, JSON.stringify(data), folder)
   return success
 }
 
-export const load: ILoad = async(name, folder = "") => {
-  const data = await window.electron.storage.load(`${name.toLowerCase()}.json`, folder)
+export const load: ILoad = async(name, folder = "", extension = ".json") => {
+  const data = await window.electron.storage.load(`${name.toLowerCase()}${extension}`, folder)
   if (data) {
-    return JSON.parse(new TextDecoder().decode(data))
+    const decodedData = new TextDecoder().decode(data)
+    return extension === ".json" ? JSON.parse(decodedData) : decodedData
   } else {
     return data
   }
 }
 
-export const deleteFile: IDelete = async(name, folder = "") => {
-  const success = await window.electron.storage.delete(`${name.toLowerCase()}.json`, folder)
+export const deleteFile: IDelete = async(name, folder = "", extension = ".json") => {
+  const success = await window.electron.storage.delete(`${name.toLowerCase()}${extension}`, folder)
   return success
 }
 

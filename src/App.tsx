@@ -7,6 +7,7 @@ import Dropdown from "rsuite/lib/Dropdown"
 import Icon from "rsuite/lib/Icon"
 import { IParsedData } from "./Components/DragLoader/types"
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
+import { load } from "./Scripts/storage"
 
 import "./rsuite-default.css"
 import "./globalStyles/index.scss"
@@ -41,10 +42,11 @@ class App extends Component<IProps, IState> {
   handlePrintPDF = async() => {
     this.setState({ isPrinting: true })
     const evaluatedData = await evaluate(this.state.parsedData)
-    console.log(evaluatedData)
     if (evaluatedData) {
       const preparedData = prepareData(evaluatedData, this.state.parsedData.header)
       console.log(preparedData)
+      const loadedHtml: string = await load("report", undefined,".html")
+      console.log(loadedHtml.replace("$FLOTA$", preparedData.Flota))
     } 
       
     this.setState({ isPrinting: false })
