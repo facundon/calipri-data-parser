@@ -16,6 +16,13 @@ body {
 .title {
   display: flex;
   justify-content: space-between;
+  font-size: 36px;
+  font-weight: 600;
+  padding: 5px 20px;
+  background-color: darkslateblue;
+  color: white;
+  border-top: 1px solid black;
+  border-radius: 10px 10px 0 0;
 }
 
 .title-left {
@@ -27,8 +34,24 @@ body {
 }
 
 .main-table {
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+  box-shadow: 0, 0, 10px, 5px, black;
+}
+
+th { 
+  background-color: black;
+  color: white;
+  padding: 8px 0;
+}
+
+td {
+  padding: 5px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }
 
 .header {
@@ -38,5 +61,5 @@ body {
 
 .footer {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
 }
