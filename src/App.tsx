@@ -10,7 +10,8 @@ import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 
 import "./rsuite-default.css"
 import "./globalStyles/index.scss"
-import { evaluate } from "./Scripts/evaluate"
+import evaluate from "./Scripts/evaluate"
+import prepareData from "./Scripts/print"
 
 interface IProps {
 }
@@ -41,6 +42,11 @@ class App extends Component<IProps, IState> {
     this.setState({ isPrinting: true })
     const evaluatedData = await evaluate(this.state.parsedData)
     console.log(evaluatedData)
+    if (evaluatedData) {
+      const preparedData = prepareData(evaluatedData, this.state.parsedData.header)
+      console.log(preparedData)
+    } 
+      
     this.setState({ isPrinting: false })
   }
 

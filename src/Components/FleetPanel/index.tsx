@@ -181,6 +181,12 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           data={fleets}
           loading={loading}
           autoHeight
+          renderEmpty={() => 
+            <div className="no-data-found-wrapper">
+              <Icon icon="close-circle" size="5x" /> 
+              <p>No se encontraron Flotas</p>
+            </div>
+          }
         >
           <Column width={30} align="center" >
             <HeaderCell></HeaderCell>

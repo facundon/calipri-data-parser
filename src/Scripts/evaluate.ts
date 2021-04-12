@@ -55,11 +55,11 @@ type Profiles = {
 
 type Damnation = ("width" | "height" | "qr" | "diameter" | "gauge")[]
 
-interface EvaluatedWheel extends Wheel {
+export interface EvaluatedWheel extends Wheel {
   damnation: Damnation
 }
 
-interface EvaluatedSubstractions {
+export interface EvaluatedSubstractions {
   width: {
     value: number,
     damnation: boolean,
@@ -210,7 +210,7 @@ const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences: any) => {
   return evaluatedWheels
 }
 
-export const evaluate: IEvaluate = async(parsedData) => {
+const evaluate: IEvaluate = async(parsedData) => {
   const { wheels, header, substractions } = parsedData
   const profilesInWheels = wheels.map(wheel => wheel.profile).filter((profile, index, arr) => arr.indexOf(profile) === index)
   const fleetObject = header.find(item => Object.keys(item)[0] === "Flota")
@@ -229,3 +229,5 @@ export const evaluate: IEvaluate = async(parsedData) => {
     return null
   }
 }
+
+export default evaluate
