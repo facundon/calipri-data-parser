@@ -111,13 +111,18 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
     const substractions = getSubstractions(rawParsedData)
 
     const parsedWheels: T.Wheel[] = []
-    rawParsedData.vehicles.forEach((element, vehicleIndex) => {
+    let decimalIndex = 0
+    rawParsedData.vehicles.forEach((_, vehicleIndex) => {
       for (let rawBogieIndex = 0; rawBogieIndex < BOGIES_PER_VEHICLE; rawBogieIndex++) {
         for (let rawGaugeIndex = 0; rawGaugeIndex < GAUGES_PER_BOGIE; rawGaugeIndex++) {
           for (let rawWheelIndex = 0; rawWheelIndex < WHEELS_PER_GAUGES; rawWheelIndex++) {
-            const wheelIndex = vehicleIndex * rawBogieIndex * rawGaugeIndex + rawWheelIndex
-            const gaugeIndex = vehicleIndex * rawBogieIndex + rawGaugeIndex
-            const bogieIndex = vehicleIndex + rawBogieIndex
+            decimalIndex = 0
+            rawWheelIndex ? decimalIndex += 1 : decimalIndex += 0
+            rawGaugeIndex ? decimalIndex += 2 : decimalIndex += 0
+            rawBogieIndex ? decimalIndex += 4 : decimalIndex += 0
+            const wheelIndex = vehicleIndex + decimalIndex
+            const gaugeIndex = vehicleIndex + decimalIndex
+            const bogieIndex = vehicleIndex + decimalIndex
             parsedWheels.push(
               {
                 width: normalize(rawParsedData.widths[wheelIndex]),
@@ -148,7 +153,7 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
   const handleOnError = (err: T.CSVErrors[]) => {
     setPreviewData([])
     handleIsLoaded(false)
-    Alert.error("No se pudo cargar el archivo")
+    Alert.error("No se pudo cargar el archivo", 7000)
     console.log(err)
   }
 

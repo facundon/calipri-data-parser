@@ -53,7 +53,7 @@ type Profiles = {
   }
 }
 
-type Damnation = ("width" | "height" | "qr" | "diameter" | "gauge")[]
+export type Damnation = ("width" | "height" | "qr" | "diameter" | "gauge")[]
 
 export interface EvaluatedWheel extends Wheel {
   damnation: Damnation
