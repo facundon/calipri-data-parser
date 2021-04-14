@@ -51,7 +51,7 @@ class App extends Component<IProps, IState> {
         replacedHtml = replace(replacedHtml, `$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
-      await save("test", replacedHtml, "templates", ".html")
+      // await save("test", replacedHtml, "templates", ".html")
     }   
     this.setState({ isPrinting: false })
   }

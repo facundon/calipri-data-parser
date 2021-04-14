@@ -8,7 +8,7 @@ import { Dimension } from "../Components/ProfilePanel/template"
 import { load } from "./storage"
 import { SubstractionKinds } from "./substraction"
 
-type Profiles = {
+export type Profiles = {
   [profile: string]: {
     Alto: {
       minVal: number | "-",
@@ -86,6 +86,7 @@ interface IEvaluate {
   (parsedData: IParsedData): Promise<{
     wheels: EvaluatedWheel[],
     substractions: EvaluatedSubstractions,
+    references: Profiles,
   } | null>
 }
 
@@ -108,16 +109,16 @@ const getProfilesReferences = async(profiles: string[], fleet: string): Promise<
         return null
       }
       loadedProfiles[profile] = {
+        Trocha: {maxVal: "-", minVal: "-"},
+        Diametro: {},
+        Alto: {maxVal: "-", minVal: "-"},
+        Ancho: {maxVal: "-", minVal: "-"},
+        qR: {maxVal: "-", minVal: "-"},
         "Dif. Ancho de Pestaña": {minVal: "-", maxVal: "-"},
         "Dif. Diametro de Rueda - Mismo Bogie": {},
         "Dif. Diametro de Rueda - Mismo Coche": {},
         "Dif. Diametro de Rueda - Mismo Eje": {},
         "Dif. Diametro de Rueda - Mismo Modulo": {},
-        Alto: {maxVal: "-", minVal: "-"},
-        Ancho: {maxVal: "-", minVal: "-"},
-        Diametro: {},
-        Trocha: {maxVal: "-", minVal: "-"},
-        qR: {maxVal: "-", minVal: "-"},
       }
       loadedData.forEach(item => {
         const fleetData = item.children.filter(child => child.name.toUpperCase() === fleet.toUpperCase())
@@ -223,7 +224,8 @@ const evaluate: IEvaluate = async(parsedData) => {
   if (profilesReferences) {
     return ({
       wheels: evaluateWheels(wheels, profilesReferences),
-      substractions: await evaluateSubstractions(substractions, profilesReferences, fleet)
+      substractions: await evaluateSubstractions(substractions, profilesReferences, fleet),
+      references: profilesReferences,
     })
   } else {
     return null

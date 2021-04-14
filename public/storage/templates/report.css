@@ -1,18 +1,115 @@
 :root {
   --black: #221f21;
   --red: #f44336;
+  --shadow: #b9b9b934;
 }
 
 @font-face {
-  font-family: 'Roboto';
-  src: url('../../../src/Fonts/Roboto.eot'); /* IE9 Compat Modes */
-  src: url('../../../src/Fonts/Roboto.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../../../src/Fonts/Roboto.woff') format('woff'), /* Modern Browsers */
-       url('../../../src/Fonts/Roboto.ttf')  format('truetype'), /* Safari, Android, iOS */
+    font-family: 'Roboto Mono';
+    src: url('../../../src/Fonts/RobotoMono-Light.eot');
+    src: url('../../../src/Fonts/RobotoMono-Light.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/RobotoMono-Light.woff2') format('woff2'),
+        url('../../../src/Fonts/RobotoMono-Light.woff') format('woff'),
+        url('../../../src/Fonts/RobotoMono-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('../../../src/Fonts/RobotoMono-Bold.eot');
+    src: url('../../../src/Fonts/RobotoMono-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/RobotoMono-Bold.woff2') format('woff2'),
+        url('../../../src/Fonts/RobotoMono-Bold.woff') format('woff'),
+        url('../../../src/Fonts/RobotoMono-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('../../../src/Fonts/RobotoMono-Regular.eot');
+    src: url('../../../src/Fonts/RobotoMono-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/RobotoMono-Regular.woff2') format('woff2'),
+        url('../../../src/Fonts/RobotoMono-Regular.woff') format('woff'),
+        url('../../../src/Fonts/RobotoMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('../../../src/Fonts/RobotoMono-Italic.eot');
+    src: url('../../../src/Fonts/RobotoMono-Italic.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/RobotoMono-Italic.woff2') format('woff2'),
+        url('../../../src/Fonts/RobotoMono-Italic.woff') format('woff'),
+        url('../../../src/Fonts/RobotoMono-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../../../src/Fonts/Roboto-Bold.eot');
+    src: url('../../../src/Fonts/Roboto-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/Roboto-Bold.woff2') format('woff2'),
+        url('../../../src/Fonts/Roboto-Bold.woff') format('woff'),
+        url('../../../src/Fonts/Roboto-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../../../src/Fonts/Roboto-Italic.eot');
+    src: url('../../../src/Fonts/Roboto-Italic.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/Roboto-Italic.woff2') format('woff2'),
+        url('../../../src/Fonts/Roboto-Italic.woff') format('woff'),
+        url('../../../src/Fonts/Roboto-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../../../src/Fonts/Roboto-Regular.eot');
+    src: url('../../../src/Fonts/Roboto-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/Roboto-Regular.woff2') format('woff2'),
+        url('../../../src/Fonts/Roboto-Regular.woff') format('woff'),
+        url('../../../src/Fonts/Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('../../../src/Fonts/Roboto-Light.eot');
+    src: url('../../../src/Fonts/Roboto-Light.eot?#iefix') format('embedded-opentype'),
+        url('../../../src/Fonts/Roboto-Light.woff2') format('woff2'),
+        url('../../../src/Fonts/Roboto-Light.woff') format('woff'),
+        url('../../../src/Fonts/Roboto-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@media print {
+    body{
+        width: 210mm;
+        height: 297mm;
+        margin: 25mm 10mm 10mm 10mm; 
+   } 
 }
 
 body {
-  font-family: Roboto, Helvetica, Fallback, sans-serif;
+  font-family: Roboto, Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .container {
@@ -24,27 +121,28 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 600;
-  padding: 6px 40px;
+  padding: 3px 30px;
   background-color: darkslateblue;
   color: white;
   border: 2.5px solid var(--black);
   border-radius: 10px 10px 0 0;
-  margin-bottom: 1px;
 }
 
 .title-left {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 400;
 }
 
 .main-table {
-  width: 100%;
   text-align: center;
   border-collapse: collapse;
   border: 2.5px solid var(--black);
   outline-style: none;
+  font-family: "Roboto Mono";
+  font-size: 13px;
+  table-layout: fixed;
 }
 
 .header {
@@ -67,35 +165,76 @@ body {
 .references {
   font-weight: 400;
   font-style: italic;
+  font-size: 11px;
 }
 th { 
   background-color: var(--black);
   color: white;
-  padding: 13px 0 8px 0;
+  padding: 6px 0 4px 0;
+  border-bottom: 1px solid grey;
 }
 
 td {
   padding: 6px;
   border: 1px solid var(--black);
+  border-right: none;
+  border-left: none;
+}
+
+.references-row {
+  box-shadow: 0 6px 5px -1px grey;
+  border-bottom: none !important;
+}
+
+#index {
+  font-weight: 600;
+  border-left: 1px solid var(--black);
+}
+
+td:nth-child(1),
+td:nth-child(2),
+td:nth-child(3),
+td:nth-child(5) {
+  width: 150px;
+}
+
+td:nth-child(4) {
+  width: 200px;
+}
+
+td:nth-child(6) {
+  width: 200px;
+}
+
+td:nth-child(7),
+td:nth-child(8),
+td:nth-child(9) {
+  width: 150px;
+}
+
+td:nth-child(10),
+td:nth-child(11) {
+  width: 40px;
+}
+
+tr > td[rowspan="8"] {
+  border-right: 1px solid var(--black);
 }
 
 tr:nth-child(even),
-tr:nth-child(7n + 2) + tr [rowspan="8"],
-tr:nth-child(7n + 4) + tr [rowspan="8"],
-tr:nth-child(7n + 6) + tr [rowspan="8"],
-tr:nth-child(7n + 8) + tr [rowspan="8"] {
-  background-color: #fdf0c433 !important;
+tr:nth-child(7n + 3) + tr [rowspan="8"],
+tr:nth-child(7n + 5) + tr [rowspan="8"],
+tr:nth-child(7n + 7) + tr [rowspan="8"],
+tr:nth-child(7n + 9) + tr [rowspan="8"],
+tr [rowspan="4"]:nth-child(odd),
+tr > td[rowspan="2"]:nth-child(5n - 4),
+td[rowspan="2"] + td[rowspan="2"]:nth-child(5n + 2) {
+  background-color: var(--shadow) !important;
 }
 
 tr [rowspan="8"],
 tr [rowspan="4"]:nth-child(odd),
-tr:nth-child(8n + 1) + tr [rowspan="2"],
-tr:nth-child(8n + 3)  {
+tr:nth-child(8n + 8) + tr [rowspan="2"],
+tr:nth-child(8n + 2){
   border-bottom: 2.5px solid var(--black);
-}
-
-tr [rowspan="8"],
-tr [rowspan="4"]:nth-child(even),
-tr:nth-child(4n - 1) + tr [rowspan="2"] {
-  background-color: white ;
 }

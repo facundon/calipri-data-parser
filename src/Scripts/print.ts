@@ -1,17 +1,67 @@
 import { PreviewData } from "../Components/Preview"
-import { EvaluatedWheel, EvaluatedSubstractions } from "./evaluate"
-
+import { EvaluatedWheel, EvaluatedSubstractions, Profiles } from "./evaluate"
 
 type EvaluatedData = {
   wheels: EvaluatedWheel[],
   substractions: EvaluatedSubstractions,
+  references: Profiles,
 }
+
+type References = {
+  [x: string]: string | string[];
+}[]
 
 const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
   const findInHeader = (item: string) => Object.values(header.find(val => val[item])!)[0]
-
-  const findProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
+  const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
     .filter((profile, index, arr) => index === arr.indexOf(profile))
+
+  const getOrderedRefValues = () => {
+    let allReferences: References[] = []
+    getProfiles().forEach((profile, index, arr) => {
+      const references = Object.keys(evaluatedData.references[profile]).map(ref => {
+        let maxVal: string | string[] | null = ""
+        let minVal = ""
+        maxVal = evaluatedData.references[profile][ref].maxVal?.toString()
+        minVal = evaluatedData.references[profile][ref].minVal?.toString()
+        if (ref === "Diametro") {
+          maxVal = null
+          minVal = index === 0 ? `Min: ${minVal}` : ""
+        }
+        if (!maxVal && !minVal && ref !== "Diametro") {
+          minVal = ""
+          maxVal = [
+            "Motriz" + ": " + evaluatedData.references[profile][ref]["MOTRIZ"]?.maxVal?.toString(),
+            "Remolque" + ": " + evaluatedData.references[profile][ref]["REMOLQUE"]?.maxVal?.toString()
+          ]
+        }
+        if (typeof maxVal === "string" && ref !== "Diametro") {
+          return { [ref]: `${arr.length !== 1 ? profile + ": " : ""}${minVal}-${maxVal}` }
+        } else {
+          return { [ref]: maxVal || minVal }
+        }
+      })
+      console.log(references)
+      allReferences.push(references)
+    })
+    const orderedRefs = allReferences.reduce((prev: any, current: any) => {
+      let refObj = {}
+      current.forEach((item: any, index: number) => {
+        refObj[Object.keys(item)[0]]=  (Object.values(prev[index]) + " " + Object.values(item)).trim()
+      })
+      return refObj
+    })
+    return orderedRefs
+  }
+
+  const findProfiles = () => {
+    const profiles = getProfiles()
+    let message = ""
+    profiles.forEach(profile => {
+      message += `Ruedas con perfil <strong>${profile}</strong> evaluadas según <strong>$ER$</strong>`
+    })
+    return message
+  }
 
   const getTable = () => {
     const getObj = (name: any, value: string | number) => ({ damnationName: name, value })
@@ -19,9 +69,9 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
       [
         getObj("", wheel.vehicle),
         getObj("", wheel.bogie) ,
-        getObj("", Math.round((index + 1) / 2)) ,
+        getObj("index", Math.round((index + 1) / 2)),
         getObj("gauge", wheel.gauge.toFixed(2)),
-        getObj("", index + 1),
+        getObj("index", index + 1),
         getObj("diameter", wheel.diameter.toFixed(2)),
         getObj("height", wheel.height.toFixed(2)),
         getObj("width", wheel.width.toFixed(2)),
@@ -55,8 +105,17 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
           break
         }
         rowSpan
-          ? index % rowSpan === 0 ? newData = `<td ${isDamn ? "damned" : ""} rowspan='${rowSpan}'>${subItem.value}</td>` : newData = ""
-          : newData = `<td ${isDamn ? "class=damned" : ""}>${subItem.value}</td>`
+          ? index % rowSpan === 0 
+            ? newData = `<td 
+              ${isDamn ? "damned" : ""} 
+              ${subItem.damnationName === "index" ? "id=index" : ""}
+              rowspan='${rowSpan}'
+              >${subItem.value}</td>` 
+            : newData = ""
+          : newData = `<td
+            ${isDamn ? "class=damned" : ""}
+            ${subItem.damnationName === "index" ? "id=index" : ""}
+            >${subItem.value}</td>`
         data += newData
       })
       row += `<tr>${data}</tr>`
@@ -86,13 +145,15 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
       noSubHeader ? data += `<th rowspan=2>${item}</th>` : data += `<th>${item}</th>`
     })
     data = `<tr>${data}</tr>`
-    const refValues = [
-      "", "", "", "1359-1363", "", "Min 790", "36/26", "26/33", "6.5/15", "", ""
-    ]
-    refValues.forEach(val => {
-      val ? data += `<th class=references>${val}</th>` : "<th></th>"
+    let subData = ""
+    const refValues = getOrderedRefValues()
+    const itemsToDelete = Object.keys(refValues).filter(item => !reorderedHeaders.includes(item))
+    console.log(refValues)
+    itemsToDelete.forEach((item: any) => delete refValues[item])
+    Object.values(refValues).forEach(val => {
+      val ? subData += `<th class=references>${val}</th>` : null
     })
-    data = `<tr>${data}</tr>`
+    data = `${data}<tr class=references-row>${subData}</tr>`
     return data
   }
 
