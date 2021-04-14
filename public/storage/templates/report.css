@@ -100,12 +100,9 @@
     font-display: swap;
 }
 
-@media print {
-    body{
-        width: 210mm;
-        height: 297mm;
-        margin: 25mm 10mm 10mm 10mm; 
-   } 
+@page {
+  size: A4;
+  margin: 5mm 10mm 10mm 10mm;
 }
 
 body {
@@ -113,8 +110,8 @@ body {
 }
 
 .container {
-  padding: 0 100px 0 100px;
-  line-height: 1.6;
+  padding: 0;
+  line-height: 1.2;
 }
 
 .title {
@@ -141,13 +138,17 @@ body {
   border: 2.5px solid var(--black);
   outline-style: none;
   font-family: "Roboto Mono";
-  font-size: 13px;
+  font-size: 12px;
   table-layout: fixed;
 }
 
 .header {
   display:flex;
   justify-content: space-between;
+}
+
+.header-right {
+  padding-bottom: 10px;
 }
 
 .footer {
@@ -165,24 +166,26 @@ body {
 .references {
   font-weight: 400;
   font-style: italic;
-  font-size: 11px;
+  font-size: 10px;
+  padding-bottom: 4px;
 }
 th { 
   background-color: var(--black);
   color: white;
-  padding: 6px 0 4px 0;
+  padding-bottom: 4px;
+  padding-top: 3px;
   border-bottom: 1px solid grey;
 }
 
 td {
-  padding: 6px;
+  padding: 2px;
   border: 1px solid var(--black);
   border-right: none;
   border-left: none;
 }
 
 .references-row {
-  box-shadow: 0 6px 5px -1px grey;
+  box-shadow: 0 2px 2px -1px grey;
   border-bottom: none !important;
 }
 
@@ -194,26 +197,16 @@ td {
 td:nth-child(1),
 td:nth-child(2),
 td:nth-child(3),
-td:nth-child(5) {
-  width: 150px;
+td:nth-child(5),
+td:nth-child(10),
+td:nth-child(11) {
+  width: 20px;
 }
 
-td:nth-child(4) {
-  width: 200px;
-}
-
-td:nth-child(6) {
-  width: 200px;
-}
-
+td:nth-child(4),
 td:nth-child(7),
 td:nth-child(8),
 td:nth-child(9) {
-  width: 150px;
-}
-
-td:nth-child(10),
-td:nth-child(11) {
   width: 40px;
 }
 

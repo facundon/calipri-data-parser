@@ -13,7 +13,7 @@ import { forIn, replace } from "lodash"
 import "./rsuite-default.css"
 import "./globalStyles/index.scss"
 import evaluate from "./Scripts/evaluate"
-import prepareData from "./Scripts/print"
+import prepareData from "./Scripts/print.js"
 
 interface IProps {
 }

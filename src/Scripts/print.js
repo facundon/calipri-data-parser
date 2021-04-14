@@ -1,29 +1,17 @@
-import { PreviewData } from "../Components/Preview"
-import { EvaluatedWheel, EvaluatedSubstractions, Profiles } from "./evaluate"
-
-type EvaluatedData = {
-  wheels: EvaluatedWheel[],
-  substractions: EvaluatedSubstractions,
-  references: Profiles,
-}
-
-type References = {
-  [x: string]: string | string[];
-}[]
-
-const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
-  const findInHeader = (item: string) => Object.values(header.find(val => val[item])!)[0]
+const prepareData = (evaluatedData, header) => {
+  const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
   const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
     .filter((profile, index, arr) => index === arr.indexOf(profile))
 
   const getOrderedRefValues = () => {
-    let allReferences: References[] = []
+    let allReferences = []
     getProfiles().forEach((profile, index, arr) => {
+      const profileRef = evaluatedData.references[profile]
       const references = Object.keys(evaluatedData.references[profile]).map(ref => {
-        let maxVal: string | string[] | null = ""
+        let maxVal = ""
         let minVal = ""
-        maxVal = evaluatedData.references[profile][ref].maxVal?.toString()
-        minVal = evaluatedData.references[profile][ref].minVal?.toString()
+        maxVal = profileRef[ref].maxVal?.toString()
+        minVal = profileRef[ref].minVal?.toString()
         if (ref === "Diametro") {
           maxVal = null
           minVal = index === 0 ? `Min: ${minVal}` : ""
@@ -31,8 +19,8 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
         if (!maxVal && !minVal && ref !== "Diametro") {
           minVal = ""
           maxVal = [
-            "Motriz" + ": " + evaluatedData.references[profile][ref]["MOTRIZ"]?.maxVal?.toString(),
-            "Remolque" + ": " + evaluatedData.references[profile][ref]["REMOLQUE"]?.maxVal?.toString()
+            "Motriz" + ": " + profileRef[ref]["MOTRIZ"]?.maxVal?.toString(),
+            "Remolque" + ": " + profileRef[ref]["REMOLQUE"]?.maxVal?.toString()
           ]
         }
         if (typeof maxVal === "string" && ref !== "Diametro") {
@@ -41,16 +29,26 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
           return { [ref]: maxVal || minVal }
         }
       })
-      console.log(references)
       allReferences.push(references)
     })
-    const orderedRefs = allReferences.reduce((prev: any, current: any) => {
-      let refObj = {}
-      current.forEach((item: any, index: number) => {
-        refObj[Object.keys(item)[0]]=  (Object.values(prev[index]) + " " + Object.values(item)).trim()
+    let orderedRefs
+    if (allReferences.length === 1) {
+      allReferences.forEach(item => {
+        let refObj = {}
+        item.forEach(item => {
+          refObj[Object.keys(item)[0]] = Object.values(item)[0].trim()
+        })
+        orderedRefs = refObj
       })
-      return refObj
-    })
+    } else {
+      orderedRefs = allReferences.reduce((prev, current) => {
+        let refObj = {}
+        current.forEach((item, index) => {
+          refObj[Object.keys(item)[0]] =  (Object.values(prev[index]) + " " + Object.values(item))
+        })
+        return refObj
+      })
+    }
     return orderedRefs
   }
 
@@ -64,7 +62,7 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
   }
 
   const getTable = () => {
-    const getObj = (name: any, value: string | number) => ({ damnationName: name, value })
+    const getObj = (name, value) => ({ damnationName: name, value })
     const reorderedWheels = evaluatedData.wheels.map((wheel, index) => 
       [
         getObj("", wheel.vehicle),
@@ -148,8 +146,7 @@ const prepareData = (evaluatedData: EvaluatedData, header: PreviewData[]) => {
     let subData = ""
     const refValues = getOrderedRefValues()
     const itemsToDelete = Object.keys(refValues).filter(item => !reorderedHeaders.includes(item))
-    console.log(refValues)
-    itemsToDelete.forEach((item: any) => delete refValues[item])
+    itemsToDelete.forEach(item => delete refValues[item])
     Object.values(refValues).forEach(val => {
       val ? subData += `<th class=references>${val}</th>` : null
     })
