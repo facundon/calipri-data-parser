@@ -108,12 +108,12 @@ const prepareData = (evaluatedData, header) => {
               ${isDamn ? "damned" : ""} 
               ${subItem.damnationName === "index" ? "id=index" : ""}
               rowspan='${rowSpan}'
-              >${subItem.value}</td>` 
+              >${subItem.value || "-"}</td>` 
             : newData = ""
           : newData = `<td
             ${isDamn ? "class=damned" : ""}
             ${subItem.damnationName === "index" ? "id=index" : ""}
-            >${subItem.value}</td>`
+            >${subItem.value || "-"}</td>`
         data += newData
       })
       row += `<tr>${data}</tr>`

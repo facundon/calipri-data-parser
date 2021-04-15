@@ -118,18 +118,25 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 600;
-  padding: 3px 30px;
+  padding: 5px 15px;
   background-color: darkslateblue;
   color: white;
   border: 2.5px solid var(--black);
+  border-bottom: none;
   border-radius: 10px 10px 0 0;
+  line-height: 1.2;
+}
+
+.title-right-top, .title-left  {
+  font-size: 16px;
+  font-weight: 200;
 }
 
 .title-left {
-  font-size: 20px;
-  font-weight: 400;
+  align-self: flex-end;
+  padding-bottom: 5px;
 }
 
 .main-table {
@@ -140,15 +147,6 @@ body {
   font-family: "Roboto Mono";
   font-size: 12px;
   table-layout: fixed;
-}
-
-.header {
-  display:flex;
-  justify-content: space-between;
-}
-
-.header-right {
-  padding-bottom: 10px;
 }
 
 .footer {
@@ -194,20 +192,20 @@ td {
   border-left: 1px solid var(--black);
 }
 
-td:nth-child(1),
-td:nth-child(2),
-td:nth-child(3),
-td:nth-child(5),
-td:nth-child(10),
-td:nth-child(11) {
-  width: 40px;
+tr:nth-child(3) > td:nth-child(1),
+tr:nth-child(3) > td:nth-child(2),
+tr:nth-child(3) > td:nth-child(3),
+tr:nth-child(3) > td:nth-child(5),
+tr:nth-child(3) > td:nth-child(10),
+tr:nth-child(3) > td:nth-child(11) {
+  width: 45px;
 }
 
-td:nth-child(4),
-td:nth-child(7),
-td:nth-child(8),
-td:nth-child(9) {
-  width: 60px;
+tr:nth-child(3) > td:nth-child(4),
+tr:nth-child(3) > td:nth-child(7),
+tr:nth-child(3) > td:nth-child(8),
+tr:nth-child(3) > td:nth-child(9) {
+  width: 80px;
 }
 
 tr > td[rowspan="8"] {

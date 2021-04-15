@@ -5,27 +5,28 @@
     <link rel='stylesheet' href='report.css'>
   </head>
   <body>
-    <div class='header'>
-      <div class='header-left'>
-        $LOGO$
-      </div>
-      <div class='header-right'>
-        $FECHA$
-      </div>
-    </div>
     <div class='container'>
-      <div class='title'>
-        <div class='title-left'>
-          Linea $LINEA$ - 
-          $FLOTA$
-        </div>
-        <div class='title-right'>
-          Formación $FORMACION$
-        </div>
-      </div>
       <table class='main-table'>
-        $HEADERS$
-        $DATA$
+        <caption>
+          <div class='title'>
+            <div class='title-left'>
+              $FECHA$
+            </div>
+            <div class='fleet-wrapper'>
+              <div class='title-right-top'>
+                Linea $LINEA$ - 
+                $FLOTA$
+              </div>
+              <div class='title-right-bot'>
+                Formación $FORMACION$
+              </div>
+            </div>
+          </div>
+        </caption>
+        <tbody>
+          $HEADERS$
+          $DATA$
+        </tbody>
       </table>
       <div class='footer'>
         <ul>
