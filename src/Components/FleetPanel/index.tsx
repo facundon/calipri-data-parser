@@ -45,7 +45,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     }
     return newLastId.toString()
   }
-  
+
   useEffect(() => {
     if (isFleetPanelOpen) {
       const loadProfiles = async() => {
@@ -59,7 +59,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
             const nextProfiles = fleet.profiles.filter(profile => profiles.includes(profile))
             posibleFleets.push({ ...fleet, profiles: nextProfiles })
           })
-          setFleets(posibleFleets)
+          setFleets([...posibleFleets])
           // TODO: need to save here without crashing
         } else {
           Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
@@ -99,14 +99,14 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         }
       }
     })
-    setFleets(nextFleets)
+    setFleets([...nextFleets])
   }
 
   const handleRemoveFleet = (fleetId: string) => {
     const nextFleets: Fleet[] = Object.assign([], fleets)
     const fleetIndex = nextFleets.findIndex(fleet => fleet.id === fleetId)
     nextFleets.splice(fleetIndex, 1)
-    setFleets(nextFleets)
+    setFleets([...nextFleets])
   }
 
   const handleAddFleet = () => {
@@ -124,7 +124,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
       }
       const nextFleets = Object.assign([], fleets)
       nextFleets.push(newFleet)
-      setFleets(nextFleets)
+      setFleets([...nextFleets])
       reset()
     } else {
       setEditing(prev => !prev)

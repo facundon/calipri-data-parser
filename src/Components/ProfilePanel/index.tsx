@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-use-before-define
 import React, { useState, useEffect } from "react"
 import Modal from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
@@ -147,9 +146,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     if (isProfilePanelOpen) {
       setLoading(true)
       const loadFleets = async() => { 
-        const nextData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
-        if (nextData) {
-          setActiveData(nextData)
+        const loadedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
+        if (loadedData) {
+          setActiveData([...loadedData])
         } else {
           Alert.error(`No se pudo cargar la configuración del perfil ${activeProfile}`, 7000)
           return null
@@ -158,7 +157,8 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
         if (loadedFleets) {
           const activeFleets = loadedFleets.filter(fleet => fleet.profiles.includes(activeProfile))
           activeFleets.length === 0 &&
-            Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000) 
+            Alert.warning(`No se encontraron flotas asociadas al perfil ${activeProfile}. Asignelas desde el panel de Flotas`, 10000)
+          const nextData: Dimension[] = Object.assign([], loadedData)
           nextData.forEach((dim, index) => {
             if (ITEMS_WITH_FLEET.includes(dim.name)) {
               const childFleet: Dimension[] = activeFleets.map((fleet, fleetIndex) => {
@@ -180,8 +180,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
               nextData[index].children = childFleet
             }
           })
-          setActiveData(nextData)
+          setActiveData([...loadedData])
           // TODO: need to save data here without crashing 
+          // save(activeProfile, getActiveDataWithoutParent(), "perfiles")
         }
       }
       loadFleets()
@@ -219,7 +220,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           nextData[parentIndex].children[itemIndex].minVal = "-"
         }
       }
-      setActiveData(nextData)
+      setActiveData([...nextData])
       break
     }
     case "add": {
@@ -256,14 +257,14 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       nextData[parentIndex].children[activeIndex].maxVal = null
       nextData[parentIndex].children[activeIndex].minVal = null
     }
-    setActiveData(nextData)
+    setActiveData([...nextData])
     setActiveItem(activeData[0])
   }
 
   const handleEditValue = (id: string, key: DataKey, value: string) => {
     const [activeItem, nextData] = findActiveItem(id)
     activeItem[key] = !value ? "-" : normalize(value)
-    setActiveData(nextData)
+    setActiveData([...nextData])
   }
 
   const handleEditState = (id: string, discard: boolean, unchangedValues: EditableValues) => {
@@ -273,7 +274,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       activeItem!.minVal = unchangedValues.minVal
     }
     activeItem!.status = activeItem!.status ? null : "EDIT"
-    setActiveData(nextData)
+    setActiveData([...nextData])
   }
 
   const handleAddProfile = async(profileName: string) => {
