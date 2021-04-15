@@ -36,7 +36,7 @@ const prepareData = (evaluatedData, header) => {
       allReferences.forEach(item => {
         let refObj = {}
         item.forEach(item => {
-          refObj[Object.keys(item)[0]] = Object.values(item)[0].trim()
+          refObj[Object.keys(item)[0]] = Object.values(item)[0]
         })
         orderedRefs = refObj
       })
@@ -44,7 +44,7 @@ const prepareData = (evaluatedData, header) => {
       orderedRefs = allReferences.reduce((prev, current) => {
         let refObj = {}
         current.forEach((item, index) => {
-          refObj[Object.keys(item)[0]] =  (Object.values(prev[index]) + " " + Object.values(item))
+          refObj[Object.keys(item)[0]] =  (Object.values(prev[index]) + " " + Object.values(item)).trim()
         })
         return refObj
       })

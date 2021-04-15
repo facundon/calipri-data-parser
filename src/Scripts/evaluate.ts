@@ -175,6 +175,9 @@ const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profi
   const evaluateItem = (dimension: any, subItem: any) => {
     let damnation = false
     let reference: any = profilesReferences[dimension!.profile][subItem]
+    if (!reference) {
+      Alert.error(`No se encontro referencia para "${subItem}" en el perfil ${dimension!.profile}`)
+    }
     const refType: string | null = getVehicleTypeByFleet(dimension?.vehicle!, fleet, loadedFleets)
     reference = checkSubItems(reference, refType, dimension!.profile, subItem)
     if (dimension!.value > reference) {

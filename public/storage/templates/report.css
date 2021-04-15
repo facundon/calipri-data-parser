@@ -200,14 +200,14 @@ td:nth-child(3),
 td:nth-child(5),
 td:nth-child(10),
 td:nth-child(11) {
-  width: 20px;
+  width: 40px;
 }
 
 td:nth-child(4),
 td:nth-child(7),
 td:nth-child(8),
 td:nth-child(9) {
-  width: 40px;
+  width: 60px;
 }
 
 tr > td[rowspan="8"] {
