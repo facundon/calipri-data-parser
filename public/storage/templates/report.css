@@ -107,6 +107,7 @@
 
 body {
   font-family: Roboto, Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 12px;
 }
 
 .container {
@@ -118,7 +119,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
   padding: 5px 15px;
   background-color: darkslateblue;
@@ -130,7 +131,7 @@ body {
 }
 
 .title-right-top, .title-left  {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 200;
 }
 
@@ -145,13 +146,17 @@ body {
   border: 2.5px solid var(--black);
   outline-style: none;
   font-family: "Roboto Mono";
-  font-size: 12px;
+  font-size: 10px;
   table-layout: fixed;
 }
 
 .footer {
   display: flex;
   justify-content: space-between;
+}
+
+.esquema {
+  margin-top: 10px;
 }
 
 .damned {
@@ -164,7 +169,7 @@ body {
 .references {
   font-weight: 400;
   font-style: italic;
-  font-size: 10px;
+  font-size: 8px;
   padding-bottom: 4px;
 }
 th { 
@@ -182,6 +187,9 @@ td {
   border-left: none;
 }
 
+th > span {
+  font-weight: 200;
+}
 .references-row {
   box-shadow: 0 2px 2px -1px grey;
   border-bottom: none !important;
@@ -198,14 +206,22 @@ tr:nth-child(3) > td:nth-child(3),
 tr:nth-child(3) > td:nth-child(5),
 tr:nth-child(3) > td:nth-child(10),
 tr:nth-child(3) > td:nth-child(11) {
-  width: 45px;
+  width: 40px;
+}
+
+tr:nth-child(3) > td:nth-child(6) {
+  width: 100px;
 }
 
 tr:nth-child(3) > td:nth-child(4),
 tr:nth-child(3) > td:nth-child(7),
 tr:nth-child(3) > td:nth-child(8),
 tr:nth-child(3) > td:nth-child(9) {
-  width: 80px;
+  width: 120px;
+}
+
+tr:first-child > th:nth-child(10) {
+  width: 65px;
 }
 
 tr > td[rowspan="8"] {
@@ -228,4 +244,52 @@ tr [rowspan="4"]:nth-child(odd),
 tr:nth-child(8n + 8) + tr [rowspan="2"],
 tr:nth-child(8n + 2){
   border-bottom: 2.5px solid var(--black);
+}
+
+
+/* SCHEMA STYLE */
+
+.coche {
+  background-color: white;
+  border: 1px solid var(--black);
+  width: 1500px;
+  height: 65px;
+  display: flex;
+  justify-content: space-around;
+  margin: 0 5px;
+}
+
+.formacion, .bogie{
+  display: flex;
+}
+
+.eje-1 {
+  display: inline-flex;
+  justify-content: space-between;
+  flex-direction: column;
+  box-shadow: 37px 0 0 -12px var(--black);
+}
+
+.eje-2 {
+  display: inline-flex;
+  justify-content: space-between;
+  flex-direction: column;
+  margin-left: 10px;
+  box-shadow: -37px 0 0 -12px var(--black);
+}
+
+.rueda {
+  width: 25px;
+  height: 10px;
+  background-color: white;
+  border: 1px solid var(--black);
+  text-align: center;
+  font-size: 10px;
+  padding: 2px 0;
+  z-index: 1;
+}
+
+[condenada] {
+  background-color: var(--red);
+  color: white;
 }

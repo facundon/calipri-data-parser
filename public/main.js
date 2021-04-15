@@ -56,7 +56,7 @@ ipcMain.handle("save", async(_, name, data, folder) => {
     fs.mkdirSync(dir, { recursive: true })
   }
   try {
-    const err = await fsp.writeFile(path.join(dir, name), data, {encoding: null})
+    const err = await fsp.writeFile(path.join(dir, name), data)
     return !err
   } catch (error) {
     return false

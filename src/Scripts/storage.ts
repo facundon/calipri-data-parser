@@ -29,7 +29,11 @@ interface IGetFiles {
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
-  const success = await window.electron.storage.save(`${name.toLowerCase()}${extension}`, JSON.stringify(data), folder)
+  let dataToSave = data
+  if (extension === ".json") {
+    dataToSave = JSON.stringify(data)
+  }
+  const success = await window.electron.storage.save(`${name.toLowerCase()}${extension}`, dataToSave, folder)
   return success
 }
 

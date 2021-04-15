@@ -1,7 +1,27 @@
-const prepareData = (evaluatedData, header) => {
+const prepareData = (evaluatedData, header, vehicleSchema) => {
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
+
   const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
     .filter((profile, index, arr) => index === arr.indexOf(profile))
+
+  const getVehicleSchema = () => {
+    let schema = ""
+    evaluatedData.substractions.vehicle.forEach(_ => {
+      schema += vehicleSchema
+    })
+    for (let wheelIndex = 1; wheelIndex <= evaluatedData.wheels.length ; wheelIndex++) {
+      let auxIndex
+      if (wheelIndex % 2 === 0) {
+        auxIndex = wheelIndex - 1
+      } else {
+        auxIndex = wheelIndex + 1
+      }
+      const isDamn = evaluatedData.wheels[auxIndex-1].damnation.length
+      schema = schema.replace("$NRO$", auxIndex)
+      schema = schema.replace("$CONDENADA$", isDamn ? "condenada" : "")
+    }
+    return `<div class=formacion>${schema}</div>`
+  }
 
   const getOrderedRefValues = () => {
     let allReferences = []
@@ -44,7 +64,7 @@ const prepareData = (evaluatedData, header) => {
       orderedRefs = allReferences.reduce((prev, current) => {
         let refObj = {}
         current.forEach((item, index) => {
-          refObj[Object.keys(item)[0]] =  (Object.values(prev[index]) + " " + Object.values(item)).trim()
+          refObj[Object.keys(item)[0]] = `<div>${Object.values(prev[index])}</div><div>${Object.values(item)}</div>`
         })
         return refObj
       })
@@ -140,7 +160,7 @@ const prepareData = (evaluatedData, header) => {
     reorderedHeaders.forEach((item, index) => {
       let noSubHeader = false
       if (index == 0 || index == 1 || index == 2 || index == 4 || index == 9 || index == 10) noSubHeader = true
-      noSubHeader ? data += `<th rowspan=2>${item}</th>` : data += `<th>${item}</th>`
+      noSubHeader ? data += `<th rowspan=2>${item}</th>` : data += `<th>${item}<span> [mm]</span></th>`
     })
     data = `<tr>${data}</tr>`
     let subData = ""
@@ -163,6 +183,7 @@ const prepareData = (evaluatedData, header) => {
     PERFILES: findProfiles(),
     HEADERS: getHeaders(),
     DATA: getTable(),
+    ESQUEMA: getVehicleSchema(),
   })
 }
 

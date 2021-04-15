@@ -44,8 +44,9 @@ class App extends Component<IProps, IState> {
     this.setState({ isPrinting: true })
     const evaluatedData = await evaluate(this.state.parsedData)
     if (evaluatedData) {
-      const preparedData = prepareData(evaluatedData, this.state.parsedData.header)
-      const loadedHtml: string = await load("report", "templates",".html")
+      const vehicleSchema: string = await load("esquema", "templates", ".html")
+      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema)
+      const loadedHtml: string = await load("report", "templates", ".html")
       let replacedHtml = loadedHtml
       forIn(preparedData, (val, key) => {
         replacedHtml = replace(replacedHtml, `$${key}$`, val)
