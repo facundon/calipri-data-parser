@@ -7,13 +7,14 @@ import Dropdown from "rsuite/lib/Dropdown"
 import Icon from "rsuite/lib/Icon"
 import { IParsedData } from "./Components/DragLoader/types"
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
-import { load, save } from "./Scripts/storage"
+import { load, save, printPdf } from "./Scripts/storage"
 import { forIn, replace } from "lodash"
 
 import "./rsuite-default.css"
 import "./globalStyles/index.scss"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
+import Alert from "rsuite/lib/Alert"
 
 interface IProps {
 }
@@ -52,7 +53,8 @@ class App extends Component<IProps, IState> {
         replacedHtml = replace(replacedHtml, `$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
-      await save("test", replacedHtml, "templates", ".html")
+      const success = await printPdf(replacedHtml, "test")
+      success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte", 10000)
     }   
     this.setState({ isPrinting: false })
   }

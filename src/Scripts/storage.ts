@@ -1,5 +1,3 @@
-import { Dimension } from "../Components/ProfilePanel/template"
-
 declare global {
   interface Window { 
     electron: {
@@ -8,6 +6,7 @@ declare global {
         load: (name: string, folder: string) => Promise<BufferSource | false>
         delete: (name: string, folder: string) =>Promise<boolean>
         getFiles: (folder: string) => Promise<string[]>
+        createPdf: (html: string, name: string) => Promise<boolean>
       }
     }
   }
@@ -26,6 +25,10 @@ interface IDelete {
 }
 interface IGetFiles {
   (folder?: string) : Promise<string[]>
+}
+
+interface ICreatePdf {
+  (html: string, name: string): Promise<boolean>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
@@ -55,4 +58,9 @@ export const deleteFile: IDelete = async(name, folder = "", extension = ".json")
 export const getFiles: IGetFiles = async(folder = "") => {
   const data = await window.electron.storage.getFiles(folder)
   return data
+}
+
+export const printPdf: ICreatePdf = async(html, name) => {
+  const success = await window.electron.storage.createPdf(html, name)
+  return success
 }

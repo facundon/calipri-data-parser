@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain } = require("electron")
 const path = require("path")
 const fs = require("fs")
 const fsp = require("fs").promises
+const url = require("url")
+const puppeteer = require("puppeteer")
 
 function getRelativePath(folder) {
   return path.join(__dirname, "storage", folder)
@@ -94,6 +96,27 @@ ipcMain.handle("getFiles", async(_, folder) => {
     return []
   }
 })
+
+ipcMain.handle("createPdf", async(_, html, name) => 
+  new Promise(resolve => {
+    try {
+      puppeteer.launch().then(async browser => {
+        let page = await browser.newPage()
+        await page.setContent(html, { waitUntil: ["networkidle2"] }) // <= here you should pass the second argument
+        await page.addStyleTag({path: getRelativePath("templates/report.css")})
+        await page.pdf({
+          path: `${name}.pdf`,
+          format: "A4",
+        })
+        browser.close()
+        resolve(true)
+      })
+    } catch (error) {
+      console.log(error)
+      resolve(false)
+    }
+  })
+)
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
