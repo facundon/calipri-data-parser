@@ -99,22 +99,23 @@ ipcMain.handle("getFiles", async(_, folder) => {
 
 ipcMain.handle("createPdf", async(_, html, name) => 
   new Promise(resolve => {
-    try {
-      puppeteer.launch().then(async browser => {
-        let page = await browser.newPage()
+    puppeteer.launch().then(async browser => {
+      let page = await browser.newPage()
+      try {
         await page.setContent(html, { waitUntil: ["networkidle2"] }) // <= here you should pass the second argument
         await page.addStyleTag({path: getRelativePath("templates/report.css")})
         await page.pdf({
           path: `${name}.pdf`,
           format: "A4",
+          preferCSSPageSize: true,
         })
         browser.close()
         resolve(true)
-      })
-    } catch (error) {
-      console.log(error)
-      resolve(false)
-    }
+      } catch (error) {
+        console.log(error)
+        resolve(false)
+      }
+    })
   })
 )
 

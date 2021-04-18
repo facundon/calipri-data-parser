@@ -50,11 +50,11 @@ class App extends Component<IProps, IState> {
       const loadedHtml: string = await load("report", "templates", ".html")
       let replacedHtml = loadedHtml
       forIn(preparedData, (val, key) => {
-        replacedHtml = replace(replacedHtml, `$${key}$`, val)
+        replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
       const success = await printPdf(replacedHtml, "test")
-      success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte", 10000)
+      success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte.", 10000)
     }   
     this.setState({ isPrinting: false })
   }
