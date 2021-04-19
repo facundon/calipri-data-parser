@@ -8,7 +8,7 @@ import Divider from "rsuite/lib/Divider"
 import InputPicker from "rsuite/lib/InputPicker"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
-import { InputWithButtons } from "../EditCell"
+import { InputWithButtons } from "../EditNumberCell"
 import { Dimension } from "../ProfilePanel/template"
 
 import "./styles/index.scss"

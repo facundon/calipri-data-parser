@@ -6,7 +6,7 @@ import Nav from "rsuite/lib/Nav"
 import Table from "rsuite/lib/Table"
 import InputModal from "../InputModal"
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
-import EditCell, { DataKey } from "../EditCell"
+import EditNumberCell, { DataKey } from "../EditNumberCell"
 import ManageCell from "../ManageCell"
 import confirmService from "../confirmService/index"
 import AddItemModal from "../AddItemModal"
@@ -270,8 +270,8 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const handleEditState = (id: string, discard: boolean, unchangedValues: EditableValues) => {
     const [activeItem, nextData] = findActiveItem(id)
     if (discard) {
-      activeItem!.maxVal = unchangedValues.maxVal
-      activeItem!.minVal = unchangedValues.minVal
+      activeItem!.maxVal = unchangedValues.maxVal!
+      activeItem!.minVal = unchangedValues.minVal!
     }
     activeItem!.status = activeItem!.status ? null : "EDIT"
     setActiveData([...nextData])
@@ -388,11 +388,11 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           </Column>
           <Column flexGrow={2} align="center">
             <HeaderCell>Mínimo</HeaderCell>
-            <EditCell dataKey="minVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
+            <EditNumberCell dataKey="minVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
           </Column>
           <Column flexGrow={2} align="center">
             <HeaderCell>Máximo</HeaderCell>
-            <EditCell dataKey="maxVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
+            <EditNumberCell dataKey="maxVal" onChange={handleEditValue} onPressEnter={handleEditState}/>
           </Column>
           <Column width={120} align="center" fixed="right">
             <HeaderCell>Editar</HeaderCell>

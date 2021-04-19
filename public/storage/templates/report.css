@@ -209,9 +209,11 @@ tr:nth-child(8n + 2){
   justify-content: center;
 }
 
-.wrapper {
-  display: flex;
-  justify-content: center;
+.esquema p {
+  align-self: center;
+  padding: 0 5px;
+  font-style: italic;
+  font-weight: 600;
 }
 
 .estaciones {
@@ -220,6 +222,10 @@ tr:nth-child(8n + 2){
 }
 
 /* SCHEMA STYLE */
+
+.formacion {
+  justify-content: center;
+}
 
 .coche {
   background-color: white;

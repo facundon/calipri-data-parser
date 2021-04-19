@@ -1,15 +1,12 @@
 .table-content-editing {
-  .rs-table-cell-content {
-    padding: 3.5px 10px;
-  }
-}
-
-.input-number-with-buttons {
-  input {
-    text-align: center;
-  }
-
-  .rs-input-number-btn-group-vertical {
-    display: none;
+  .rs{
+    &-table-cell-content {
+      padding: 3.5px 10px;
+      .rs-input {
+        margin: 0 !important;
+        width: 220px !important;
+        padding: 7px 11px !important;
+      }
+    }
   }
 }

@@ -6,8 +6,10 @@ const prepareData = (evaluatedData, header, vehicleSchema) => {
 
   const getVehicleSchema = () => {
     let schema = ""
-    evaluatedData.substractions.vehicle.forEach(_ => {
+    let vehiclesAmount = 0
+    evaluatedData.substractions.vehicle.forEach((_, index) => {
       schema += vehicleSchema
+      vehiclesAmount = index
     })
     for (let wheelIndex = 1; wheelIndex <= evaluatedData.wheels.length ; wheelIndex++) {
       let auxIndex
@@ -20,7 +22,16 @@ const prepareData = (evaluatedData, header, vehicleSchema) => {
       schema = schema.replace("$NRO$", auxIndex)
       schema = schema.replace("$CONDENADA$", isDamn ? "condenada" : "")
     }
-    return `<div class=formacion>${schema}</div>`
+    const headStation = "prueba"
+    const anotherRowStations = `<div class="estaciones"><p>${headStation}</p><p>${headStation}</p></div>`
+    return (
+      `<div class=formacion>
+        <p>${vehiclesAmount < 5 ? headStation : ""}</p>
+        ${schema}
+        <p>${vehiclesAmount < 5 ? headStation : ""}</p>
+      </div>
+      ${vehiclesAmount >= 5 ? anotherRowStations : ""}`
+    )
   }
 
   const getOrderedRefValues = () => {

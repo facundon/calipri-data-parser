@@ -6,25 +6,44 @@ import Table from "rsuite/lib/Table"
 import Divider from "rsuite/lib/Divider"
 import { Dimension } from "../ProfilePanel/template"
 import { DataKey } from "../EditCell"
+import { Line } from "../StationPanel/template" 
 
 export type EditableValues = {
-  maxVal: number | null | "-",
-  minVal: number | null | "-"
+  maxVal?: number | null | "-",
+  minVal?: number | null | "-"
+ } & {
+   station1?: string,
+   station2?: string
  }
 
-const ActionEditCell: React.ElementType = ({ rowData, dataKey, onClick, ...props }: {rowData: Dimension, dataKey: DataKey, onClick: any}) => {
+const ActionEditCell: React.ElementType = ({ 
+  rowData,
+  dataKey,
+  onClick,
+  station = false,
+  ...props 
+}: {
+  rowData: Dimension & Line,
+  dataKey: DataKey,
+  onClick: any,
+  station?: boolean
+}) => {
   const { Cell } = Table
   const [unchangedValues, setUnchangedValues] = useState<EditableValues>()
   const editing = rowData!.status === "EDIT"
   const editable = rowData.children?.length === 0
 
   const handleAction = (discard: boolean) => {
-    setUnchangedValues({ minVal: rowData.minVal, maxVal: rowData.maxVal })
+    if (station) {
+      setUnchangedValues({station1: rowData.station1, station2: rowData.station2})
+    } else {
+      setUnchangedValues({ minVal: rowData.minVal, maxVal: rowData.maxVal })
+    }
     onClick && onClick(rowData!.id, discard, unchangedValues)
   }
 
   return (
-    editable
+    editable || station
       ? <Cell {...props} className="link-group" style={{ padding: "8px 0" }}>
         <IconButton
           appearance="ghost"

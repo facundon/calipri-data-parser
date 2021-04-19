@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 
-import { ProfilePanel, DragLoader, FleetPanel } from "./Components"
+import { ProfilePanel, DragLoader, FleetPanel, StationPanel } from "./Components"
 import Button from "rsuite/lib/Button"
 import ButtonGroup from "rsuite/lib/ButtonGroup"
 import Dropdown from "rsuite/lib/Dropdown"
@@ -24,7 +24,7 @@ interface IState {
   isPrinting: boolean,
   isProfilePanelOpen: boolean,
   isFleetConfigOpen: boolean,
-  isTerminalConfigOpen: boolean,
+  isStationConfigOpen: boolean,
   parsedData: IParsedData
 }
 
@@ -36,7 +36,7 @@ class App extends Component<IProps, IState> {
       isPrinting: false,
       isProfilePanelOpen: false,
       isFleetConfigOpen: false,
-      isTerminalConfigOpen: false,
+      isStationConfigOpen: false,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
   }
@@ -53,6 +53,7 @@ class App extends Component<IProps, IState> {
         replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
+      // await save("test", replacedHtml, "templates", ".html")
       const success = await printPdf(replacedHtml, "test")
       success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte.", 10000)
     }   
@@ -95,7 +96,7 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
-              <Dropdown.Item onSelect={() => this.setState({ isTerminalConfigOpen: true })}>
+              <Dropdown.Item onSelect={() => this.setState({ isStationConfigOpen: true })}>
                 <Icon icon="map-marker" size="lg" />
                 Cabeceras
               </Dropdown.Item>
@@ -118,6 +119,10 @@ class App extends Component<IProps, IState> {
         <FleetPanel
           fleetPanelHandler={val => this.setState({ isFleetConfigOpen: val })}
           isFleetPanelOpen={this.state.isFleetConfigOpen}
+        />
+        <StationPanel 
+          stationPanelHandler={val => this.setState({ isStationConfigOpen: val })}
+          isStationPanelOpen={this.state.isStationConfigOpen}
         />
       </div>
     )
