@@ -15,6 +15,7 @@ import "./globalStyles/index.scss"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
 import Alert from "rsuite/lib/Alert"
+import { Line } from "./Components/StationPanel/template"
 
 interface IProps {
 }
@@ -42,12 +43,33 @@ class App extends Component<IProps, IState> {
   }
 
   handlePrintPDF = async() => {
+    const findStations = async() => {
+      const lines: Line[] = await load("lineas", undefined)
+      if (lines){
+        const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
+        if (!line) {
+          Alert.error("No se encontro el parámetro 'Linea' en los datos de la medición", 10000)  
+          return null
+        }
+        return [line.station1, line.station2]
+      } else {
+        Alert.error("No se pudieron cargar las cabeceras", 10000)
+        return null
+      }
+    }
+
     this.setState({ isPrinting: true })
     const evaluatedData = await evaluate(this.state.parsedData)
     if (evaluatedData) {
       const vehicleSchema: string = await load("esquema", "templates", ".html")
-      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema)
+      const stations = await findStations()
+      if (!stations) return
+      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations)
       const loadedHtml: string = await load("report", "templates", ".html")
+      if (!loadedHtml) {
+        Alert.error("No se pudo cargar la plantilla para imprimri", 10000)
+        return
+      }
       let replacedHtml = loadedHtml
       forIn(preparedData, (val, key) => {
         replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)

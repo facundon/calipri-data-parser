@@ -219,7 +219,7 @@ const evaluate: IEvaluate = async(parsedData) => {
   const profilesInWheels = wheels.map(wheel => wheel.profile).filter((profile, index, arr) => arr.indexOf(profile) === index)
   const fleetObject = header.find(item => Object.keys(item)[0] === "Flota")
   if (!fleetObject) {
-    Alert.error("No se encontro el parámetro 'Flota' en los datos de la medición", 7000)
+    Alert.error("No se encontro el parámetro 'Flota' en los datos de la medición", 10000)
     return null
   }
   const fleet = Object.values(fleetObject)[0]

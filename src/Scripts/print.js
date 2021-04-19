@@ -1,4 +1,4 @@
-const prepareData = (evaluatedData, header, vehicleSchema) => {
+const prepareData = (evaluatedData, header, vehicleSchema, stations) => {
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
 
   const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
@@ -22,13 +22,12 @@ const prepareData = (evaluatedData, header, vehicleSchema) => {
       schema = schema.replace("$NRO$", auxIndex)
       schema = schema.replace("$CONDENADA$", isDamn ? "condenada" : "")
     }
-    const headStation = "prueba"
-    const anotherRowStations = `<div class="estaciones"><p>${headStation}</p><p>${headStation}</p></div>`
+    const anotherRowStations = `<div class="estaciones"><p>${stations[0]}</p><p>${stations[1]}</p></div>`
     return (
       `<div class=formacion>
-        <p>${vehiclesAmount < 5 ? headStation : ""}</p>
+        <p>${vehiclesAmount < 5 ? stations[0] : ""}</p>
         ${schema}
-        <p>${vehiclesAmount < 5 ? headStation : ""}</p>
+        <p>${vehiclesAmount < 5 ? stations[1] : ""}</p>
       </div>
       ${vehiclesAmount >= 5 ? anotherRowStations : ""}`
     )
@@ -190,7 +189,6 @@ const prepareData = (evaluatedData, header, vehicleSchema) => {
     LINEA: findInHeader("Linea"),
     FORMACION: findInHeader("Formacion"),
     FECHA: findInHeader("Fecha"),
-    CABECERA: "",
     PERFILES: findProfiles(),
     HEADERS: getHeaders(),
     DATA: getTable(),

@@ -180,7 +180,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           rowKey="id"
           data={fleets}
           loading={loading}
-          autoHeight
+          height={370}
           renderEmpty={() => 
             <div className="no-data-found-wrapper">
               <Icon icon="close-circle" size="5x" /> 

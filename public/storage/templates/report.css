@@ -114,6 +114,7 @@ body {
 .footer {
   display: flex;
   justify-content: space-between;
+  font-size: 10px;
 }
 
 .damned {
@@ -214,6 +215,15 @@ tr:nth-child(8n + 2){
   padding: 0 5px;
   font-style: italic;
   font-weight: 600;
+  width: 80px;
+}
+
+.esquema p:first-child {
+  text-align: right;
+}
+
+.esquema p:last-child {
+  text-align: left;
 }
 
 .estaciones {
@@ -230,7 +240,7 @@ tr:nth-child(8n + 2){
 .coche {
   background-color: white;
   border: 1px solid var(--black);
-  width: 120px;
+  width: 130px;
   height: 65px;
   display: flex;
   justify-content: space-around;
