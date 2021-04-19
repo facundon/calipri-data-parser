@@ -13,7 +13,7 @@ import { isEqual } from "lodash"
 import confirmService from "../confirmService"
 import ManageCell from "../ManageCell"
 import AvatarCell from "../AvatarCell"
-import EditCell from "../EditCell"
+import EditCell, { DataKey } from "../EditCell"
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
 
 import { save, load, getFiles } from "../../Scripts/storage"
@@ -143,7 +143,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
 
   const handleEditValue = (id: string, key: DataKey, value: string) => {
     const nextLines = Object.assign([], lines)
-    const activeLine = lines.find(line => line.id === id)
+    const activeLine: Line = lines.find(line => line.id === id)!
     if (!value) {
       
     }
