@@ -63,11 +63,12 @@ class App extends Component<IProps, IState> {
     if (evaluatedData) {
       const vehicleSchema: string = await load("esquema", "templates", ".html")
       const stations = await findStations()
+      const ers = await load("ers")
       if (!stations) return
-      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations)
+      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations, ers)
       const loadedHtml: string = await load("report", "templates", ".html")
       if (!loadedHtml) {
-        Alert.error("No se pudo cargar la plantilla para imprimri", 10000)
+        Alert.error("No se pudo cargar la plantilla para crear PDF", 10000)
         return
       }
       let replacedHtml = loadedHtml

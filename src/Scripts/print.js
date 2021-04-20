@@ -1,4 +1,4 @@
-const prepareData = (evaluatedData, header, vehicleSchema, stations) => {
+const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
 
   const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
@@ -86,7 +86,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations) => {
     const profiles = getProfiles()
     let message = ""
     profiles.forEach(profile => {
-      message += `Ruedas con perfil <strong>${profile}</strong> evaluadas según <strong>$ER$</strong>`
+      message += `<li>Ruedas con perfil <strong>${profile}</strong> evaluadas según <strong>${ers[profile]}</strong></li>`
     })
     return message
   }

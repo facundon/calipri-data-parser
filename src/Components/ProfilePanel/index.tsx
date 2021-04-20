@@ -161,7 +161,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       } else {
         await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
           Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
-        await save("perfiles", {[activeProfile]: activeEr})
+        await save("ers", {[activeProfile]: activeEr})
       }
       setLoading(false)
     }
@@ -222,7 +222,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       setLoading(true)
       const loadFleets = async() => { 
         const loadedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
-        const loadedErs: {[x: string]: string} = await load("perfiles")
+        const loadedErs: {[x: string]: string} = await load("ers")
         if (loadedData && loadedErs) {
           setActiveData([...loadedData])
           setActiveEr(loadedErs[activeProfile] || "Ingresar Especificación de Reparación")
@@ -397,9 +397,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     })
     if (confirm) {
       setLoading(true)
-      const loadedErs: {[x: string]: string} = await load("perfiles") 
+      const loadedErs: {[x: string]: string} = await load("ers") 
       loadedErs[activeProfile] = activeEr
-      const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER) && await save("perfiles", loadedErs)
+      const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER) && await save("ers", loadedErs)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
       profilePanelHandler(false)
@@ -409,7 +409,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const handleDiscard = async(event: React.SyntheticEvent | string) => {
     setLoading(true)
     const savedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
-    const ers: {[x: string]: string} = await load("perfiles")
+    const ers: {[x: string]: string} = await load("ers")
     setLoading(false)
     if (savedData && (!isEqual(savedData, getActiveDataWithoutParent()) || !isEqual(ers[activeProfile], activeEr))) {
       const confirm = await confirmService.show({
