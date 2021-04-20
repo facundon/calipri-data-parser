@@ -216,6 +216,7 @@ tr:nth-child(8n + 2){
   font-style: italic;
   font-weight: 600;
   width: 80px;
+  height: 5px;
 }
 
 .esquema p:first-child {

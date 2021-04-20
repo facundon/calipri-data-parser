@@ -25,9 +25,9 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations) => {
     const anotherRowStations = `<div class="estaciones"><p>${stations[0]}</p><p>${stations[1]}</p></div>`
     return (
       `<div class=formacion>
-        <p>${vehiclesAmount < 5 ? stations[0] : ""}</p>
+        ${vehiclesAmount < 5 ? `<p>${stations[0]}</p>` : ""}
         ${schema}
-        <p>${vehiclesAmount < 5 ? stations[1] : ""}</p>
+        ${vehiclesAmount < 5 ? `<p>${stations[1]}</p>` : ""}
       </div>
       ${vehiclesAmount >= 5 ? anotherRowStations : ""}`
     )

@@ -5,12 +5,18 @@ import Icon from "rsuite/lib/Icon"
 import Nav from "rsuite/lib/Nav"
 import Table from "rsuite/lib/Table"
 import InputModal from "../InputModal"
+import Tag from "rsuite/lib/Tag"
+import Whisper from "rsuite/lib/Whisper"
+import Tooltip from "rsuite/lib/Tooltip"
+import Input from "rsuite/lib/Input"
+import IconButton from "rsuite/lib/IconButton"
+import Alert from "rsuite/lib/Alert"
+
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
 import EditNumberCell, { DataKey } from "../EditNumberCell"
 import ManageCell from "../ManageCell"
 import confirmService from "../confirmService/index"
 import AddItemModal from "../AddItemModal"
-import Alert from "rsuite/lib/Alert"
 
 import { isEqual } from "lodash"
 import { normalize } from "../../Scripts/utils"
@@ -22,6 +28,7 @@ import { FLEET_FILE } from "../FleetPanel"
 import { Fleet } from "../FleetPanel/template"
 
 export const PROFILES_FOLDER = "perfiles"
+
 const ITEMS_WITH_FLEET = [
   "Diametro",
   "Dif. Diametro de Rueda - Mismo Eje",
@@ -30,6 +37,68 @@ const ITEMS_WITH_FLEET = [
   "Dif. Diametro de Rueda - Mismo Modulo",
 ]
 
+const EditableInput: React.ElementType = ({ handleSubmit, initValue }:
+   {
+     handleSubmit: (val: string) => void,
+     initValue: string,
+    }) => {
+  const [error, setError] = useState(false)
+  const [val, setVal] = useState(initValue)
+  const [editing, setEditing] = useState(false)
+
+  useEffect(() => {
+    setVal(initValue)
+  }, [initValue])
+
+  const handleSave = () => {
+    if (editing) {
+      if (!val){
+        setError(true)
+        return
+      }
+      handleSubmit(val)
+      setEditing(false)
+    } else {
+      setEditing(true)
+    }
+  }
+
+  return(
+    <div className="er-wrapper">
+      {editing
+        ? <Whisper
+          open={error}
+          trigger="none"
+          placement="bottomStart"
+          speaker={<Tooltip className="modal-form">Requerido</Tooltip>}
+        >
+          <Input
+            className="er-input"
+            style={{width: 200}}
+            onChange={str => {
+              setVal(str)
+              setError(false)
+            }}
+            onPressEnter={handleSave}
+            maxLength={50}
+            autoFocus
+            size="md"
+            placeholder="Especificación de Reparación"
+            defaultValue={val === "Ingresar Especificación de Reparación" ? undefined : val}
+          />
+        </Whisper>
+        : <Tag className="er-input-tag">{val}</Tag>}
+      <IconButton 
+        className="single-tag-button er-btn"
+        appearance={"link"}
+        color={"green"}
+        size={"sm"}
+        icon={<Icon icon={editing ? "check" : "edit"} />}
+        onClick={handleSave}
+      />
+    </div>
+  )
+}
 
 interface IProfilePanel {
   profilePanelHandler: (value: boolean) => void,
@@ -80,6 +149,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const [activeItem, setActiveItem] = useState<Dimension>(TEMPLATE[0])
   const [showAddItem, setShowAddItem] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
+  const [activeEr, setActiveEr] = useState("ER93-15 Rev.04")
 
   // load all profiles on folder to display names
   useEffect(() => {
@@ -91,6 +161,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       } else {
         await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
           Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
+        await save("perfiles", {[activeProfile]: activeEr})
       }
       setLoading(false)
     }
@@ -141,14 +212,20 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     })
   }
 
+  useEffect(() => {
+    
+  }, [activeEr])
+
   // get profile fleets & load profile data
   useEffect(() => {
     if (isProfilePanelOpen) {
       setLoading(true)
       const loadFleets = async() => { 
         const loadedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
-        if (loadedData) {
+        const loadedErs: {[x: string]: string} = await load("perfiles")
+        if (loadedData && loadedErs) {
           setActiveData([...loadedData])
+          setActiveEr(loadedErs[activeProfile] || "Ingresar Especificación de Reparación")
         } else {
           Alert.error(`No se pudo cargar la configuración del perfil ${activeProfile}`, 7000)
           return null
@@ -320,7 +397,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     })
     if (confirm) {
       setLoading(true)
-      const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER)
+      const loadedErs: {[x: string]: string} = await load("perfiles") 
+      loadedErs[activeProfile] = activeEr
+      const saved = await save(activeProfile, dataToSave, PROFILES_FOLDER) && await save("perfiles", loadedErs)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
       profilePanelHandler(false)
@@ -330,8 +409,9 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const handleDiscard = async(event: React.SyntheticEvent | string) => {
     setLoading(true)
     const savedData: Dimension[] = await load(activeProfile, PROFILES_FOLDER)
+    const ers: {[x: string]: string} = await load("perfiles")
     setLoading(false)
-    if (savedData && !isEqual(savedData, getActiveDataWithoutParent())) {
+    if (savedData && (!isEqual(savedData, getActiveDataWithoutParent()) || !isEqual(ers[activeProfile], activeEr))) {
       const confirm = await confirmService.show({
         message: `Seguro que desea descartar los cambios realizados al perfil ${activeProfile}?`,
         actionIcon: "trash2",
@@ -410,6 +490,10 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           <Icon icon="minus" size="lg"/>
           Eliminar Perfil
         </Button>
+        <EditableInput 
+          handleSubmit={(val: string) => setActiveEr(val)} 
+          initValue={activeEr}
+        />
         <Button onClick={handleSave} appearance="primary">
           <Icon icon="save" size="lg"/>
           Guardar

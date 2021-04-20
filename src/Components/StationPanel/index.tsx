@@ -112,7 +112,9 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     })
     if (confirm) {
       setLoading(true)
-      const saved = await save(LINE_FILE, lines)
+      const nextLines: Line[] = Object.assign([], lines)
+      lines.forEach((_, i) => nextLines[i].status = null)
+      const saved = await save(LINE_FILE, nextLines)
       setLoading(false)
       saved ? Alert.success("Cambios Guardados!", 7000) : Alert.error("No se pudieron guardar los cambios", 7000)
       stationPanelHandler(false)

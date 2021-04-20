@@ -56,6 +56,7 @@ const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }
             autoFocus
             size="xs"
             placeholder={ref || "R"}
+            defaultValue={ref}
           />
         </Whisper>
         : <Tag key={rowData.id} className="single-tag-tag">{rowData.reference}</Tag>
