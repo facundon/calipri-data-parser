@@ -8,6 +8,7 @@ import "./styles/index.scss"
 
 const AvatarCell: React.ElementType = ({ rowData, onClick, ...props }: {rowData: Line, onClick: (id: string) => void}) => {
   const { Cell } = Table
+
   return (
     <Cell 
       {...props}
@@ -15,9 +16,10 @@ const AvatarCell: React.ElementType = ({ rowData, onClick, ...props }: {rowData:
     >
       <Avatar
         circle
-        className={rowData.name}
         style={{backgroundColor: rowData.color}}
-        onClick={() => onClick && onClick(rowData.id)}
+        onClick={() => 
+          onClick && onClick(rowData.id)
+        }
       >
         {rowData.name}
       </Avatar>

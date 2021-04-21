@@ -76,7 +76,7 @@ class App extends Component<IProps, IState> {
         replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
-      // await save("test", replacedHtml, "templates", ".html")
+      await save("test", replacedHtml, "templates", ".html")
       const success = await printPdf(replacedHtml, "test")
       success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte.", 10000)
     }   

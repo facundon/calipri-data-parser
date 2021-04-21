@@ -170,6 +170,17 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     setLines([...nextLines])
   }
 
+  const handleOpenColor = (id: string) => {
+    setActiveId(id)
+    setColorOpen(prev => 
+      prev 
+        ? activeId !== id
+        : true
+    )
+    const activeLine = lines.find(line => line.id === id)!
+    setActiveColor(activeLine?.color)
+  }
+
   const handleColorChange = (color: string) => {
     const nextLines: Line[] = Object.assign([], lines)
     const activeLine = nextLines.find(line => line.id === activeId)!
@@ -204,12 +215,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
           </Column>
           <Column flexGrow={2} fixed align="center">
             <HeaderCell>Linea</HeaderCell>
-            <AvatarCell dataKey="name" className="parameter-cell" onClick={(id: string) => {
-              setActiveId(id)
-              setColorOpen(prev => !prev)
-              const activeLine = lines.find(line => line.id === id)!
-              setActiveColor(activeLine?.color)
-            }} />
+            <AvatarCell dataKey="name" className="parameter-cell" onClick={handleOpenColor} />
           </Column>
           <Column flexGrow={4}>
             <HeaderCell>Cabecera 1</HeaderCell>
