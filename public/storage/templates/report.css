@@ -83,7 +83,7 @@ body {
   font-size: 26px;
   font-weight: 600;
   padding: 5px 15px;
-  background-color: darkslateblue;
+  background-color: var(--bkgr-color);
   color: white;
   border: 2.5px solid var(--black);
   border-bottom: none;
@@ -114,7 +114,7 @@ body {
 .footer {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 8px;
 }
 
 .damned {

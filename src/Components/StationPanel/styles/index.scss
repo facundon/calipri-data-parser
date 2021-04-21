@@ -18,7 +18,30 @@
     }
   }
 
-  
+  .react-colorful {
+    display: inline-flex;
+    width: 522px;
+    padding-right: 30px;
+    height: 6px;
+    &__hue {
+      height: 10px;
+    }
+    &__hue-pointer {
+      width: 8px !important;  
+      height: 17px !important;
+      border-radius: 25% !important;
+    }
+    &__pointer {
+      border: 1px solid white;
+      width: 10px;
+      height: 10px;
+      border-radius: 25%;
+    }
+    &__saturation {
+      display: none
+    }
+  }
+
   .add-profile-wrapper {
     margin-top: 8px;
   }

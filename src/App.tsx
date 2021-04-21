@@ -44,14 +44,14 @@ class App extends Component<IProps, IState> {
 
   handlePrintPDF = async() => {
     const findStations = async() => {
-      const lines: Line[] = await load("lineas", undefined)
+      const lines: Line[] = await load("lineas")
       if (lines){
         const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
         if (!line) {
           Alert.error("No se encontro el parámetro 'Linea' en los datos de la medición", 10000)  
           return null
         }
-        return [line.station1, line.station2]
+        return [line.station1, line.station2, line.color]
       } else {
         Alert.error("No se pudieron cargar las cabeceras", 10000)
         return null

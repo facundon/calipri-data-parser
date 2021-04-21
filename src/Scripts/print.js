@@ -193,6 +193,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
     HEADERS: getHeaders(),
     DATA: getTable(),
     ESQUEMA: getVehicleSchema(),
+    COLOR: stations[2]
   })
 }
 

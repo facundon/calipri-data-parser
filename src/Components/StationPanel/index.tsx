@@ -10,6 +10,8 @@ import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
 
 import { isEqual } from "lodash"
+import { HexColorPicker } from "react-colorful"
+
 import confirmService from "../confirmService"
 import ManageCell from "../ManageCell"
 import AvatarCell from "../AvatarCell"
@@ -35,6 +37,9 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
   const [editing, setEditing] = useState<boolean>(false)
   const [newLineName, setNewLineName] = useState<string>("")
   const [error, setError] = useState<boolean>(false)
+  const [colorOpen, setColorOpen] = useState(false)
+  const [activeColor, setActiveColor] = useState("")
+  const [activeId, setActiveId] = useState("1")
 
   function getNewId() {
     const ids = lines.map(line => line.id)
@@ -71,6 +76,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     setError(false)
     setNewLineName("")
     setEditing(false)
+    setColorOpen(false)
   }
 
   const handleRemoveFleet = (fleetId: string) => {
@@ -92,7 +98,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
         name: newLineName,
         station1: "Cabecera 1",
         station2: "Cabecera 2",
-        color: "#" + Math.floor(Math.random()*16777215).toString(16),
+        color: "#00ffbb",
         status: null,
       }
       const nextLines = Object.assign([], lines)
@@ -164,6 +170,13 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     setLines([...nextLines])
   }
 
+  const handleColorChange = (color: string) => {
+    const nextLines: Line[] = Object.assign([], lines)
+    const activeLine = nextLines.find(line => line.id === activeId)!
+    setActiveColor(color)
+    activeLine.color = color
+  }
+
   return (
     <Modal size={"md"} show={isStationPanelOpen} className="config-form station-form">
       <Modal.Header closeButton={false}>
@@ -191,7 +204,12 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
           </Column>
           <Column flexGrow={2} fixed align="center">
             <HeaderCell>Linea</HeaderCell>
-            <AvatarCell dataKey="name" className="parameter-cell" />
+            <AvatarCell dataKey="name" className="parameter-cell" onClick={(id: string) => {
+              setActiveId(id)
+              setColorOpen(prev => !prev)
+              const activeLine = lines.find(line => line.id === id)!
+              setActiveColor(activeLine?.color)
+            }} />
           </Column>
           <Column flexGrow={4}>
             <HeaderCell>Cabecera 1</HeaderCell>
@@ -236,8 +254,13 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
           }
         </div>
       </Modal.Body>
-
       <Modal.Footer>
+        {colorOpen && 
+          <HexColorPicker
+            color={activeColor}
+            onChange={handleColorChange}
+          />
+        }
         <Button onClick={handleSave} appearance="primary">
           <Icon icon="save" size="lg"/>
           Guardar
