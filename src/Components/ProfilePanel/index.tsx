@@ -493,15 +493,16 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
         <EditableInput 
           handleSubmit={(val: string) => setActiveEr(val)} 
           initValue={activeEr}
-        />
-        <Button onClick={handleSave} appearance="primary">
-          <Icon icon="save" size="lg"/>
-          Guardar
-        </Button>
+        />  
         <Button onClick={handleDiscard} appearance="subtle">
           <Icon icon="trash-o" size="lg"/>
           Descartar
         </Button>
+        <Button onClick={handleSave} appearance="primary">
+          <Icon icon="save" size="lg"/>
+          Guardar
+        </Button>
+
       </Modal.Footer>
       <InputModal
         setShow={setshowRemoveProfile}

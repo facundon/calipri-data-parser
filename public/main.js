@@ -97,27 +97,33 @@ ipcMain.handle("getFiles", async(_, folder) => {
   }
 })
 
-ipcMain.handle("createPdf", async(_, html, name) => 
-  new Promise(resolve => {
-    puppeteer.launch().then(async browser => {
-      let page = await browser.newPage()
-      try {
-        await page.setContent(html, { waitUntil: ["networkidle2"] }) // <= here you should pass the second argument
-        await page.addStyleTag({path: getRelativePath("templates/report.css")})
-        await page.pdf({
-          path: `${name}.pdf`,
-          format: "A4",
-          preferCSSPageSize: true,
-        })
-        browser.close()
-        resolve(true)
-      } catch (error) {
-        console.log(error)
-        resolve(false)
-      }
+ipcMain.handle("createPdf", async(_, html, name) => {
+  const footer = await fsp.readFile(getRelativePath("templates/footer.html"), {encoding: "utf-8"})
+  if (!footer) return(new Promise(resolve => resolve(false)))
+  return(
+    new Promise(resolve => {
+      puppeteer.launch().then(async browser => {
+        let page = await browser.newPage()
+        try {
+          await page.setContent(html, { waitUntil: ["networkidle2"] })
+          await page.addStyleTag({path: getRelativePath("templates/report.css")})
+          await page.pdf({
+            path: `${name}.pdf`,
+            format: "A4",
+            preferCSSPageSize: true,
+            displayHeaderFooter: true,
+            footerTemplate: footer,
+          })
+          browser.close()
+          resolve(true)
+        } catch (error) {
+          console.log(error)
+          resolve(false)
+        }
+      })
     })
-  })
-)
+  )
+})
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

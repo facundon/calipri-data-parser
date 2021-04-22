@@ -4,7 +4,8 @@ import { normalize } from "./utils"
 type SubstractionStructure = {
   value: number,
   profile: string,
-  vehicle: string | null,
+  vehicle: string,
+  bogie: string,
 }
 
 export type SubstractionKinds = {
@@ -19,11 +20,17 @@ interface ISubstraction {
   (data: T.IRawParsedData) : SubstractionKinds
 }
 
-const substraction = (data: string[], profiles: string[], step: number, vehicles?: string[]) => {
+const substraction = (data: string[], profiles: string[], step: number, vehicles: string[], bogies: string[]) => {
   let adaptedVehicles: string[] = []
-  vehicles?.forEach(item => {
+  vehicles.forEach(item => {
     for (let index = 0; index < data.length / vehicles.length; index++) {
       adaptedVehicles.push(item)
+    }
+  })
+  let adaptedBogies: string[] = []
+  bogies.forEach(bogie => {
+    for (let index = 0; index < data.length / bogies.length; index++) {
+      adaptedBogies.push(bogie)
     }
   })
   return (
@@ -35,7 +42,8 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
           return ({
             value: Math.abs(Math.round(rawSubstraction * 100) / 100),
             profile: profiles[index],
-            vehicle: vehicles ? adaptedVehicles[index] : null
+            vehicle: adaptedVehicles[index],
+            bogie: adaptedBogies[index],
           })
         } else { return (null) }
       }
@@ -44,9 +52,9 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
 
 export const getSubstractions: ISubstraction = (data) => (
   {
-    width: substraction(data.widths, data.profiles, 2),
-    shaft: substraction(data.diameters, data.profiles, 2, data.vehicles),
-    bogie: substraction(data.diameters, data.profiles, 4, data.vehicles),
-    vehicle: substraction(data.diameters, data.profiles, 8, data.vehicles),
+    width: substraction(data.widths, data.profiles, 2, data.vehicles, data.bogies),
+    shaft: substraction(data.diameters, data.profiles, 2, data.vehicles, data.bogies),
+    bogie: substraction(data.diameters, data.profiles, 4, data.vehicles, data.bogies),
+    vehicle: substraction(data.diameters, data.profiles, 8, data.vehicles, data.bogies),
   }
 )

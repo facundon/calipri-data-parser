@@ -22,12 +22,12 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
       schema = schema.replace("$NRO$", auxIndex)
       schema = schema.replace("$CONDENADA$", isDamn ? "condenada" : "")
     }
-    const anotherRowStations = `<div class="estaciones"><p>${stations[0]}</p><p>${stations[1]}</p></div>`
+    const anotherRowStations = `<div class="estaciones"><p>${stations[1]}</p><p>${stations[0]}</p></div>`
     return (
       `<div class=formacion>
-        ${vehiclesAmount < 5 ? `<p>${stations[0]}</p>` : ""}
-        ${schema}
         ${vehiclesAmount < 5 ? `<p>${stations[1]}</p>` : ""}
+        ${schema}
+        ${vehiclesAmount < 5 ? `<p>${stations[0]}</p>` : ""}
       </div>
       ${vehiclesAmount >= 5 ? anotherRowStations : ""}`
     )
@@ -44,19 +44,19 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
         minVal = profileRef[ref].minVal?.toString()
         if (ref === "Diametro") {
           maxVal = null
-          minVal = index === 0 ? `Min: ${minVal}` : ""
+          minVal = index === 0 ? `Mín: ${minVal}` : ""
         }
         if (!maxVal && !minVal && ref !== "Diametro") {
           minVal = ""
           maxVal = [
-            "Motriz" + ": " + profileRef[ref]["MOTRIZ"]?.maxVal?.toString(),
-            "Remolque" + ": " + profileRef[ref]["REMOLQUE"]?.maxVal?.toString()
+            profileRef[ref]["MOTRIZ"]?.maxVal?.toString() ? `Motriz ${profile}: ` + profileRef[ref]["MOTRIZ"]?.maxVal?.toString() : null,
+            profileRef[ref]["REMOLQUE"]?.maxVal?.toString() ? `Remolque ${profile}: ` + profileRef[ref]["REMOLQUE"]?.maxVal?.toString() : null
           ]
         }
         if (typeof maxVal === "string" && ref !== "Diametro") {
-          return { [ref]: `${arr.length !== 1 ? profile + ": " : ""}${minVal}-${maxVal}` }
+          return { [ref]: `${arr.length !== 1 ? profile + ": " : ""}${minVal || ""}-${maxVal || ""}` }
         } else {
-          return { [ref]: maxVal || minVal }
+          return { [ref]: maxVal || minVal || ""}
         }
       })
       allReferences.push(references)
@@ -74,7 +74,17 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
       orderedRefs = allReferences.reduce((prev, current) => {
         let refObj = {}
         current.forEach((item, index) => {
-          refObj[Object.keys(item)[0]] = `<div>${Object.values(prev[index])}</div><div>${Object.values(item)}</div>`
+          if (typeof Object.values(prev[index])[0] === "object") {
+            let nextRef = ""
+            Object.values(prev[index])[0].forEach((val, i) => {
+              nextRef += `
+                ${val ? `<div>${val}</div>` : ""}
+                ${Object.values(item)[i] ? `<div>${Object.values(item)[i][0]}</div>` : ""}`
+            })
+            refObj[Object.keys(item)[0]] = nextRef
+          } else {
+            refObj[Object.keys(item)[0]] = `<div>${Object.values(prev[index])}</div><div>${Object.values(item)}</div>`
+          }
         })
         return refObj
       })
@@ -184,16 +194,85 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
     return data
   }
 
+  const getDifTable = (type) => {
+    let data = ""
+    evaluatedData.substractions[type].forEach((item, index) => {
+      switch (type) {
+      case "width":
+      case "shaft":
+        data += `
+        <tr>
+          ${index % 4 === 0 ? `<td rowspan=4>${item.vehicle || "-"}</td>` : ""}
+          ${index % 2 === 0 ? `<td rowspan=2>${item.bogie || "-"}</td>` : ""}
+          <td id=index>${index + 1}</td>
+          <td>${item.profile}</td>
+          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+        </tr>`
+        break
+      case "bogie":
+        data += `
+        <tr>
+          ${index % 2 === 0 ? `<td rowspan=2>${item.vehicle || "-"}</td>` : ""}
+          <td id=index>${item.bogie || "-"}</td>
+          <td>${item.type}</td>
+          <td>${item.profile}</td>
+          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+        </tr>`
+        break
+      case "vehicle":
+        data += `
+        <tr>
+          <td id=index>${item.vehicle || "-"}</td>
+          <td>${item.type}</td>
+          <td>${item.profile}</td>
+          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+        </tr>`
+      default:
+        break
+      }
+    })
+    return data
+  }
+
+  const getDifHeaders = (headers, ref) => {
+    let data = ""
+    headers.map((item) => {
+      data += `<th ${item !== "Diferencia" ? "rowspan=2" : ""}>${item}${item === "Diferencia" ? "<span> [mm]</span>" : ""}</th>`
+    })
+    data = `<tr>${data}</tr>`
+    const refValues = getOrderedRefValues()
+    const currentRef = Object.keys(refValues).find(item => item === ref)
+    let value = refValues[currentRef]
+    if (typeof value === "string") {
+      value = value.replaceAll("-", "")
+    } else {
+      let newVal = ""
+      value.forEach(val => newVal += `<div>${val}</div>`)
+      value = newVal
+    }
+    const subData = `<th class=diff-references><div>Max: </div><div>${value}</th>`
+    data = `${data}<tr class=references-row>${subData}</tr>`
+    return data
+  } 
+
   return ({
     FLOTA: findInHeader("Flota"),
     LINEA: findInHeader("Linea"),
     FORMACION: findInHeader("Formacion"),
     FECHA: findInHeader("Fecha"),
     PERFILES: findProfiles(),
-    HEADERS: getHeaders(),
-    DATA: getTable(),
+    COLOR: stations[2],
     ESQUEMA: getVehicleSchema(),
-    COLOR: stations[2]
+    HEADERS: getHeaders(),
+    WIDTH_HEADERS: getDifHeaders(["Coche", "Bogie", "Eje",  "Perfil", "Diferencia"], "Dif. Ancho de Pestaña"),
+    SHAFT_HEADERS: getDifHeaders(["Coche", "Bogie", "Eje",  "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Eje"),
+    BOGIE_HEADERS: getDifHeaders(["Coche", "Bogie", "Tipo", "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Bogie"),
+    VEHICLE_HEADERS: getDifHeaders(["Coche", "Tipo", "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Coche"),
+    DATA: getTable(),
+    WIDTH_DATA: getDifTable("width"),
+    SHAFT_DATA: getDifTable("shaft"),
+    BOGIE_DATA: getDifTable("bogie"),
+    VEHICLE_DATA: getDifTable("vehicle"),
   })
 }
 

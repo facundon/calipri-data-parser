@@ -62,9 +62,17 @@ body {
   }
 
   .btn-group {
-    .rs-btn-subtle.rs-btn-yellow:focus, .rs-btn-subtle.rs-btn-yellow.rs-btn-focus, .rs-btn-subtle.rs-btn-yellow:hover {
-      color: rgba(8, 8, 8, 0.705);
+    .dropdown-btn {
+      &:hover, &:focus {
+        background-color: $secondaryLight;
+        color: $white;
+      }
+      &:active {
+        background-color: $secondary;
+        color: $white;
+      }
     }
+
     .rs {
       &-btn {
         display: flex;

@@ -267,13 +267,13 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
             onChange={handleColorChange}
           />
         }
-        <Button onClick={handleSave} appearance="primary">
-          <Icon icon="save" size="lg"/>
-          Guardar
-        </Button>
         <Button onClick={handleDiscard} appearance="subtle">
           <Icon icon="trash-o" size="lg"/>
           Descartar
+        </Button>
+        <Button onClick={handleSave} appearance="primary">
+          <Icon icon="save" size="lg"/>
+          Guardar
         </Button>
       </Modal.Footer>
     </Modal>

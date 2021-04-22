@@ -13,6 +13,9 @@
             <div class='title-left'>
               $FECHA$
             </div>
+            <div class='title-center'>
+              Reporte de Medición
+            </div>
             <div class='fleet-wrapper'>
               <div class='title-right-top'>
                 Linea $LINEA$ - 
@@ -32,7 +35,72 @@
       <div class='esquema'>
         $ESQUEMA$
       </div>      
+      
+      <div class='second-title' style='--bkgr-color: $COLOR$'>
+        <div class='title-left'>
+          $FECHA$
+        </div>
+        <div class='title-center'>
+          Análisis de Diferencias
+        </div>
+        <div class='fleet-wrapper'>
+          <div class='title-right-top'>
+            Linea $LINEA$ - 
+            $FLOTA$
+          </div>
+          <div class='title-right-bot'>
+            Formación $FORMACION$
+          </div>
+        </div>
+      </div>
+      <div class="diff-wrapper">
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diferencia Ancho de Pestaña
+            </div>
+          </caption>
+          <tbody>
+            $WIDTH_HEADERS$
+            $WIDTH_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diferencia Diametro de Rueda Mismo Eje
+            </div>
+          </caption>
+          <tbody>
+            $SHAFT_HEADERS$
+            $SHAFT_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diferencia Diametro de Rueda Mismo Bogie
+            </div>
+          </caption>
+          <tbody>
+            $BOGIE_HEADERS$
+            $BOGIE_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diferencia Diametro de Rueda Mismo Coche
+            </div>
+          </caption>
+          <tbody>
+            $VEHICLE_HEADERS$
+            $VEHICLE_DATA$
+          </tbody>
+        </table>
+      </div>
       <div class='footer'>
+        <strong>Notas</strong>
         <ul>
           $PERFILES$ 
           <li>

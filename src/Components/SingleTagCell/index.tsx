@@ -17,7 +17,7 @@ const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }
     updateReference: (ref: string, id: string, action: "update") => void,
   }) => {
   const { Cell } = Table
-  const [ref, setRef] = useState<string>("")
+  const [ref, setRef] = useState<string>(rowData.reference)
   const [editing, setEditing] = useState<boolean>(false)
   const [error, setError] = useState<boolean>(false)
 

@@ -123,6 +123,7 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
             const wheelIndex = vehicleIndex + decimalIndex
             const gaugeIndex = vehicleIndex + decimalIndex
             const bogieIndex = vehicleIndex + decimalIndex
+            console.log(bogieIndex)
             parsedWheels.push(
               {
                 width: normalize(rawParsedData.widths[wheelIndex]),
