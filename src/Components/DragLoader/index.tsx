@@ -111,35 +111,27 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
     const substractions = getSubstractions(rawParsedData)
 
     const parsedWheels: T.Wheel[] = []
-    let decimalIndex = 0
-    rawParsedData.vehicles.forEach((_, vehicleIndex) => {
-      for (let rawBogieIndex = 0; rawBogieIndex < BOGIES_PER_VEHICLE; rawBogieIndex++) {
-        for (let rawGaugeIndex = 0; rawGaugeIndex < GAUGES_PER_BOGIE; rawGaugeIndex++) {
-          for (let rawWheelIndex = 0; rawWheelIndex < WHEELS_PER_GAUGES; rawWheelIndex++) {
-            decimalIndex = 0
-            rawWheelIndex ? decimalIndex += 1 : decimalIndex += 0
-            rawGaugeIndex ? decimalIndex += 2 : decimalIndex += 0
-            rawBogieIndex ? decimalIndex += 4 : decimalIndex += 0
-            const wheelIndex = vehicleIndex + decimalIndex
-            const gaugeIndex = vehicleIndex + decimalIndex
-            const bogieIndex = vehicleIndex + decimalIndex
-            console.log(bogieIndex)
-            parsedWheels.push(
-              {
-                width: normalize(rawParsedData.widths[wheelIndex]),
-                height: normalize(rawParsedData.heights[wheelIndex]),
-                qr: normalize(rawParsedData.qrs[wheelIndex]),
-                diameter: normalize(rawParsedData.diameters[wheelIndex]),
-                gauge: normalize(rawParsedData.gauges[gaugeIndex]),
-                vehicle: rawParsedData.vehicles[vehicleIndex],
-                bogie: rawParsedData.bogies[bogieIndex],
-                profile: rawParsedData.profiles[wheelIndex],
-                type: rawParsedData.types[wheelIndex]
-              }
-            )
-          }
+    let gaugeIndex = 0
+    let vehicleIndex = 0
+    let bogieIndex = 0
+    rawParsedData.widths.forEach((_, wheelIndex) => {
+      if (wheelIndex % 2 === 0 && wheelIndex !== 0) gaugeIndex += 1
+      if (wheelIndex % 4 === 0 && wheelIndex !== 0) bogieIndex += 1
+      if (wheelIndex % 8 === 0 && wheelIndex !== 0) vehicleIndex += 1
+      console.log(bogieIndex)
+      parsedWheels.push(
+        {
+          width: normalize(rawParsedData.widths[wheelIndex]),
+          height: normalize(rawParsedData.heights[wheelIndex]),
+          qr: normalize(rawParsedData.qrs[wheelIndex]),
+          diameter: normalize(rawParsedData.diameters[wheelIndex]),
+          gauge: normalize(rawParsedData.gauges[gaugeIndex]),
+          vehicle: rawParsedData.vehicles[vehicleIndex],
+          bogie: rawParsedData.bogies[bogieIndex],
+          profile: rawParsedData.profiles[wheelIndex],
+          type: rawParsedData.types[wheelIndex]
         }
-      }
+      )
     })
     setPreviewData(parsedPreview)
     handleParsedData({
