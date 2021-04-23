@@ -28,4 +28,10 @@ contextBridge.exposeInMainWorld("electron", {
       return success
     },
   },
+  database: {
+    async useDb(action, data, table) {
+      const success = await ipcRenderer.invoke("dbHandler", action, data, table)
+      return success
+    }
+  }
 })

@@ -16,10 +16,6 @@ import { getSubstractions } from "../../Scripts/substraction"
 
 const { Bounce } = Animation
 
-const BOGIES_PER_VEHICLE = 2
-const GAUGES_PER_BOGIE = 2
-const WHEELS_PER_GAUGES = 2
-
 export const PARSED_DATA_INITIAL_VALUES = {
   header: [],
   wheels: [],
@@ -119,7 +115,6 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
       if (wheelIndex % 2 === 0 && wheelIndex !== 0) gaugeIndex += 1
       if (wheelIndex % 4 === 0 && wheelIndex !== 0) bogieIndex += 1
       if (wheelIndex % 8 === 0 && wheelIndex !== 0) vehicleIndex += 1
-      console.log(bogieIndex)
       parsedWheels.push(
         {
           width: normalize(rawParsedData.widths[wheelIndex]),

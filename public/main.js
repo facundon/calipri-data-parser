@@ -2,11 +2,24 @@ const { app, BrowserWindow, ipcMain } = require("electron")
 const path = require("path")
 const fs = require("fs")
 const fsp = require("fs").promises
-const url = require("url")
+
 const puppeteer = require("puppeteer")
+const Database = require("better-sqlite3")
+
+const db = new Database("calipri.db")
 
 function getRelativePath(folder) {
   return path.join(__dirname, "storage", folder)
+}
+
+function createMeasurementsTable(table) {
+  return db.prepare(`CREATE TABLE IF NOT EXISTS ${table}(
+    date TEXT NOT NULL,
+    line TEXT NOT NULL,
+    fleet TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    data BLOB NOT NULL UNIQUE)`
+  )
 }
 
 let mainWindow
@@ -124,6 +137,42 @@ ipcMain.handle("createPdf", async(_, html, name) => {
       })
     })
   )
+})
+
+ipcMain.handle("dbHandler", async(_, action, data, table) => {
+  switch (action) {
+  case "add":
+    let count = 0
+    const maxTries = 1
+    while (true) {
+      try {
+        const stmt = db.prepare(`INSERT INTO ${table} VALUES ($date, $line, $fleet, $unit, $data)`)
+        stmt.run({
+          date: data.date,
+          line: data.line,
+          fleet: data.fleet,
+          unit: data.unit,
+          data: data.data,
+        })
+        db.close()
+        return true
+      } catch (error) {
+        if (error.message.includes("UNIQUE")) return "unique"
+        if (count === maxTries) return false
+        count++
+        try {
+          createMeasurementsTable(table).run()
+        } catch { return false }
+      } 
+    }
+
+  case "fetchAll":
+    break
+
+  default:
+    console.error("wrong action")
+    return(false)
+  }
 })
 
 app.on("window-all-closed", () => {

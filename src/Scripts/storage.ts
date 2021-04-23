@@ -7,6 +7,9 @@ declare global {
         delete: (name: string, folder: string) =>Promise<boolean>
         getFiles: (folder: string) => Promise<string[]>
         createPdf: (html: string, name: string) => Promise<boolean>
+      },
+      database: {
+        useDb: (action: "add" | "fetchAll", data: any, table?: string) => Promise<boolean | string>
       }
     }
   }
@@ -29,6 +32,10 @@ interface IGetFiles {
 
 interface ICreatePdf {
   (html: string, name: string): Promise<boolean>
+}
+
+interface IUseDb {
+  (action: "add" | "fetchAll", data: any, table?: string): Promise<boolean | string>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
@@ -62,5 +69,10 @@ export const getFiles: IGetFiles = async(folder = "") => {
 
 export const printPdf: ICreatePdf = async(html, name) => {
   const success = await window.electron.storage.createPdf(html, name)
+  return success
+}
+
+export const useDb: IUseDb = async(action, data, table = "measurements") => {
+  const success = await window.electron.database.useDb(action, data, table)
   return success
 }

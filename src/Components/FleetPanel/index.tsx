@@ -60,7 +60,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
             posibleFleets.push({ ...fleet, profiles: nextProfiles })
           })
           setFleets([...posibleFleets])
-          save(FLEET_FILE, posibleFleets)
+          await save(FLEET_FILE, posibleFleets)
         } else {
           Alert.error("No se pudo cargar la configuración de las Flotas", 7000)
           const files = await getFiles()

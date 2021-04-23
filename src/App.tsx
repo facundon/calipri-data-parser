@@ -7,7 +7,7 @@ import Dropdown from "rsuite/lib/Dropdown"
 import Icon from "rsuite/lib/Icon"
 import { IParsedData } from "./Components/DragLoader/types"
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
-import { load, save, printPdf } from "./Scripts/storage"
+import { load, save, printPdf, useDb } from "./Scripts/storage"
 import { forIn, replace } from "lodash"
 
 import "./rsuite-default.css"
@@ -16,6 +16,14 @@ import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
 import Alert from "rsuite/lib/Alert"
 import { Line } from "./Components/StationPanel/template"
+
+type DbMeasurementsData = {
+  date: string,
+  line: string,
+  fleet: string,
+  unit: string,
+  data: string,
+}
 
 interface IProps {
 }
@@ -28,6 +36,8 @@ interface IState {
   isStationConfigOpen: boolean,
   parsedData: IParsedData
 }
+
+
 
 class App extends Component<IProps, IState> {
   constructor(props: any) {
@@ -42,6 +52,8 @@ class App extends Component<IProps, IState> {
     }
   }
 
+  getItemInHeader = (item: string) => this.state.parsedData.header.find(val => Object.keys(val)[0] === item)![item]
+  
   handlePrintPDF = async() => {
     const findStations = async() => {
       const lines: Line[] = await load("lineas")
@@ -78,7 +90,22 @@ class App extends Component<IProps, IState> {
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
       // await save("test", replacedHtml, "templates", ".html")
       const success = await printPdf(replacedHtml, "test")
-      success ? Alert.success("Reporte emitido!", 10000) : Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+      if (success) {
+        Alert.success("Reporte emitido!", 10000)
+        const dataToSave: DbMeasurementsData = {
+          data: JSON.stringify(this.state.parsedData),
+          line: this.getItemInHeader("Linea"),
+          fleet: this.getItemInHeader("Flota"),
+          unit: this.getItemInHeader("Formacion"),
+          date: this.getItemInHeader("Fecha")
+        }
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const success = await useDb("add", dataToSave)
+        !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
+        if (success === "unique") Alert.warning(`Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}`, 10000)
+      } else {
+        Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+      }
     }   
     this.setState({ isPrinting: false })
   }

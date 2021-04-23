@@ -1,5 +1,4 @@
 import * as T from "../Components/DragLoader/types"
-import { chunk } from "lodash"
 import { normalize } from "./utils"
 
 type SubstractionStructure = {
@@ -19,17 +18,6 @@ export type SubstractionKinds = {
 
 interface ISubstraction {
   (data: T.IRawParsedData, preview: string) : SubstractionKinds
-}
-
-const unitSubstraction = (data: string[], profiles: string[], vehicles: string[], bogies: string[], fleet: string) => {
-  const dataByVehicle = chunk(data, 8)
-  switch (fleet) {
-  case "Fiat":
-    break
-  
-  default:
-    break
-  }
 }
 
 const substraction = (data: string[], profiles: string[], step: number, vehicles: string[], bogies: string[]) => {
@@ -66,6 +54,6 @@ export const getSubstractions: ISubstraction = (data, fleet) => (
     shaft: substraction(data.diameters, data.profiles, 2, data.vehicles, data.bogies),
     bogie: substraction(data.diameters, data.profiles, 4, data.vehicles, data.bogies),
     vehicle: substraction(data.diameters, data.profiles, 8, data.vehicles, data.bogies),
-    // unit: unitSubstraction(data.diameters, data.profiles, data.vehicles, data.bogies, fleet),
+    // unit: await unitSubstraction(data.diameters, data.profiles, data.vehicles, fleet),
   }
 )
