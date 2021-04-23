@@ -148,7 +148,7 @@ const getVehicleTypeByFleet = (vehicle: string, fleet: string, loadedFleets: Fle
     return null
   }
   if (fleet.toUpperCase() === "CAF6000") {
-    return vehicle?.indexOf(fleetObj.reference) === 1 ? "REMOLQUE" : "MOTRIZ"
+    return vehicle[1] !== fleetObj.reference ? "REMOLQUE" : "MOTRIZ"
   }
   return vehicle?.includes(fleetObj.reference) ? "REMOLQUE" : "MOTRIZ"
 }

@@ -1,4 +1,5 @@
 import * as T from "../Components/DragLoader/types"
+import { chunk } from "lodash"
 import { normalize } from "./utils"
 
 type SubstractionStructure = {
@@ -17,7 +18,18 @@ export type SubstractionKinds = {
 }
 
 interface ISubstraction {
-  (data: T.IRawParsedData) : SubstractionKinds
+  (data: T.IRawParsedData, preview: string) : SubstractionKinds
+}
+
+const unitSubstraction = (data: string[], profiles: string[], vehicles: string[], bogies: string[], fleet: string) => {
+  const dataByVehicle = chunk(data, 8)
+  switch (fleet) {
+  case "Fiat":
+    break
+  
+  default:
+    break
+  }
 }
 
 const substraction = (data: string[], profiles: string[], step: number, vehicles: string[], bogies: string[]) => {
@@ -34,27 +46,26 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
     }
   })
   return (
-    data.map(
-      (_, index, arr) => {
-        if (index % step === 0) {
-          const dataArr = arr.slice(index, index + step).map(val => normalize(val))
-          const rawSubstraction = Math.max.apply(null, dataArr) - Math.min.apply(null, dataArr)
-          return ({
-            value: Math.abs(Math.round(rawSubstraction * 100) / 100),
-            profile: profiles[index],
-            vehicle: adaptedVehicles[index],
-            bogie: adaptedBogies[index],
-          })
-        } else { return (null) }
-      }
-    ).filter(val => val !== null)
+    data.map((_, index, arr) => {
+      if (index % step === 0) {
+        const dataArr = arr.slice(index, index + step).map(val => normalize(val))
+        const rawSubstraction = Math.max.apply(null, dataArr) - Math.min.apply(null, dataArr)
+        return ({
+          value: Math.abs(Math.round(rawSubstraction * 100) / 100),
+          profile: profiles[index],
+          vehicle: adaptedVehicles[index],
+          bogie: adaptedBogies[index],
+        })
+      } else { return (null) }
+    }).filter(val => val !== null)
   )}
 
-export const getSubstractions: ISubstraction = (data) => (
+export const getSubstractions: ISubstraction = (data, fleet) => (
   {
     width: substraction(data.widths, data.profiles, 2, data.vehicles, data.bogies),
     shaft: substraction(data.diameters, data.profiles, 2, data.vehicles, data.bogies),
     bogie: substraction(data.diameters, data.profiles, 4, data.vehicles, data.bogies),
     vehicle: substraction(data.diameters, data.profiles, 8, data.vehicles, data.bogies),
+    // unit: unitSubstraction(data.diameters, data.profiles, data.vehicles, data.bogies, fleet),
   }
 )

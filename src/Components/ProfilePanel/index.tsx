@@ -258,8 +258,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
             }
           })
           setActiveData([...loadedData])
-          // TODO: need to save data here without crashing 
-          // save(activeProfile, getActiveDataWithoutParent(), "perfiles")
+          save(activeProfile, loadedData, "perfiles")
         }
       }
       loadFleets()

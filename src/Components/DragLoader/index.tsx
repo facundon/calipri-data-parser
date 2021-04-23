@@ -108,7 +108,8 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
       types: parseFlangeExtraData(positions.type)
     }
 
-    const substractions = getSubstractions(rawParsedData)
+    const fleet = parsedPreview.find(item => Object.keys(item)[0] === "Flota")?.Flota
+    const substractions = getSubstractions(rawParsedData, fleet || "-")
 
     const parsedWheels: T.Wheel[] = []
     let gaugeIndex = 0
