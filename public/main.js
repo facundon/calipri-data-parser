@@ -107,6 +107,7 @@ ipcMain.handle("createPdf", async(_, html, name) => {
         try {
           await page.setContent(html, { waitUntil: ["networkidle2"] })
           await page.addStyleTag({path: getRelativePath("templates/report.css")})
+          await page.evaluateHandle("document.fonts.ready")
           await page.pdf({
             path: `${name}.pdf`,
             format: "A4",

@@ -273,6 +273,9 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
     SHAFT_DATA: getDifTable("shaft"),
     BOGIE_DATA: getDifTable("bogie"),
     VEHICLE_DATA: getDifTable("vehicle"),
+    OPERADORES: findInHeader("Operador"),
+    CABECERA: stations[1],
+    FIRST_VEHICLE: evaluatedData.wheels[0].vehicle,
   })
 }
 

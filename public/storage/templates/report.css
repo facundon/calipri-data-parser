@@ -101,11 +101,11 @@ body {
 .diff-wrapper {
   display: flex;
   flex-flow: wrap;
-  justify-content: space-evenly;
+  justify-content: space-between;
 }
 
 .difference-table {
-  width: 330px;
+  width: 360px;
   margin-bottom: 20px;
 }
 
@@ -122,10 +122,14 @@ body {
 }
 
 .footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
+  font-size: 10px;
   break-inside: avoid;
+  line-height: 1.4;
+}
+
+.footer-title {
+ font-size: 12px;
+ text-decoration: underline var(--black);
 }
 
 .damned {
@@ -166,6 +170,11 @@ td {
 th > span {
   font-weight: 200;
 }
+
+tr:nth-child(3)  > td {
+  padding-top: 3px;
+}
+
 .references-row {
   box-shadow: 0 3px 2px -1px #333;
   border-bottom: none !important;
