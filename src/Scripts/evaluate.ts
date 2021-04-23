@@ -184,7 +184,7 @@ const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profi
       damnation = true
     }
     return ({
-      value: dimension!.value.toFixed(2),
+      value: dimension!.value.toFixed(2) || "-",
       damnation: damnation,
       bogie: dimension!.bogie,
       vehicle: dimension!.vehicle,
