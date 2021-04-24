@@ -9,7 +9,7 @@ declare global {
         createPdf: (html: string, name: string) => Promise<boolean>
       },
       database: {
-        useDb: (action: "add" | "fetchAll", data: any, table?: string) => Promise<boolean | string>
+        useDb: (action: "add" | "fetchLines", data?: any, table?: string) => Promise<boolean | string>
       }
     }
   }
@@ -35,7 +35,7 @@ interface ICreatePdf {
 }
 
 interface IUseDb {
-  (action: "add" | "fetchAll", data: any, table?: string): Promise<boolean | string>
+  (action: "add" | "fetchLines", data?: any, table?: string): Promise<boolean | string>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
@@ -72,7 +72,7 @@ export const printPdf: ICreatePdf = async(html, name) => {
   return success
 }
 
-export const useDb: IUseDb = async(action, data, table = "measurements") => {
+export const useDb: IUseDb = async(action, data = {}, table = "measurements") => {
   const success = await window.electron.database.useDb(action, data, table)
   return success
 }

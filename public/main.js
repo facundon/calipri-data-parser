@@ -6,10 +6,10 @@ const fsp = require("fs").promises
 const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const db = new Database("calipri.db")
 
 function getRelativePath(folder) {
-  return path.join(__dirname, "storage", folder)
+  const homedir = require("os").homedir()
+  return path.join(homedir, "OneDrive", "Documentos", "Calipri Parser Config", folder)
 }
 
 function createMeasurementsTable(table) {
@@ -140,6 +140,7 @@ ipcMain.handle("createPdf", async(_, html, name) => {
 })
 
 ipcMain.handle("dbHandler", async(_, action, data, table) => {
+  const db = new Database(getRelativePath("calipri.db"))
   switch (action) {
   case "add":
     let count = 0
@@ -157,17 +158,29 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
         db.close()
         return true
       } catch (error) {
+        console.log(error)
         if (error.message.includes("UNIQUE")) return "unique"
         if (count === maxTries) return false
         count++
         try {
           createMeasurementsTable(table).run()
-        } catch { return false }
+        } catch (err) { 
+          console.log(err)
+          return false
+        }
       } 
     }
 
-  case "fetchAll":
-    break
+  case "fetchLines":
+    try {
+      const stmt = db.prepare(`SELECT DISTINCT line FROM ${table} ORDER BY line`)
+      const data = stmt.all()
+      db.close()
+      return data
+    } catch (error) {
+      console.log(error)
+      return false
+    }
 
   default:
     console.error("wrong action")

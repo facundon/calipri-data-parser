@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { Component } from "react"
 
 import { ProfilePanel, DragLoader, FleetPanel, StationPanel } from "./Components"
@@ -99,10 +100,10 @@ class App extends Component<IProps, IState> {
           unit: this.getItemInHeader("Formacion"),
           date: this.getItemInHeader("Fecha")
         }
-        // eslint-disable-next-line react-hooks/rules-of-hooks
         const success = await useDb("add", dataToSave)
         !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
         if (success === "unique") Alert.warning(`Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}`, 10000)
+        console.log(await useDb("fetchLines"))
       } else {
         Alert.error("Ocurrio un error al emitir el reporte.", 10000)
       }
