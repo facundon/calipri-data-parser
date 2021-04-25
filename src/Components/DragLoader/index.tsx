@@ -31,6 +31,10 @@ const readerConfig = {
   skipEmptyLines: true,
 }
 
+function addZero(n: number){
+  return n < 10? "0" + n : "" + n
+}
+
 const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData }) => {
   const [previewData, setPreviewData] = useState<PreviewData[]>([])
 
@@ -75,6 +79,15 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
     ).map(
       (marr) => ({ [marr.data[0]]: marr.data[1] })
     )
+    const date = parsedPreview.find(item => Object.keys(item)[0] === "Fecha")?.Fecha
+    const dateArr = date?.split("/")
+    const newDateArr = dateArr?.map(val => addZero(parseInt(val)))
+    const newDate = newDateArr?.join("/")
+    parsedPreview.forEach((item, index) => {
+      if (Object.keys(item)[0] === "Fecha") {
+        parsedPreview[index].Fecha = newDate!
+      }
+    })
 
     const parsedVehicle = data.filter(
       (arr) => arr.data[positions.vehicleName] === Dimension.Vehicle

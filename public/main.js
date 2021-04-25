@@ -140,7 +140,21 @@ ipcMain.handle("createPdf", async(_, html, name) => {
 })
 
 ipcMain.handle("dbHandler", async(_, action, data, table) => {
+  function executeAll(query) {
+    try {
+      const stmt = db.prepare(query)
+      const data = stmt.all()
+      db.close()
+      return data
+    } catch (error) {
+      console.log(error)
+      db.close()
+      return false
+    }
+  }
+
   const db = new Database(getRelativePath("calipri.db"))
+
   switch (action) {
   case "add":
     let count = 0
@@ -159,6 +173,7 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
         return true
       } catch (error) {
         console.log(error)
+        db.close()
         if (error.message.includes("UNIQUE")) return "unique"
         if (count === maxTries) return false
         count++
@@ -166,25 +181,24 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
           createMeasurementsTable(table).run()
         } catch (err) { 
           console.log(err)
+          db.close()
           return false
         }
       } 
     }
 
   case "fetchLines":
-    try {
-      const stmt = db.prepare(`SELECT DISTINCT line FROM ${table} ORDER BY line`)
-      const data = stmt.all()
-      db.close()
-      return data
-    } catch (error) {
-      console.log(error)
-      return false
-    }
+    return executeAll(`SELECT DISTINCT line FROM ${table} ORDER BY line`)
+  
+  case "fetchUnitsByLine":
+    return executeAll(`SELECT DISTINCT unit FROM ${table} WHERE line = '${data}' ORDER BY unit`)
+  
+  case "fetchDatesByUnit":
+    return executeAll(`SELECT date FROM ${table} WHERE unit = '${data}' ORDER BY date`)
 
   default:
     console.error("wrong action")
-    return(false)
+    return false
   }
 })
 

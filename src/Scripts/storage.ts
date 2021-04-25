@@ -9,7 +9,7 @@ declare global {
         createPdf: (html: string, name: string) => Promise<boolean>
       },
       database: {
-        useDb: (action: "add" | "fetchLines", data?: any, table?: string) => Promise<boolean | string>
+        useDb: (action: "add" | "fetchLines" | "fetchUnitsByLine" | "fetchDatesByUnit", data?: any, table?: string) => Promise<any>
       }
     }
   }
@@ -35,7 +35,7 @@ interface ICreatePdf {
 }
 
 interface IUseDb {
-  (action: "add" | "fetchLines", data?: any, table?: string): Promise<boolean | string>
+  (action: "add" | "fetchLines" | "fetchUnitsByLine" | "fetchDatesByUnit", data?: any, table?: string): Promise<any>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {

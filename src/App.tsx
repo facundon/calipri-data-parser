@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { Component } from "react"
 
-import { ProfilePanel, DragLoader, FleetPanel, StationPanel } from "./Components"
+import { ProfilePanel, DragLoader, FleetPanel, StationPanel, ExportPanel } from "./Components"
 import Button from "rsuite/lib/Button"
 import ButtonGroup from "rsuite/lib/ButtonGroup"
 import Dropdown from "rsuite/lib/Dropdown"
@@ -35,6 +35,7 @@ interface IState {
   isProfilePanelOpen: boolean,
   isFleetConfigOpen: boolean,
   isStationConfigOpen: boolean,
+  isExportPanelOpen: boolean,
   parsedData: IParsedData
 }
 
@@ -49,6 +50,7 @@ class App extends Component<IProps, IState> {
       isProfilePanelOpen: false,
       isFleetConfigOpen: false,
       isStationConfigOpen: false,
+      isExportPanelOpen: false,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
   }
@@ -101,9 +103,9 @@ class App extends Component<IProps, IState> {
           date: this.getItemInHeader("Fecha")
         }
         const success = await useDb("add", dataToSave)
-        !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
+        success !== true && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
         if (success === "unique") Alert.warning(`Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}`, 10000)
-        console.log(await useDb("fetchLines"))
+        // TODO: ask to replace record in DB
       } else {
         Alert.error("Ocurrio un error al emitir el reporte.", 10000)
       }
@@ -147,6 +149,10 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
+              <Dropdown.Item onSelect={() => this.setState({ isExportPanelOpen: true })}>
+                <Icon icon="file-download" size="lg" />
+                Exportar
+              </Dropdown.Item>
               <Dropdown.Item onSelect={() => this.setState({ isStationConfigOpen: true })}>
                 <Icon icon="map-marker" size="lg" />
                 Cabeceras
@@ -174,6 +180,10 @@ class App extends Component<IProps, IState> {
         <StationPanel 
           stationPanelHandler={val => this.setState({ isStationConfigOpen: val })}
           isStationPanelOpen={this.state.isStationConfigOpen}
+        />
+        <ExportPanel
+          exportPanelHandler={val => this.setState({ isExportPanelOpen: val })}
+          isExportPanelOpen={this.state.isExportPanelOpen}
         />
       </div>
     )
