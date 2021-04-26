@@ -193,9 +193,15 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
   case "fetchUnitsByLine":
     return executeAll(`SELECT DISTINCT unit FROM ${table} WHERE line = '${data}' ORDER BY unit`)
   
-  case "fetchDatesByUnit":
-    return executeAll(`SELECT date FROM ${table} WHERE unit = '${data}' ORDER BY date`)
-
+  case "fetchDatesByUnitAndLine":
+    console.log(data.unit, data.line)
+    return executeAll(`SELECT date FROM ${table} WHERE unit = '${data?.unit}' AND line = '${data?.line}' ORDER BY date`)
+  
+  case "fetchData":
+    return executeAll(`SELECT data FROM ${table} 
+      WHERE unit = '${data?.unit}'
+      AND line = '${data?.line}'
+      ${data?.date ? `AND date = '${data?.date}'` : ""}`)
   default:
     console.error("wrong action")
     return false

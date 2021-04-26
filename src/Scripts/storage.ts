@@ -9,7 +9,11 @@ declare global {
         createPdf: (html: string, name: string) => Promise<boolean>
       },
       database: {
-        useDb: (action: "add" | "fetchLines" | "fetchUnitsByLine" | "fetchDatesByUnit", data?: any, table?: string) => Promise<any>
+        useDb: (action: "add"
+        | "fetchLines"
+        | "fetchUnitsByLine"
+        | "fetchDatesByUnitAndLine"
+        | "fetchData", data?: any, table?: string) => Promise<any>
       }
     }
   }
@@ -35,7 +39,11 @@ interface ICreatePdf {
 }
 
 interface IUseDb {
-  (action: "add" | "fetchLines" | "fetchUnitsByLine" | "fetchDatesByUnit", data?: any, table?: string): Promise<any>
+  (action: "add"
+  | "fetchLines"
+  | "fetchUnitsByLine"
+  | "fetchDatesByUnitAndLine"
+  | "fetchData", data?: any, table?: string): Promise<any>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
@@ -43,7 +51,7 @@ export const save: ISave = async(name, data, folder = "", extension = ".json") =
   if (extension === ".json") {
     dataToSave = JSON.stringify(data)
   }
-  const success = await window.electron.storage.save(`${name.toLowerCase()}${extension}`, dataToSave, folder)
+  const success = await window.electron.storage.save(`${extension === ".json" ? name.toLowerCase() : name}${extension}`, dataToSave, folder)
   return success
 }
 

@@ -91,12 +91,13 @@ class App extends Component<IProps, IState> {
         replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
+      const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
       // await save("test", replacedHtml, "templates", ".html")
-      const success = await printPdf(replacedHtml, "test")
+      const success = await printPdf(replacedHtml, fileName)
       if (success) {
         Alert.success("Reporte emitido!", 10000)
         const dataToSave: DbMeasurementsData = {
-          data: JSON.stringify(this.state.parsedData),
+          data: JSON.stringify(this.state.parsedData.wheels),
           line: this.getItemInHeader("Linea"),
           fleet: this.getItemInHeader("Flota"),
           unit: this.getItemInHeader("Formacion"),

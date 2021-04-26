@@ -1,5 +1,14 @@
+@import "../../../globalStyles/variables.scss";
+
 .export-panel {
-  .rs-modal-dialog {
-    width: 444px;
+  .rs-tag-group {
+    margin: 10px;
+    border: 2px solid $primary;
+    border-radius: 7px;
+    padding: 10px;
+    &>.rs-tag {
+      margin: 4px 2px;
+      padding: 2px 8px;
+    }
   }
 }
