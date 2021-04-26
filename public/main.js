@@ -74,6 +74,7 @@ ipcMain.handle("save", async(_, name, data, folder) => {
     const err = await fsp.writeFile(path.join(dir, name), data)
     return !err
   } catch (error) {
+    console.log(error)
     return false
   }
 })
@@ -84,6 +85,7 @@ ipcMain.handle("load", async(_, name, folder) => {
     const data = await fsp.readFile(path.join(dir, name))
     return data
   } catch (error) {
+    console.log(error)
     return false
   }
 })
@@ -194,7 +196,6 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
     return executeAll(`SELECT DISTINCT unit FROM ${table} WHERE line = '${data}' ORDER BY unit`)
   
   case "fetchDatesByUnitAndLine":
-    console.log(data.unit, data.line)
     return executeAll(`SELECT date FROM ${table} WHERE unit = '${data?.unit}' AND line = '${data?.line}' ORDER BY date`)
   
   case "fetchData":
@@ -202,6 +203,17 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
       WHERE unit = '${data?.unit}'
       AND line = '${data?.line}'
       ${data?.date ? `AND date = '${data?.date}'` : ""}`)
+  case "update":
+    try {
+      const stmt = db.prepare(`UPDATE ${table} SET date = '${data.date}', line = '${data.line}', fleet = '${data.fleet}', unit = '${data.unit}' WHERE data = '${data.data}'`)
+      stmt.run()
+      db.close()
+      return true
+    } catch (error) {
+      console.log(error)
+      db.close()
+      return false
+    }
   default:
     console.error("wrong action")
     return false

@@ -1,22 +1,23 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { Component } from "react"
 
-import { ProfilePanel, DragLoader, FleetPanel, StationPanel, ExportPanel } from "./Components"
+import { ProfilePanel, DragLoader, FleetPanel, StationPanel, ExportPanel, confirmService } from "./Components"
 import Button from "rsuite/lib/Button"
 import ButtonGroup from "rsuite/lib/ButtonGroup"
 import Dropdown from "rsuite/lib/Dropdown"
 import Icon from "rsuite/lib/Icon"
-import { IParsedData } from "./Components/DragLoader/types"
-import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
-import { load, save, printPdf, useDb } from "./Scripts/storage"
-import { forIn, replace } from "lodash"
+import Alert from "rsuite/lib/Alert"
+import { forIn } from "lodash"
 
-import "./rsuite-default.css"
-import "./globalStyles/index.scss"
+import { load, save, printPdf, useDb } from "./Scripts/storage"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
-import Alert from "rsuite/lib/Alert"
+
+import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
+import { IParsedData } from "./Components/DragLoader/types"
 import { Line } from "./Components/StationPanel/template"
+import "./rsuite-default.css"
+import "./globalStyles/index.scss"
 
 type DbMeasurementsData = {
   date: string,
@@ -103,10 +104,20 @@ class App extends Component<IProps, IState> {
           unit: this.getItemInHeader("Formacion"),
           date: this.getItemInHeader("Fecha")
         }
-        const success = await useDb("add", dataToSave)
-        success !== true && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
-        if (success === "unique") Alert.warning(`Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}`, 10000)
-        // TODO: ask to replace record in DB
+        let success = await useDb("add", dataToSave)
+        !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
+        if (success === "unique") {
+          const confirm = await confirmService.show({
+            message: `Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}`,
+            actionIcon: "window-restore",
+            actionMessage: "Sobreescribir",
+            iconColor: "#f44336",
+          })
+          if (confirm) {
+            success = await useDb("update", dataToSave)
+            !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
+          }
+        }
       } else {
         Alert.error("Ocurrio un error al emitir el reporte.", 10000)
       }

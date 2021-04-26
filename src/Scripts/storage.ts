@@ -13,7 +13,9 @@ declare global {
         | "fetchLines"
         | "fetchUnitsByLine"
         | "fetchDatesByUnitAndLine"
-        | "fetchData", data?: any, table?: string) => Promise<any>
+        | "fetchData"
+        | "update"
+        , data?: any, table?: string) => Promise<any>
       }
     }
   }
@@ -43,7 +45,9 @@ interface IUseDb {
   | "fetchLines"
   | "fetchUnitsByLine"
   | "fetchDatesByUnitAndLine"
-  | "fetchData", data?: any, table?: string): Promise<any>
+  | "fetchData"
+  | "update"
+  , data?: any, table?: string): Promise<any>
 }
 
 export const save: ISave = async(name, data, folder = "", extension = ".json") => {
