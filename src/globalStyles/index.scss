@@ -4,7 +4,13 @@ body {
   font-size: $baseFontSize;
   line-height: $baseLineHeight;
   overflow-x: hidden;
-  margin-right: calc(-1 * (100vw - 100%));
+  background-image: linear-gradient(to top, #fddb92 0%, #d1fdff 100%);
+  // background-color: #8BC6EC;
+  // background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
   h1 {
     font-size: $h1FontSize;
@@ -38,16 +44,17 @@ body {
     place-items: center;
     width: $containerWidth;
     max-width: 100vw;
-    box-shadow: 0 1px 10px rgba(0,0,0,0.12), 
-              0 1px 2px rgba(0,0,0,0.12), 
-              0 2px 4px rgba(0,0,0,0.12), 
-              0 4px 8px rgba(0,0,0,0.12),
-              0 8px 16px rgba(0,0,0,0.12);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.12), 
+              0 2px 2px rgba(0,0,0,0.12), 
+              0 4px 4px rgba(0,0,0,0.12), 
+              0 8px 8px rgba(0,0,0,0.12),
+              0 16px 16px rgba(0,0,0,0.12);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     border-radius: 6px;
+    background-image: linear-gradient(to top, #d5d4d0 0%, #d5d4d0 1%, #eeeeec 31%, #efeeec 75%, #ffffff 100%);
   }
 
   .title {
@@ -67,6 +74,7 @@ body {
 
   .btn-group {
     .dropdown-btn {
+      color: $dark;
       &:hover, &:focus {
         background-color: $secondaryLight;
         color: $white;
