@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron")
+const { app, BrowserWindow, ipcMain, dialog } = require("electron")
 const path = require("path")
 const fs = require("fs")
 const fsp = require("fs").promises
@@ -22,10 +22,16 @@ function createMeasurementsTable(table) {
   )
 }
 
+const DIALOG_OPTIONS = {
+  title: "Guardar Reporte",
+  buttonLabel: "Guardar",
+  filters: [{name: "Reporte", extensions: ["pdf"]}]
+}
+
 let mainWindow
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1300,
+    width: 1100,
     height: 1000,
     center: true,
     show: false,
@@ -113,6 +119,9 @@ ipcMain.handle("getFiles", async(_, folder) => {
 })
 
 ipcMain.handle("createPdf", async(_, html, name) => {
+  DIALOG_OPTIONS["defaultPath"] = name
+  const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, DIALOG_OPTIONS)
+  if (canceled) return "canceled"
   const footer = await fsp.readFile(getRelativePath("templates/footer.html"), {encoding: "utf-8"})
   if (!footer) return(new Promise(resolve => resolve(false)))
   return(
@@ -124,7 +133,7 @@ ipcMain.handle("createPdf", async(_, html, name) => {
           await page.addStyleTag({path: getRelativePath("templates/report.css")})
           await page.evaluateHandle("document.fonts.ready")
           await page.pdf({
-            path: `${name}.pdf`,
+            path: filePath,
             format: "A4",
             preferCSSPageSize: true,
             displayHeaderFooter: true,

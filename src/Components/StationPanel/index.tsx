@@ -199,6 +199,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
           shouldUpdateScroll={false}
           rowKey="id"
           data={lines}
+          locale={{loading: "Cargando"}}
           loading={loading}
           height={490}
           rowHeight={63}

@@ -176,6 +176,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
 
       <Modal.Body>
         <Table
+          locale={{loading: "Cargando"}}
           shouldUpdateScroll={false}
           rowKey="id"
           data={fleets}

@@ -6,7 +6,7 @@ declare global {
         load: (name: string, folder: string) => Promise<BufferSource | false>
         delete: (name: string, folder: string) =>Promise<boolean>
         getFiles: (folder: string) => Promise<string[]>
-        createPdf: (html: string, name: string) => Promise<boolean>
+        createPdf: (html: string, name: string) => Promise<boolean | "canceled">
       },
       database: {
         useDb: (action: "add"
@@ -37,7 +37,7 @@ interface IGetFiles {
 }
 
 interface ICreatePdf {
-  (html: string, name: string): Promise<boolean>
+  (html: string, name: string): Promise<boolean | "canceled">
 }
 
 interface IUseDb {

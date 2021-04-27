@@ -445,6 +445,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
         </Nav>
         <Table
           isTree
+          locale={{loading: "Cargando"}}
           loading={loading}
           shouldUpdateScroll={false}
           rowKey="id"

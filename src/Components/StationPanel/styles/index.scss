@@ -22,7 +22,7 @@
     display: inline-flex;
     width: 522px;
     padding-right: 30px;
-    height: 6px;
+    height: 50px;
     &__hue {
       height: 10px;
     }
@@ -37,9 +37,9 @@
       height: 10px;
       border-radius: 25%;
     }
-    &__saturation {
-      display: none
-    }
+    // &__saturation {
+    //   display: none
+    // }
   }
 
   .add-profile-wrapper {
