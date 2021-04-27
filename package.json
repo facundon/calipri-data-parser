@@ -4,11 +4,11 @@
     "name": "Facundo Rodriguez",
     "email": "facundonrodriguez@gmail.com"
   },
-  "homepage": "https://github.com/facundon/calipri-data-parser",
+  "homepage": "./",
   "description": "Parser for CSV files emited by Calipri",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "main": "public/main.js",
+  "main": "public/electron.js",
   "repository": {
     "url": "https://github.com/facundon/calipri-data-parser"
   },
@@ -17,7 +17,24 @@
     "productName": "Calipri Data Parser",
     "copyright": "Copyright © 2021 ${author}",
     "win": {
-      "target": "portable"
+      "target": [
+        { 
+          "target": "nsis",
+          "arch": "x64"
+        } 
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
     }
   },
   "dependencies": {
@@ -41,10 +58,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron-start": "electron .",
-    "rebuild": "node_modules/.bin/electron-rebuild -f -w better-sqlite3",
+    "electron-pack": "electron-builder -c.extraMetadata.main=build/electron.js",
     "postinstall": "electron-builder install-app-deps",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "preelectron-pack": "npm run build",
+    "dist": "electron-builder",
+    "rebuild": "node_modules/.bin/electron-rebuild -f -w better-sqlite3"
   },
   "eslintConfig": {
     "extends": [

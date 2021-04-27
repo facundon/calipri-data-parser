@@ -3,6 +3,7 @@ declare global {
     electron: {
       storage: {
         save: (name: string, data: {}, folder: string) => Promise<boolean>
+        saveBulk: (names: string[], data: {}[], folder: string) => Promise<boolean>
         load: (name: string, folder: string) => Promise<BufferSource | false>
         delete: (name: string, folder: string) =>Promise<boolean>
         getFiles: (folder: string) => Promise<string[]>
@@ -23,6 +24,10 @@ declare global {
 
 interface ISave {
   (name: string, data: {} | [], folder?: string, extension?: string) : Promise<boolean>
+}
+
+interface ISaveBulk {
+  (names: string[], data: {}[], folder?: string, extension?: string) : Promise<boolean>
 }
 
 interface ILoad {
@@ -56,6 +61,12 @@ export const save: ISave = async(name, data, folder = "", extension = ".json") =
     dataToSave = JSON.stringify(data)
   }
   const success = await window.electron.storage.save(`${extension === ".json" ? name.toLowerCase() : name}${extension}`, dataToSave, folder)
+  return success
+}
+
+export const saveBulk: ISaveBulk = async(names, data, folder = "", extension = ".csv") => {
+  const namesArr = names.map(name => name + extension)
+  const success = await window.electron.storage.saveBulk(namesArr, data, folder)
   return success
 }
 

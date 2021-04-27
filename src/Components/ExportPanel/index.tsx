@@ -10,7 +10,7 @@ import Loader from "rsuite/lib/Loader"
 import Alert from "rsuite/lib/Alert"
 
 import { jsonToCSV } from "react-papaparse"
-import { save, useDb } from "../../Scripts/storage"
+import { saveBulk, useDb } from "../../Scripts/storage"
 
 import "./styles/index.scss"
 import { concat } from "lodash"
@@ -37,6 +37,7 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
     setSelectedMeasurements([])
     const loadData = async() => {
       const lines: [{["line"]: string}] = await useDb("fetchLines")
+      if (!lines) return
       let data: CascaderData[] = []
       let lIndex = 0
       for (const line of lines) {
@@ -129,7 +130,8 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
       return { line, unit, date }
     }
 
-    let success = []
+    let fileNames = []
+    let csvs = []
     for (const item of selectedMeasurements) {
       let idData = getIdData(item)
       idData.line = idData.line?.replace("Linea ", "")
@@ -139,14 +141,14 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
       let index = 0
       for (const data of allData) {
         const dataObj = JSON.parse(data.data)
-        const csv = jsonToCSV(dataObj)
+        csvs.push(jsonToCSV(dataObj))
         idData = getIdData(item, index)
-        const fileName = `${idData.line} - ${idData.unit} - ${idData.date?.replaceAll("/", "-")}`
-        success.push(await save(fileName, csv, "exports", ".csv"))
+        fileNames.push(`${idData.line} - ${idData.unit} - ${idData.date?.replaceAll("/", "-")}`)
         index++
       }
     }
-    success.includes(false) ? Alert.error("Hubo un problema al exportar", 10000) : Alert.success("Exportación exitosa!", 10000)
+    const success = await saveBulk(fileNames, csvs, "Calipri Parser Exports", ".csv")
+    success ? Alert.error("Hubo un problema al exportar", 10000) : Alert.success("Exportación exitosa!", 10000)
     setLoading(false)
     exportPanelHandler(false)
   }

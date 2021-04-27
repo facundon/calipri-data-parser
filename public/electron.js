@@ -7,9 +7,21 @@ const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
 
+const isDev = true
+
+const homedir = require("os").homedir()
+let configPath = path.join(homedir, "Calipri Parser Config")
+
+async function getFilePath() {
+  try {
+    const response = await fsp.readFile(path.join(__dirname, "config_path.txt"), {encoding: "utf-8"})
+    configPath = response
+  } catch (error) {
+  }
+}
+
 function getRelativePath(folder) {
-  const homedir = require("os").homedir()
-  return path.join(homedir, "OneDrive", "Documentos", "Calipri Parser Config", folder)
+  return path.join(configPath, folder)
 }
 
 function createMeasurementsTable(table) {
@@ -22,13 +34,28 @@ function createMeasurementsTable(table) {
   )
 }
 
-const DIALOG_OPTIONS = {
+const SAVE_PDF_DIALOG_OPT = {
   title: "Guardar Reporte",
   buttonLabel: "Guardar",
   filters: [{name: "Reporte", extensions: ["pdf"]}]
 }
+const FILEPATH_WARN_DIALOG_OPT = {
+  message: `No se encontraron archivos de configuración.
+Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o puede dejar que creemos una por usted en ${configPath}`,
+  type: "warning",
+  buttons: ["Elegir Ubicación", "Crear"],
+  defaultId: 0,
+  title: "No se encontro configuración",
+}
+const PATH_SELECT_DIALOG_OPTION = {
+  title: "Seleccionar Carpeta",
+  defaultPath: configPath,
+  buttonLabel: "Seleccionar",
+  properties: ["openDirectory"]
+}
 
 let mainWindow
+
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -43,8 +70,21 @@ function createMainWindow() {
     }
   })
 
-  mainWindow.loadURL("http://localhost:3000/")
+  mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   // mainWindow.removeMenu()
+}
+
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
 }
 
 app.on("ready", () => {
@@ -58,7 +98,8 @@ app.on("ready", () => {
     height: 350,
     opacity: 0.85,
   })
-  loading.once("show", () => {
+  loading.once("show", async() => {
+    await getFilePath()
     createMainWindow()
     mainWindow.webContents.once("dom-ready", () => {
       mainWindow.show()
@@ -72,10 +113,7 @@ app.on("ready", () => {
 
 
 ipcMain.handle("save", async(_, name, data, folder) => {
-  const dir = getRelativePath(folder)
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
-  }
+  let dir = getRelativePath(folder)
   try {
     const err = await fsp.writeFile(path.join(dir, name), data)
     return !err
@@ -84,6 +122,27 @@ ipcMain.handle("save", async(_, name, data, folder) => {
     return false
   }
 })
+
+ipcMain.handle("saveBulk", async(_, names, data, folder) => {
+  let dir = getRelativePath(folder)
+  try {
+    const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
+    if (canceled) return false
+    dir = path.join(filePaths[0], folder)
+    fs.mkdirSync(dir, { recursive: true })
+    let index = 0
+    for (const name of names) {
+      await fsp.writeFile(path.join(dir, name), data[index])
+      index++
+    }
+    return true
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+})
+    
+
 
 ipcMain.handle("load", async(_, name, folder) => {
   const dir = getRelativePath(folder)
@@ -108,19 +167,39 @@ ipcMain.handle("delete", async(_, name, folder) => {
 })
 
 ipcMain.handle("getFiles", async(_, folder) => {
-  const dir = getRelativePath(folder)
-  try {
-    const data = await fsp.readdir(dir)
-    return data
-  } catch (error) {
-    fs.mkdirSync(dir, { recursive: true })
-    return []
+  let count = 0
+  let maxTries = 1
+  while (true) {
+    const dir = getRelativePath(folder)
+    try {
+      const data = await fsp.readdir(dir)
+      return data
+    } catch (error) {
+      const { response } = await dialog.showMessageBox(mainWindow, FILEPATH_WARN_DIALOG_OPT)
+      switch (response) {
+      case 0:  //seleccionar ubicacion
+        const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
+        configPath = filePaths[0]
+        try {
+          await fsp.writeFile(path.join(__dirname, "config_path.txt"), configPath)
+        } catch (error) {
+          console.log(error)
+        }
+        break
+      case 1:  //crear directorio
+        fs.mkdirSync(dir, { recursive: true })
+        break
+      }
+      if (count === maxTries) return []
+      count++
+    }
   }
+  
 })
 
 ipcMain.handle("createPdf", async(_, html, name) => {
-  DIALOG_OPTIONS["defaultPath"] = name
-  const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, DIALOG_OPTIONS)
+  SAVE_PDF_DIALOG_OPT["defaultPath"] = name
+  const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
   if (canceled) return "canceled"
   const footer = await fsp.readFile(getRelativePath("templates/footer.html"), {encoding: "utf-8"})
   if (!footer) return(new Promise(resolve => resolve(false)))

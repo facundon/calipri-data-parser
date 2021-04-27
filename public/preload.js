@@ -11,6 +11,10 @@ contextBridge.exposeInMainWorld("electron", {
       const success = await ipcRenderer.invoke("save", name, data, folder)
       return success
     },
+    async saveBulk(names, data, folder) {
+      const success = await ipcRenderer.invoke("saveBulk", names, data, folder)
+      return success
+    },
     async load(name, folder) {
       const data = await ipcRenderer.invoke("load", name, folder)
       return data

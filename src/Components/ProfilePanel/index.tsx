@@ -167,7 +167,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     }
     loadProfiles()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isProfilePanelOpen])
 
   function getActiveDataWithoutParent(data = activeData) {
     const dataWithoutParent: Dimension[] = Object.assign([], data)
@@ -264,6 +264,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       loadFleets()
       setLoading(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProfilePanelOpen, activeProfile])
 
   const handleManage = async(id: string, action: "remove" | "add") => {
