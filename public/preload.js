@@ -37,5 +37,15 @@ contextBridge.exposeInMainWorld("electron", {
       const success = await ipcRenderer.invoke("dbHandler", action, data, table)
       return success
     }
+  },
+  config: {
+    async selectConfigDirectory() {
+      const success = await ipcRenderer.invoke("selectDirectory")
+      return success
+    },
+    async resetConfig() {
+      const success = await ipcRenderer.invoke("resetConfig")
+      return success
+    }
   }
 })

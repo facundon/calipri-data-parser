@@ -33,37 +33,44 @@ function createMeasurementsTable(table) {
   )
 }
 
+async function selectConfigPath() {
+  const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
+  if (canceled) throw {name: "Minor Error", message: "Por favor vuelva a abrir el programa y elija una opción"}
+  configPath = filePaths[0]
+  try {
+    await fs.writeFile(path.join(__dirname, "config", "config_path.txt"), configPath)
+    return
+  } catch (error) {
+    console.log(error)
+    throw new Error("Error al crear archivo de configuración")
+  }
+}
+
+async function createConfigPath() {
+  try {
+    const origin = path.join(SOURCE_CONFIG_PATH)
+    const destiny = path.join(configPath)
+    await fs.ensureDir(destiny)
+    await fs.copy(origin, destiny)
+    return
+  } catch (error) {
+    console.log(error)
+    throw new Error("Error al crear directorio de configuración")
+  }
+}
+
 async function selectOrCreateConfigFolder() {
   try {
     await fs.readdir(configPath)
     return
   } catch (error) {
     const { response } = await dialog.showMessageBox(mainWindow, FILEPATH_WARN_DIALOG_OPT)
-
     switch (response) {
     case 0:  //seleccionar ubicacion
-      const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
-      if (canceled) throw new Error("Por favor vuelva a abrir el programa y elija una opción")
-      configPath = filePaths[0]
-      try {
-        await fs.writeFile(path.join(__dirname, "config", "config_path.txt"), configPath)
-        return
-      } catch (error) {
-        console.log(error)
-        throw new Error("Error al crear archivo de configuración")
-      }
-
+      await selectConfigPath()
+      break
     case 1:  //crear directorio
-      try {
-        const origin = path.join(SOURCE_CONFIG_PATH)
-        const destiny = path.join(configPath)
-        await fs.ensureDir(destiny)
-        await fs.copy(origin, destiny)
-        return
-      } catch (error) {
-        console.log(error)
-        throw new Error("Error al crear directorio de configuración")
-      }
+      await createConfigPath()
     }
   }
 }
@@ -151,6 +158,26 @@ app.on("ready", () => {
   loading.show()
 })
 
+ipcMain.handle("selectDirectory", async() => {
+  try {
+    await selectConfigPath()
+    return true
+  } catch (error) {
+    if (error.name === "Minor Error") return false
+    console.log(error)
+    return error.message
+  }
+})
+
+ipcMain.handle("resetConfig", async() => {
+  try {
+    await createConfigPath()
+    return true
+  } catch (error) {
+    console.log(error)
+    return error.message
+  }
+})
 
 ipcMain.handle("save", async(_, name, data, folder) => {
   let dir = getRelativePath(folder)

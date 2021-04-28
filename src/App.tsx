@@ -9,7 +9,7 @@ import Icon from "rsuite/lib/Icon"
 import Alert from "rsuite/lib/Alert"
 import { forIn } from "lodash"
 
-import { load, save, printPdf, useDb } from "./Scripts/storage"
+import { load, save, printPdf, useDb, selectConfigDirectory, resetConfig } from "./Scripts/storage"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
 
@@ -58,6 +58,28 @@ class App extends Component<IProps, IState> {
 
   getItemInHeader = (item: string) => this.state.parsedData.header.find(val => Object.keys(val)[0] === item)![item]
   
+  handleSelectConfigDirectory = async() => {
+    const result = await selectConfigDirectory()
+    if (typeof result === "string") {
+      Alert.error(result, 10000)
+    } else if (result) {
+      Alert.success("Configuración cargada con éxito!", 10000) 
+    }
+  }
+
+  handleResetConfig = async() => {
+    const confirm = await confirmService.show({
+      message: "¿Seguro que desea reestablecer la configuración? Esto sobreescribira cualquier cambio realizado a los perfiles, flotas y estaciones",
+      actionIcon: "undo",
+      actionMessage: "Reestablecer",
+      iconColor: "#f44336",
+    })
+    if (confirm) {
+      const result = await resetConfig()
+      result !== true ? Alert.error(result, 10000) : Alert.success("Configuración reestablecida éxito!", 10000) 
+    }
+  }
+
   handlePrintPDF = async() => {
     const findStations = async() => {
       const lines: Line[] = await load("lineas")
@@ -110,7 +132,7 @@ class App extends Component<IProps, IState> {
         if (success === "unique") {
           const confirm = await confirmService.show({
             message: `Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}. Desea reemplazarla?`,
-            actionIcon: "refresh",
+            actionIcon: "clone",
             actionMessage: "Reemplazar",
             iconColor: "#f44336",
           })
@@ -162,6 +184,16 @@ class App extends Component<IProps, IState> {
                 </Button>
               }
             >
+              <Dropdown.Menu icon={<Icon icon="more" />} title="Más" pullLeft>
+                <Dropdown.Item onSelect={this.handleResetConfig}>
+                  <Icon icon="undo" />
+                  Reestablecer Configuración
+                </Dropdown.Item>
+                <Dropdown.Item onSelect={this.handleSelectConfigDirectory}>
+                  <Icon icon="crosshairs" />
+                  Seleccionar Configuración
+                </Dropdown.Item>
+              </Dropdown.Menu>
               <Dropdown.Item onSelect={() => this.setState({ isExportPanelOpen: true })}>
                 <Icon icon="file-download" size="lg" />
                 Exportar
@@ -179,7 +211,6 @@ class App extends Component<IProps, IState> {
                 Flotas
               </Dropdown.Item>
             </Dropdown>
-
           </ButtonGroup>
         </div>
         <ProfilePanel 

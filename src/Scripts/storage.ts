@@ -17,6 +17,10 @@ declare global {
         | "fetchData"
         | "update"
         , data?: any, table?: string) => Promise<any>
+      },
+      config: {
+        selectConfigDirectory: () => Promise<true | string>,
+        resetConfig: () => Promise<true | string>,
       }
     }
   }
@@ -97,5 +101,15 @@ export const printPdf: ICreatePdf = async(html, name) => {
 
 export const useDb: IUseDb = async(action, data = {}, table = "measurements") => {
   const success = await window.electron.database.useDb(action, data, table)
+  return success
+}
+
+export const resetConfig = async() => {
+  const success = await window.electron.config.resetConfig()
+  return success
+}
+
+export const selectConfigDirectory = async() => {
+  const success = await window.electron.config.selectConfigDirectory()
   return success
 }
