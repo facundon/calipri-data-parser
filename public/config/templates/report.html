@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <link rel='stylesheet' href='report.css' type="text/css">
+    <title>Linea $LINEA$ - $FLOTA$ - Formacion $FORMACION$</title>
+  </head>
+  <body>
+    <div class='container'>
+      <table class='main-table'>
+        <caption>
+          <div class='title' style='--bkgr-color: $COLOR$'>
+            <div class='title-left'>
+              $FECHA$
+            </div>
+            <div class='title-center'>
+              Reporte de Medición
+            </div>
+            <div class='fleet-wrapper'>
+              <div class='title-right-top'>
+                Linea $LINEA$ - 
+                $FLOTA$
+              </div>
+              <div class='title-right-bot'>
+                Formación $FORMACION$
+              </div>
+            </div>
+          </div>
+        </caption>
+        <tbody>
+          $HEADERS$
+          $DATA$
+        </tbody>
+      </table> 
+      <div class='esquema'>
+        $ESQUEMA$
+      </div>      
+      
+      <div class='second-title' style='--bkgr-color: $COLOR$'>
+        <div class='title-left'>
+          $FECHA$
+        </div>
+        <div class='title-center'>
+          Análisis de Diferencias
+        </div>
+        <div class='fleet-wrapper'>
+          <div class='title-right-top'>
+            Linea $LINEA$ - 
+            $FLOTA$
+          </div>
+          <div class='title-right-bot'>
+            Formación $FORMACION$
+          </div>
+        </div>
+      </div>
+      <div class="diff-wrapper">
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Ancho de Pestaña
+            </div>
+          </caption>
+          <tbody>
+            $WIDTH_HEADERS$
+            $WIDTH_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diametro de Rueda Mismo Eje
+            </div>
+          </caption>
+          <tbody>
+            $SHAFT_HEADERS$
+            $SHAFT_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diametro de Rueda Mismo Bogie
+            </div>
+          </caption>
+          <tbody>
+            $BOGIE_HEADERS$
+            $BOGIE_DATA$
+          </tbody>
+        </table>
+        <table class='difference-table'>
+          <caption>
+            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+              Diametro de Rueda Mismo Coche
+            </div>
+          </caption>
+          <tbody>
+            $VEHICLE_HEADERS$
+            $VEHICLE_DATA$
+          </tbody>
+        </table>
+      </div>
+      <div class='footer'>
+        <div class='footer-title'>Notas</div>
+        <ul>
+          $PERFILES$
+          <li>
+            <strong>Rueda N°1:</strong> Rueda izquierda bajo cabina coche <strong>$FIRST_VEHICLE$</strong> punta <strong>$CABECERA$</strong>
+          </li> 
+          <li>
+            Operadores: $OPERADORES$
+          </li>
+          <li>
+            Insturmento utilizado: 344-E-163
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

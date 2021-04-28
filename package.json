@@ -18,10 +18,10 @@
     "copyright": "Copyright © 2021 ${author}",
     "win": {
       "target": [
-        { 
+        {
           "target": "nsis",
           "arch": "x64"
-        } 
+        }
       ]
     },
     "nsis": {
@@ -42,6 +42,7 @@
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
     "better-sqlite3": "^7.1.5",
+    "fs-extra": "^9.1.0",
     "lodash": "^4.17.21",
     "puppeteer": "^8.0.0",
     "react": "^17.0.2",
