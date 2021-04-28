@@ -330,11 +330,24 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
   case "fetchDatesByUnitAndLine":
     return executeAll(`SELECT date FROM ${table} WHERE unit = '${data?.unit}' AND line = '${data?.line}' ORDER BY date`)
   
+  case "fetchLastDate":
+    try {
+      const stmt = db.prepare(`SELECT date from ${table} WHERE unit = '${data?.unit}' AND line = '${data?.line}' AND fleet = '${data?.fleet}' ORDER BY rowid DESC`)
+      const result = stmt.get()
+      db.close()
+      return result
+    } catch (error) {
+      console.log(error)
+      db.close()
+      return false
+    }
+  
   case "fetchData":
     return executeAll(`SELECT data FROM ${table} 
       WHERE unit = '${data?.unit}'
       AND line = '${data?.line}'
       ${data?.date ? `AND date = '${data?.date}'` : ""}`)
+
   case "update":
     try {
       const stmt = db.prepare(`UPDATE ${table} SET date = '${data.date}', line = '${data.line}', fleet = '${data.fleet}', unit = '${data.unit}' WHERE data = '${data.data}'`)

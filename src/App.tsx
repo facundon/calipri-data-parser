@@ -102,8 +102,13 @@ class App extends Component<IProps, IState> {
       const vehicleSchema: string = await load("esquema", "templates", ".html")
       const stations = await findStations()
       const ers = await load("ers")
+      const lastDate = await useDb("fetchLastDate", { 
+        line: this.getItemInHeader("Linea"),
+        fleet: this.getItemInHeader("Flota"),
+        unit: this.getItemInHeader("Formacion")
+      })
       if (!stations) return
-      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations, ers)
+      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations, ers, lastDate)
       const loadedHtml: string = await load("report", "templates", ".html")
       if (!loadedHtml) {
         Alert.error("No se pudo cargar la plantilla para crear PDF", 10000)

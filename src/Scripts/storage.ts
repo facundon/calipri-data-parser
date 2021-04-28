@@ -15,6 +15,7 @@ declare global {
         | "fetchUnitsByLine"
         | "fetchDatesByUnitAndLine"
         | "fetchData"
+        | "fetchLastDate"
         | "update"
         , data?: any, table?: string) => Promise<any>
       },
@@ -55,6 +56,7 @@ interface IUseDb {
   | "fetchUnitsByLine"
   | "fetchDatesByUnitAndLine"
   | "fetchData"
+  | "fetchLastDate"
   | "update"
   , data?: any, table?: string): Promise<any>
 }

@@ -1,5 +1,13 @@
-const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
+const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDate) => {
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
+
+  const getLastDate = () => {
+    if (lastDate.date) {
+      return `<li>Ultima medición: <strong>${lastDate?.date}</strong></li>`
+    } else {
+      return ""
+    }
+  }
 
   const getProfiles = () => evaluatedData.wheels.map(wheel => wheel.profile)
     .filter((profile, index, arr) => index === arr.indexOf(profile))
@@ -276,6 +284,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers) => {
     OPERADORES: findInHeader("Operador"),
     CABECERA: stations[1],
     FIRST_VEHICLE: evaluatedData.wheels[0].vehicle,
+    LAST_DATE: getLastDate(),
   })
 }
 
