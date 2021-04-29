@@ -20,7 +20,8 @@ import {
   closeApp,
   minimizeApp,
   onUpdate,
-  startUpdate
+  startUpdate,
+  getUpdateProgress
 } from "./Scripts/electron-bridge"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
@@ -172,6 +173,9 @@ class App extends Component<IProps, IState> {
     onUpdate((info: string) => {
       this.setState({ needUpdate: true })
       Alert.info(info, 10000)
+    })
+    getUpdateProgress((progress: any) => {
+      console.log(progress)
     })
   }
 

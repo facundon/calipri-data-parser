@@ -402,8 +402,9 @@ autoUpdater.on("update-available", (info) => {
 autoUpdater.on("error", (err) => {
   dialog.showErrorBox("Error buscando actualizacion", err?.message)
 })
-// autoUpdater.on("download-progress", (progressObj) => {
-// })
+autoUpdater.on("download-progress", (progressObj) => {
+  mainWindow.webContents.send("update-progress", progressObj.percent)
+})
 autoUpdater.on("update-downloaded", async(info) => {
   const UPDATE_DIALOG_OPTIONS = {
     message: `Se descargó la actualización. ¿Desea salir y actualizar ahora?${info}`,
