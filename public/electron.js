@@ -106,6 +106,7 @@ function createMainWindow() {
     width: 1100,
     minWidth: 750,
     height: 1000,
+    minHeight: 600,
     center: true,
     show: false,
     frame: false,
