@@ -75,7 +75,11 @@ body {
   .top-bar {
     display: flex;
     justify-content: flex-end;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
     .update-wrapper {
+      -webkit-app-region: no-drag;
       align-self: center;
       width: 90%;
       text-align: center;
@@ -92,6 +96,7 @@ body {
               0 10px 10px rgba(0,0,0,0.12), 
     }
     .btn-wrapper {
+      -webkit-app-region: no-drag;
       .rs-btn {
         border-radius: 0px;
         &:focus {

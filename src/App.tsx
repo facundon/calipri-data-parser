@@ -17,7 +17,8 @@ import prepareData from "./Scripts/print.js"
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 import { IParsedData } from "./Components/DragLoader/types"
 import { Line } from "./Components/StationPanel/template"
-import "./rsuite-default.css"
+
+import "rsuite/dist/styles/rsuite-default.css"
 import "./globalStyles/index.scss"
 
 type DbMeasurementsData = {
