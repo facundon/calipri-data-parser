@@ -47,5 +47,9 @@ contextBridge.exposeInMainWorld("electron", {
       const success = await ipcRenderer.invoke("resetConfig")
       return success
     }
+  },
+  window: {
+    close: () => ipcRenderer.send("close"),
+    minimize: () => ipcRenderer.send("minimize")
   }
 })

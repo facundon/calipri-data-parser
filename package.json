@@ -13,21 +13,17 @@
     "url": "https://github.com/facundon/calipri-data-parser"
   },
   "build": {
-    "appId": "metrovias.electron.${name}",
+    "appId": "metrovias.electron.calipridataparser",
     "productName": "Calipri Data Parser",
     "copyright": "Copyright © 2021 ${author}",
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": "x64"
-        }
-      ]
+      "target": "nsis"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": true,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/installerIcon.ico"
     },
     "files": [
       "build/**/*",
@@ -35,7 +31,10 @@
     ],
     "directories": {
       "buildResources": "assets"
-    }
+    },
+    "extraFiles": [
+      "config"
+    ]
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.10",

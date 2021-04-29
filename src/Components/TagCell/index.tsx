@@ -6,7 +6,7 @@ import Icon from "rsuite/lib/Icon"
 import TagGroup from "rsuite/lib/TagGroup"
 import Tag from "rsuite/lib/Tag"
 
-import { getFiles } from "../../Scripts/storage"
+import { getFiles } from "../../Scripts/electron-bridge"
 import { Fleet } from "../FleetPanel/template"
 import InputPicker from "rsuite/lib/InputPicker"
 import { PROFILES_FOLDER } from "../ProfilePanel"

@@ -20,7 +20,7 @@ import AddItemModal from "../AddItemModal"
 
 import { isEqual } from "lodash"
 import { normalize } from "../../Scripts/utils"
-import { load, save, deleteFile, getFiles } from "../../Scripts/storage"
+import { load, save, deleteFile, getFiles } from "../../Scripts/electron-bridge"
 import { TEMPLATE, Dimension } from "./template"
 import "./styles/index.scss"
 

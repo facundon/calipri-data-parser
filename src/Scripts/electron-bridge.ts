@@ -22,6 +22,10 @@ declare global {
       config: {
         selectConfigDirectory: () => Promise<true | string>,
         resetConfig: () => Promise<true | string>,
+      },
+      window: {
+        close(): () => void,
+        minimize(): () => void
       }
     }
   }
@@ -115,3 +119,6 @@ export const selectConfigDirectory = async() => {
   const success = await window.electron.config.selectConfigDirectory()
   return success
 }
+
+export const closeApp = () => window.electron.window.close()
+export const minimizeApp = () => window.electron.window.minimize()

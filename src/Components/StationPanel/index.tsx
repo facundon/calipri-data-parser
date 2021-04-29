@@ -18,7 +18,7 @@ import AvatarCell from "../AvatarCell"
 import EditCell, { DataKey } from "../EditCell"
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
 
-import { save, load, getFiles } from "../../Scripts/storage"
+import { save, load, getFiles } from "../../Scripts/electron-bridge"
 import { LINE_TEMPLATE, Line } from "./template"
 
 import "./styles/index.scss"

@@ -15,7 +15,7 @@ import SingleTagCell from "../SingleTagCell"
 import confirmService from "../confirmService"
 import ManageCell from "../ManageCell"
 
-import { save, load, getFiles } from "../../Scripts/storage"
+import { save, load, getFiles } from "../../Scripts/electron-bridge"
 import { FLEETS_TEMPLATE, Fleet } from "./template"
 
 import "./styles/index.scss"

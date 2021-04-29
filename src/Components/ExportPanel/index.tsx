@@ -10,7 +10,7 @@ import Loader from "rsuite/lib/Loader"
 import Alert from "rsuite/lib/Alert"
 
 import { jsonToCSV } from "react-papaparse"
-import { saveBulk, useDb } from "../../Scripts/storage"
+import { saveBulk, useDb } from "../../Scripts/electron-bridge"
 
 import "./styles/index.scss"
 import { concat } from "lodash"

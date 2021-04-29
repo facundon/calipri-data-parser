@@ -72,6 +72,33 @@ body {
     height: 50%;
   }
 
+  .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    .update-wrapper {
+      align-self: center;
+      width: 90%;
+      text-align: center;
+      color: #fcfcfc;
+      font-style: italic;
+      span {
+        margin-left: 5px;
+      }
+    }
+    &.update {
+      background-image: -webkit-linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+      background-image: -moz-linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+      background-image: -o-linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+      background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+      box-shadow: 0 1px 1px rgba(0,0,0,0.12), 
+              0 5px 5px rgba(0,0,0,0.12), 
+              0 10px 10px rgba(0,0,0,0.12), 
+    }
+    .btn-wrapper {
+      margin: 5px;
+    }
+  }
+
   .btn-group {
     .dropdown-btn {
       color: $dark;

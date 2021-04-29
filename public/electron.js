@@ -13,9 +13,13 @@ let configPath = path.join(HOMEDIR, "Calipri Parser Config")
 
 async function getFilePath() {
   try {
-    configPath = await fs.readFile(path.join(__dirname, "config", "config_path.txt"), {encoding: "utf-8"})
+    configPath = await fs.readFile(path.join(app.getAppPath(), "../../config_path.txt"), {encoding: "utf-8"})
   } catch (error) {
-    await fs.writeFile(path.join(__dirname, "config", "config_path.txt"), configPath)
+    try {
+      await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
+    } catch (err) {
+      throw err
+    }
   }
 }
 
@@ -38,7 +42,7 @@ async function selectConfigPath() {
   if (canceled) throw {name: "Minor Error", message: "Por favor vuelva a abrir el programa y elija una opción"}
   configPath = filePaths[0]
   try {
-    await fs.writeFile(path.join(__dirname, "config", "config_path.txt"), configPath)
+    await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
     return
   } catch (error) {
     console.log(error)
@@ -100,9 +104,11 @@ let mainWindow
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
+    minWidth: 750,
     height: 1000,
     center: true,
     show: false,
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -112,7 +118,7 @@ function createMainWindow() {
   })
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
-  // mainWindow.removeMenu()
+  mainWindow.removeMenu()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -140,8 +146,8 @@ app.on("ready", () => {
     opacity: 0.85,
   })
   loading.once("show", async() => {
-    await getFilePath()
     try {
+      await getFilePath()
       await selectOrCreateConfigFolder()
     } catch (err) {
       dialog.showErrorBox("Error de Configuración", err.message)
@@ -363,6 +369,14 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
     console.error("wrong action")
     return false
   }
+})
+
+ipcMain.on("close", () => {
+  app.quit()
+})
+
+ipcMain.on("minimize", () => {
+  mainWindow.minimize()
 })
 
 app.on("window-all-closed", () => {

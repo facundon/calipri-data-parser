@@ -5,7 +5,7 @@ import { FLEET_FILE } from "../Components/FleetPanel"
 import { Fleet } from "../Components/FleetPanel/template"
 import { PROFILES_FOLDER } from "../Components/ProfilePanel"
 import { Dimension } from "../Components/ProfilePanel/template"
-import { load } from "./storage"
+import { load } from "./electron-bridge"
 import { SubstractionKinds } from "./substraction"
 
 export type Profiles = {
