@@ -179,15 +179,12 @@ class App extends Component<IProps, IState> {
           <div className="btn-wrapper">
             <IconButton 
               icon={<Icon icon="minus"/>}
-              color="blue"
-              circle
               appearance="subtle"
               onClick={() => minimizeApp()}
             />
             <IconButton 
               icon={<Icon icon="close"/>}
               color="red"
-              circle
               appearance="subtle"
               disabled={this.state.isPrinting}
               onClick={() => closeApp()}
