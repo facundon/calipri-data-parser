@@ -6,7 +6,7 @@
   },
   "homepage": "./",
   "description": "Parser for CSV files emited by Calipri",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "main": "public/electron.js",
   "repository": {
@@ -39,7 +39,8 @@
       {
         "provider": "github",
         "owner": "facundon",
-        "repo": "calipri-data-parser"
+        "repo": "calipri-data-parser",
+        "releaseType": "release" 
       }
     ]
   },
@@ -70,7 +71,9 @@
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "npm run build",
     "dist": "electron-builder",
-    "rebuild": "node_modules/.bin/electron-rebuild -f -w better-sqlite3"
+    "rebuild": "node_modules/.bin/electron-rebuild -f -w better-sqlite3",
+    "prerelease": "npm run build",
+    "release": "electron-builder -c.extraMetadata.main=build/electron.js"
   },
   "eslintConfig": {
     "extends": [

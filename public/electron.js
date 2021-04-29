@@ -1,15 +1,24 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron")
+const { autoUpdater } = require("electron-updater")
 const path = require("path")
 const fs = require("fs-extra")
 
 const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const isDev = true
+const isDev = false
+autoUpdater.autoDownload = false
 
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
 const HOMEDIR = require("os").homedir()
 let configPath = path.join(HOMEDIR, "Calipri Parser Config")
+
+const PATH_SELECT_DIALOG_OPTION = {
+  title: "Seleccionar Carpeta",
+  defaultPath: configPath,
+  buttonLabel: "Seleccionar",
+  properties: ["openDirectory"]
+}
 
 async function getFilePath() {
   try {
@@ -64,6 +73,14 @@ async function createConfigPath() {
 }
 
 async function selectOrCreateConfigFolder() {
+  const FILEPATH_WARN_DIALOG_OPT = {
+    message: `No se encontraron archivos de configuración.
+Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o puede dejar que creemos una por usted en ${configPath}`,
+    type: "warning",
+    buttons: ["Elegir Ubicación", "Crear"],
+    defaultId: 0,
+    title: "No se encontro configuración",
+  }
   try {
     await fs.readdir(configPath)
     return
@@ -79,28 +96,11 @@ async function selectOrCreateConfigFolder() {
   }
 }
 
-const SAVE_PDF_DIALOG_OPT = {
-  title: "Guardar Reporte",
-  buttonLabel: "Guardar",
-  filters: [{name: "Reporte", extensions: ["pdf"]}]
-}
-const FILEPATH_WARN_DIALOG_OPT = {
-  message: `No se encontraron archivos de configuración.
-Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o puede dejar que creemos una por usted en ${configPath}`,
-  type: "warning",
-  buttons: ["Elegir Ubicación", "Crear"],
-  defaultId: 0,
-  title: "No se encontro configuración",
-}
-const PATH_SELECT_DIALOG_OPTION = {
-  title: "Seleccionar Carpeta",
-  defaultPath: configPath,
-  buttonLabel: "Seleccionar",
-  properties: ["openDirectory"]
-}
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+}, 30000)
 
 let mainWindow
-
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -157,6 +157,7 @@ app.on("ready", () => {
     createMainWindow()
     mainWindow.webContents.once("dom-ready", () => {
       mainWindow.show()
+      autoUpdater.checkForUpdates()
       loading.hide()
       loading.close()
     })
@@ -249,7 +250,12 @@ ipcMain.handle("getFiles", async(_, folder) => {
 })
 
 ipcMain.handle("createPdf", async(_, html, name) => {
-  SAVE_PDF_DIALOG_OPT["defaultPath"] = name
+  const SAVE_PDF_DIALOG_OPT = {
+    title: "Guardar Reporte",
+    buttonLabel: "Guardar",
+    filters: [{name: "Reporte", extensions: ["pdf"]}],
+    defaultPath: name,
+  }
   const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
   if (canceled) return "canceled"
   const footer = await fs.readFile(getRelativePath("templates/footer.html"), {encoding: "utf-8"})
@@ -372,6 +378,10 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
   }
 })
 
+ipcMain.on("start-update", () => {
+  autoUpdater.downloadUpdate()
+})
+
 ipcMain.on("close", () => {
   app.quit()
 })
@@ -384,4 +394,24 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit()
   }
+})
+
+autoUpdater.on("update-available", (info) => {
+  mainWindow.webContents.send("update-available", info)
+})
+autoUpdater.on("error", (err) => {
+  dialog.showErrorBox("Error buscando actualizacion", err?.message)
+})
+// autoUpdater.on("download-progress", (progressObj) => {
+// })
+autoUpdater.on("update-downloaded", async(info) => {
+  const UPDATE_DIALOG_OPTIONS = {
+    message: `Se descargó la actualización. ¿Desea salir y actualizar ahora?${info}`,
+    type: "question",
+    buttons: ["Salir y Actualizar", "Más Tarde"],
+    defaultId: 0,
+    title: "Actualización",
+  }
+  const { response } = await dialog.showMessageBox(mainWindow, UPDATE_DIALOG_OPTIONS)
+  if (response === 0) autoUpdater.quitAndInstall()  
 })

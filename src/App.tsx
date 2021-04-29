@@ -10,7 +10,18 @@ import IconButton from "rsuite/lib/IconButton"
 import Alert from "rsuite/lib/Alert"
 import { forIn } from "lodash"
 
-import { load, save, printPdf, useDb, selectConfigDirectory, resetConfig, closeApp, minimizeApp } from "./Scripts/electron-bridge"
+import { 
+  load,
+  save,
+  printPdf,
+  useDb,
+  selectConfigDirectory,
+  resetConfig,
+  closeApp,
+  minimizeApp,
+  onUpdate,
+  startUpdate
+} from "./Scripts/electron-bridge"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
 
@@ -43,8 +54,6 @@ interface IState {
   isUpdating: boolean,
   parsedData: IParsedData
 }
-
-
 
 class App extends Component<IProps, IState> {
   constructor(props: any) {
@@ -159,6 +168,13 @@ class App extends Component<IProps, IState> {
     this.setState({ isPrinting: false })
   }
 
+  componentDidMount() {
+    onUpdate((info: string) => {
+      this.setState({ needUpdate: true })
+      Alert.info(info, 10000)
+    })
+  }
+
   render() {
     return (
       <>
@@ -173,6 +189,7 @@ class App extends Component<IProps, IState> {
                 appearance="primary"
                 loading={this.state.isUpdating}
                 disabled={this.state.isUpdating}
+                onClick={() => startUpdate()}
               />
               <span>Nueva version disponible!</span>
             </div>

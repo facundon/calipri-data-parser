@@ -25,7 +25,9 @@ declare global {
       },
       window: {
         close(): () => void,
-        minimize(): () => void
+        minimize(): () => void,
+        onUpdate(callback: any): (callback: any) => void,
+        startUpdate(): () => void,
       }
     }
   }
@@ -122,3 +124,5 @@ export const selectConfigDirectory = async() => {
 
 export const closeApp = () => window.electron.window.close()
 export const minimizeApp = () => window.electron.window.minimize()
+export const onUpdate = (callback: any) => window.electron.window.onUpdate(callback)
+export const startUpdate = () => window.electron.window.startUpdate()
