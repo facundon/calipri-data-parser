@@ -426,5 +426,8 @@ autoUpdater.on("update-downloaded", async(info) => {
     title: "Actualización",
   }
   const { response } = await dialog.showMessageBox(mainWindow, UPDATE_DIALOG_OPTIONS)
-  if (response === 0) autoUpdater.quitAndInstall()  
+  if (response === 0) autoUpdater.quitAndInstall()
+  if (response === 1) {
+    mainWindow.webContents.send("update-downloaded", info)
+  }
 })

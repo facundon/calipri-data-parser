@@ -54,5 +54,6 @@ contextBridge.exposeInMainWorld("electron", {
     onUpdate: (callback) => ipcRenderer.on("update-available", (_, info) => callback(info)),
     getUpdateProgress: (callback) => ipcRenderer.on("download-progress", (_, progress) => callback(progress)),
     startUpdate: () => ipcRenderer.send("start-update"),
+    onUpdateDownloaded: (callback) => ipcRenderer.on("update-downloaded", (_, info) => callback(info)),
   }
 })

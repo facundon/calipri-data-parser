@@ -21,7 +21,8 @@ import {
   minimizeApp,
   onUpdate,
   startUpdate,
-  getUpdateProgress
+  getUpdateProgress,
+  onUpdateDownloaded
 } from "./Scripts/electron-bridge"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
@@ -178,6 +179,12 @@ class App extends Component<IProps, IState> {
     getUpdateProgress((progress: number) => {
       this.setState({ updateProgress: progress})
     })
+    onUpdateDownloaded(() => {
+      this.setState({
+        isUpdating: false,
+        needUpdate: false
+      })
+    })
   }
 
   render() {
@@ -194,7 +201,10 @@ class App extends Component<IProps, IState> {
                 appearance="primary"
                 loading={this.state.isUpdating}
                 disabled={this.state.isUpdating}
-                onClick={() => startUpdate()}
+                onClick={() => {
+                  this.setState({ isUpdating: true })
+                  startUpdate()
+                }}
               />
               <span>Nueva version disponible!</span>
               <span>{this.state.updateProgress}</span>
@@ -210,7 +220,7 @@ class App extends Component<IProps, IState> {
               icon={<Icon icon="close"/>}
               color="red"
               appearance="subtle"
-              disabled={this.state.isPrinting}
+              disabled={this.state.isPrinting || this.state.isUpdating}
               onClick={() => closeApp()}
             />
           </div>
@@ -229,7 +239,7 @@ class App extends Component<IProps, IState> {
             <ButtonGroup justified>
               <Button
                 color="green"
-                disabled={!this.state.isLoaded || this.state.isPrinting}
+                disabled={!this.state.isLoaded || this.state.isPrinting || this.state.isUpdating}
                 loading={this.state.isPrinting}
                 onClick={this.handlePrintPDF}
               >
@@ -243,6 +253,7 @@ class App extends Component<IProps, IState> {
                   <Button
                     appearance="subtle"
                     className="dropdown-btn"
+                    disabled={this.state.isUpdating}
                   >
                     <Icon icon="sliders" size="2x" />
                     {children}

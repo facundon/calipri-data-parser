@@ -29,6 +29,7 @@ declare global {
         onUpdate(callback: any): (callback: any) => void,
         getUpdateProgress(callback: any): (callback: any) => void,
         startUpdate(): () => void,
+        onUpdateDownloaded(callback: void): (callback: any) => void,
       }
     }
   }
@@ -128,3 +129,4 @@ export const minimizeApp = () => window.electron.window.minimize()
 export const onUpdate = (callback: any) => window.electron.window.onUpdate(callback)
 export const getUpdateProgress = (callback: any) => window.electron.window.getUpdateProgress(callback)
 export const startUpdate = () => window.electron.window.startUpdate()
+export const onUpdateDownloaded = (callback: any) => window.electron.window.onUpdateDownloaded(callback)
