@@ -53,6 +53,7 @@ interface IState {
   isExportPanelOpen: boolean,
   needUpdate: boolean,
   isUpdating: boolean,
+  updateProgress: number,
   parsedData: IParsedData
 }
 
@@ -68,6 +69,7 @@ class App extends Component<IProps, IState> {
       isExportPanelOpen: false,
       needUpdate: false,
       isUpdating: false,
+      updateProgress: 0,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
   }
@@ -170,12 +172,11 @@ class App extends Component<IProps, IState> {
   }
 
   componentDidMount() {
-    onUpdate((info: string) => {
+    onUpdate(() => {
       this.setState({ needUpdate: true })
-      Alert.info(info, 10000)
     })
-    getUpdateProgress((progress: any) => {
-      console.log(progress)
+    getUpdateProgress((progress: number) => {
+      this.setState({ updateProgress: progress})
     })
   }
 
@@ -196,6 +197,7 @@ class App extends Component<IProps, IState> {
                 onClick={() => startUpdate()}
               />
               <span>Nueva version disponible!</span>
+              <span>{this.state.updateProgress}</span>
             </div>
           }
           <div className="btn-wrapper">

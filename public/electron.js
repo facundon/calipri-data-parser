@@ -26,6 +26,9 @@ async function getFilePath() {
   } catch (error) {
     try {
       await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
+      fs.chmod(path.join(app.getAppPath(), "../../config_path.txt"), 0666, (error) => {
+        console.log("Changed file permissions")
+      })
     } catch (err) {
       throw err
     }
@@ -52,6 +55,9 @@ async function selectConfigPath() {
   configPath = filePaths[0]
   try {
     await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
+    fs.chmod(path.join(app.getAppPath(), "../../config_path.txt"), 0666, (error) => {
+      console.log("Changed file permissions")
+    })
     return
   } catch (error) {
     console.log(error)
@@ -191,6 +197,9 @@ ipcMain.handle("save", async(_, name, data, folder) => {
   let dir = getRelativePath(folder)
   try {
     const err = await fs.writeFile(path.join(dir, name), data)
+    fs.chmod(path.join(dir, name), 0666, (error) => {
+      console.log("Changed file permissions")
+    })
     return !err
   } catch (error) {
     console.log(error)
@@ -208,6 +217,9 @@ ipcMain.handle("saveBulk", async(_, names, data, folder) => {
     let index = 0
     for (const name of names) {
       await fs.writeFile(path.join(dir, name), data[index])
+      fs.chmod(path.join(dir, name), 0666, (error) => {
+        console.log("Changed file permissions")
+      })
       index++
     }
     return true
@@ -407,7 +419,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 })
 autoUpdater.on("update-downloaded", async(info) => {
   const UPDATE_DIALOG_OPTIONS = {
-    message: `Se descargó la actualización. ¿Desea salir y actualizar ahora?${info}`,
+    message: "Se descargó la actualización. ¿Desea salir y actualizar ahora?",
     type: "question",
     buttons: ["Salir y Actualizar", "Más Tarde"],
     defaultId: 0,
