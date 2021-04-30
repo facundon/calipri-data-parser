@@ -6,7 +6,7 @@ const fs = require("fs-extra")
 const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const isDev = true
+const isDev = false
 autoUpdater.autoDownload = false
 
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
@@ -22,11 +22,11 @@ const PATH_SELECT_DIALOG_OPTION = {
 
 async function getFilePath() {
   try {
-    configPath = await fs.readFile(path.join(app.getAppPath(), "../../config_path.txt"), {encoding: "utf-8"})
+    configPath = await fs.readFile(path.join(app.getPath("userData"), "config_path.txt"), {encoding: "utf-8"})
   } catch (error) {
     try {
-      await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
-      fs.chmod(path.join(app.getAppPath(), "../../config_path.txt"), 0666, (error) => {
+      await fs.writeFile(path.join(app.getPath("userData"), "config_path.txt"), configPath)
+      fs.chmod(path.join(app.getPath("userData"), "config_path.txt"), 0666, (error) => {
         console.log("Changed file permissions")
       })
     } catch (err) {
@@ -54,8 +54,8 @@ async function selectConfigPath() {
   if (canceled) throw {name: "Minor Error", message: "Por favor vuelva a abrir el programa y elija una opción"}
   configPath = filePaths[0]
   try {
-    await fs.writeFile(path.join(app.getAppPath(), "../../config_path.txt"), configPath)
-    fs.chmod(path.join(app.getAppPath(), "../../config_path.txt"), 0666, (error) => {
+    await fs.writeFile(path.join(app.getPath("userData"), "config_path.txt"), configPath)
+    fs.chmod(path.join(app.getPath("userData"), "config_path.txt"), 0666, (error) => {
       console.log("Changed file permissions")
     })
     return
@@ -427,7 +427,5 @@ autoUpdater.on("update-downloaded", async(info) => {
   }
   const { response } = await dialog.showMessageBox(mainWindow, UPDATE_DIALOG_OPTIONS)
   if (response === 0) autoUpdater.quitAndInstall()
-  if (response === 1) {
-    mainWindow.webContents.send("update-downloaded", info)
-  }
+  if (response === 1) mainWindow.webContents.send("update-downloaded", info)
 })
