@@ -411,12 +411,18 @@ app.on("window-all-closed", () => {
 autoUpdater.on("update-available", (info) => {
   mainWindow.webContents.send("update-available", info)
 })
+
+let updating = false
 autoUpdater.on("error", (err) => {
-  dialog.showErrorBox(err?.name, err?.message)
+  if (updating)
+    dialog.showErrorBox("Error de actualización", err?.message)
 })
+
 autoUpdater.on("download-progress", (progressObj) => {
+  updating = true
   mainWindow.webContents.send("update-progress", progressObj.percent)
 })
+
 autoUpdater.on("update-downloaded", async(info) => {
   const UPDATE_DIALOG_OPTIONS = {
     message: "Se descargó la actualización. ¿Desea salir y actualizar ahora?",
@@ -425,6 +431,7 @@ autoUpdater.on("update-downloaded", async(info) => {
     defaultId: 0,
     title: "Actualización",
   }
+  updating = false
   const { response } = await dialog.showMessageBox(mainWindow, UPDATE_DIALOG_OPTIONS)
   if (response === 0) autoUpdater.quitAndInstall()
   if (response === 1) mainWindow.webContents.send("update-downloaded", info)
