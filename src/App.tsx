@@ -190,27 +190,29 @@ class App extends Component<IProps, IState> {
   render() {
     return (
       <>
-        <div className={`top-bar ${this.state.needUpdate && "update"}`}>
+        <div className={`top-bar update ${this.state.needUpdate && "update"}`}>
           {this.state.needUpdate &&
             <div className="update-wrapper">
-              <IconButton
-                icon={<Icon icon="cloud-download" />}
-                color="green"
-                circle
-                size="md"
-                appearance="primary"
-                loading={this.state.isUpdating}
-                disabled={this.state.isUpdating}
-                onClick={() => {
-                  this.setState({ isUpdating: true })
-                  startUpdate()
-                }}
-              />
               <span>Nueva version disponible!</span>
               <span>{this.state.updateProgress}</span>
             </div>
           }
           <div className="btn-wrapper">
+            {this.state.needUpdate &&
+              <Button
+                color="green"
+                size="md"
+                appearance="primary"
+                loading={this.state.isUpdating}
+                onClick={() => {
+                  this.setState({ isUpdating: true })
+                  startUpdate()
+                }}
+              >
+                Actualizar
+                <Icon icon="cloud-download" style={{paddingLeft: "5px"}}/>
+              </Button>
+            }
             <IconButton 
               icon={<Icon icon="minus"/>}
               appearance="subtle"

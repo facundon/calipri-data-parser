@@ -6,7 +6,7 @@ const fs = require("fs-extra")
 const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const isDev = false
+const isDev = true
 autoUpdater.autoDownload = false
 
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
