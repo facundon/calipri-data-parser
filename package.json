@@ -6,7 +6,7 @@
   },
   "homepage": "./",
   "description": "Parser for CSV files emited by Calipri",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "private": true,
   "main": "public/electron.js",
   "repository": {

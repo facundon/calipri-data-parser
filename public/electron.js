@@ -104,7 +104,7 @@ Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o
 
 setInterval(() => {
   autoUpdater.checkForUpdates()
-}, 30000)
+}, 300000)
 
 let mainWindow
 function createMainWindow() {

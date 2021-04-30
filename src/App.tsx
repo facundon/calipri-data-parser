@@ -190,7 +190,7 @@ class App extends Component<IProps, IState> {
   render() {
     return (
       <>
-        <div className={`top-bar update ${this.state.needUpdate && "update"}`}>
+        <div className={`top-bar ${this.state.needUpdate && "update"}`}>
           {this.state.needUpdate &&
             <div className="update-wrapper">
               <span>Nueva version disponible!</span>
