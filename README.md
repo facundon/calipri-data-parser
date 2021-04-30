@@ -1,46 +1,49 @@
-# Getting Started with Create React App
+# Calipri Data Parser
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A parser for CSV files emited by the wheel laser meter [Calipri](https://www.nextsense-worldwide.com/en/industries/railway.html). Once parsed, the app emits a report in pdf format with all the values evaluated against the corresponding profile configuration.
 
-## Available Scripts
+This project is used in [Buenos Aires Subway](https://www.metrovias.com.ar/) by the QC department.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+### `Profiles Panel`
+- Posibility to add or remove wheel profiles
+- Repair specification tag for each profile
+- Loaded data for each profile depends on the profile of each fleet
+- The fleets profiles can be assigned from the Fleet Panel
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### `Fleet Panel`
+- Posibility to add or remove fleets
+- Asigment of profiles only declared in the Profile Panel
+- Assigment of a reference to identify trailer cars
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### `Terminals Panel`
+- Posibility to add or remove lines
+- Assigment of both terminals for each line
+- Posibility to change color of existing lines
 
-### `npm test`
+### `Export`
+Posibility to export, one or more, already emited reports back to csv for other uses (for ex. data analysis). The exported csv file only has redundant data
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### `Configuration`
+The default configuration file schema is:
+- **templates**
+  - **report.html** -> *the report template with placeholders*
+  - **report.css** -> *the report styling*
+  - **unit_schema.html** -> *a html drawed car to insert in the report*
+  - **footer.html** -> *footer of each pdf page*
+- **profiles** -> *one file per profile that holds the repair especification data*
+  - **ore.json** 
+  - **cde.json**
+  - **lb.json**
+- **lines.json** -> *holds all the lines with its respective terminals and line color*
+- **fleets.json** -> *holds all the fleets with its respective profiles and references*
+- **ers.json** -> *holds the specification tags*
+- **calipri.db** -> *historical data from all emited reports*
 
-### `npm run build`
+from the options, the user can:
+- Posibility to select a folder from where the configuration is loaded
+- Posibility to overwrite existing configuration to default.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+There is one more file (config_path.txt), saved in appData folder, that contains the path to the configuration folder.
+If the folder doesn't exists, the app asks wether to **chose the path** to the configuration folder or to **create** the folder with the default configuration in `/Documents/Calipri Parser Config`
