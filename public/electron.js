@@ -412,7 +412,7 @@ autoUpdater.on("update-available", (info) => {
   mainWindow.webContents.send("update-available", info)
 })
 autoUpdater.on("error", (err) => {
-  dialog.showErrorBox("Error buscando actualizacion", err?.message)
+  dialog.showErrorBox(err?.name, err?.message)
 })
 autoUpdater.on("download-progress", (progressObj) => {
   mainWindow.webContents.send("update-progress", progressObj.percent)
