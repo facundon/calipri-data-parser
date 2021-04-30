@@ -52,7 +52,7 @@ contextBridge.exposeInMainWorld("electron", {
     close: () => ipcRenderer.send("close"),
     minimize: () => ipcRenderer.send("minimize"),
     onUpdate: (callback) => ipcRenderer.on("update-available", (_, info) => callback(info)),
-    getUpdateProgress: (callback) => ipcRenderer.on("download-progress", (_, progress) => callback(progress)),
+    getUpdateProgress: (callback) => ipcRenderer.on("download-progress", (_, progress, updating) => callback(progress, updating)),
     startUpdate: () => ipcRenderer.send("start-update"),
     onUpdateDownloaded: (callback) => ipcRenderer.on("update-downloaded", (_, info) => callback(info)),
   }

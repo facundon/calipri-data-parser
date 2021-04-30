@@ -2,7 +2,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDa
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
 
   const getLastDate = () => {
-    if (lastDate.date) {
+    if (lastDate?.date) {
       return `<li>Ultima medición: <strong>${lastDate?.date}</strong></li>`
     } else {
       return ""

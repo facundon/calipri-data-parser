@@ -8,6 +8,7 @@ import Dropdown from "rsuite/lib/Dropdown"
 import Icon from "rsuite/lib/Icon"
 import IconButton from "rsuite/lib/IconButton"
 import Alert from "rsuite/lib/Alert"
+import Progress from "rsuite/lib/Progress"
 import { forIn } from "lodash"
 
 import { 
@@ -29,10 +30,13 @@ import prepareData from "./Scripts/print.js"
 
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 import { IParsedData } from "./Components/DragLoader/types"
-import { Line } from "./Components/StationPanel/template"
+import { TLine } from "./Components/StationPanel/template"
 
 import "rsuite/dist/styles/rsuite-default.css"
 import "./globalStyles/index.scss"
+
+
+const { Line } = Progress
 
 type DbMeasurementsData = {
   date: string,
@@ -55,6 +59,7 @@ interface IState {
   needUpdate: boolean,
   isUpdating: boolean,
   updateProgress: number,
+  updateError: boolean,
   parsedData: IParsedData
 }
 
@@ -71,6 +76,7 @@ class App extends Component<IProps, IState> {
       needUpdate: false,
       isUpdating: false,
       updateProgress: 0,
+      updateError: false,
       parsedData: PARSED_DATA_INITIAL_VALUES
     }
   }
@@ -101,7 +107,7 @@ class App extends Component<IProps, IState> {
 
   handlePrintPDF = async() => {
     const findStations = async() => {
-      const lines: Line[] = await load("lineas")
+      const lines: TLine[] = await load("lineas")
       if (lines){
         const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
         if (!line) {
@@ -176,8 +182,11 @@ class App extends Component<IProps, IState> {
     onUpdate(() => {
       this.setState({ needUpdate: true })
     })
-    getUpdateProgress((progress: number) => {
-      this.setState({ updateProgress: progress})
+    getUpdateProgress((progress: number, updating: boolean) => {
+      this.setState({
+        updateProgress: progress,
+        updateError: !updating
+      })
     })
     onUpdateDownloaded(() => {
       this.setState({
@@ -188,22 +197,30 @@ class App extends Component<IProps, IState> {
   }
 
   render() {
+    const { isExportPanelOpen, isFleetConfigOpen, isProfilePanelOpen,
+      isLoaded, isPrinting, isStationConfigOpen, isUpdating, needUpdate,
+      updateError, updateProgress } = this.state
     return (
       <>
-        <div className={`top-bar ${this.state.needUpdate && "update"}`}>
-          {this.state.needUpdate &&
+        <div className={`top-bar ${needUpdate && "update"}`}>
+          {needUpdate &&
             <div className="update-wrapper">
-              <span>Nueva version disponible!</span>
-              <span>{this.state.updateProgress}</span>
+              {updateProgress 
+                ? <Line 
+                  percent={updateProgress}
+                  status={updateError ? "fail" : updateProgress !== 100 ? "active" : "success"}
+                />  
+                : <span>Nueva version disponible!</span>
+              }
             </div>
           }
           <div className="btn-wrapper">
-            {this.state.needUpdate &&
+            {needUpdate &&
               <Button
                 color="green"
                 size="md"
                 appearance="primary"
-                loading={this.state.isUpdating}
+                loading={isUpdating}
                 onClick={() => {
                   this.setState({ isUpdating: true })
                   startUpdate()
@@ -222,7 +239,7 @@ class App extends Component<IProps, IState> {
               icon={<Icon icon="close"/>}
               color="red"
               appearance="subtle"
-              disabled={this.state.isPrinting || this.state.isUpdating}
+              disabled={isPrinting || isUpdating}
               onClick={() => closeApp()}
             />
           </div>
@@ -241,8 +258,8 @@ class App extends Component<IProps, IState> {
             <ButtonGroup justified>
               <Button
                 color="green"
-                disabled={!this.state.isLoaded || this.state.isPrinting || this.state.isUpdating}
-                loading={this.state.isPrinting}
+                disabled={!isLoaded || isPrinting || isUpdating}
+                loading={isPrinting}
                 onClick={this.handlePrintPDF}
               >
                 <Icon icon="file-pdf-o" size="2x" />
@@ -255,7 +272,7 @@ class App extends Component<IProps, IState> {
                   <Button
                     appearance="subtle"
                     className="dropdown-btn"
-                    disabled={this.state.isUpdating}
+                    disabled={isUpdating}
                   >
                     <Icon icon="sliders" size="2x" />
                     {children}
@@ -293,19 +310,19 @@ class App extends Component<IProps, IState> {
           </div>
           <ProfilePanel 
             profilePanelHandler={val => this.setState({ isProfilePanelOpen: val })} 
-            isProfilePanelOpen={this.state.isProfilePanelOpen} 
+            isProfilePanelOpen={isProfilePanelOpen} 
           />
           <FleetPanel
             fleetPanelHandler={val => this.setState({ isFleetConfigOpen: val })}
-            isFleetPanelOpen={this.state.isFleetConfigOpen}
+            isFleetPanelOpen={isFleetConfigOpen}
           />
           <StationPanel 
             stationPanelHandler={val => this.setState({ isStationConfigOpen: val })}
-            isStationPanelOpen={this.state.isStationConfigOpen}
+            isStationPanelOpen={isStationConfigOpen}
           />
           <ExportPanel
             exportPanelHandler={val => this.setState({ isExportPanelOpen: val })}
-            isExportPanelOpen={this.state.isExportPanelOpen}
+            isExportPanelOpen={isExportPanelOpen}
           />
         </div>
       </>

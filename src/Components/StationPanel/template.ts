@@ -1,4 +1,4 @@
-export type Line = {
+export type TLine = {
   id: string,
   name: string,
   station1: string,
@@ -7,7 +7,7 @@ export type Line = {
   status: "EDIT" | null,
 }
 
-export const LINE_TEMPLATE: Line[] = [
+export const LINE_TEMPLATE: TLine[] = [
   {
     id: "1",
     name: "A",

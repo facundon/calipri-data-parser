@@ -9,9 +9,11 @@ const Database = require("better-sqlite3")
 const isDev = false
 autoUpdater.autoDownload = false
 
+const CONFIG_PATH_FILE = "config_path.txt"
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
-const HOMEDIR = require("os").homedir()
-let configPath = path.join(HOMEDIR, "Calipri Parser Config")
+const MY_DOCUMENTS_PATH = app.getPath("documents")
+const USER_DATA_PATH = app.getPath("userData")
+let configPath = path.join(MY_DOCUMENTS_PATH, "Calipri Parser Config")
 
 const PATH_SELECT_DIALOG_OPTION = {
   title: "Seleccionar Carpeta",
@@ -22,11 +24,11 @@ const PATH_SELECT_DIALOG_OPTION = {
 
 async function getFilePath() {
   try {
-    configPath = await fs.readFile(path.join(app.getPath("userData"), "config_path.txt"), {encoding: "utf-8"})
+    configPath = await fs.readFile(path.join(USER_DATA_PATH, CONFIG_PATH_FILE), {encoding: "utf-8"})
   } catch (error) {
     try {
-      await fs.writeFile(path.join(app.getPath("userData"), "config_path.txt"), configPath)
-      fs.chmod(path.join(app.getPath("userData"), "config_path.txt"), 0666, (error) => {
+      await fs.writeFile(path.join(USER_DATA_PATH, CONFIG_PATH_FILE), configPath)
+      fs.chmod(path.join(USER_DATA_PATH, CONFIG_PATH_FILE), 0666, (error) => {
         console.log("Changed file permissions")
       })
     } catch (err) {
@@ -54,8 +56,8 @@ async function selectConfigPath() {
   if (canceled) throw {name: "Minor Error", message: "Por favor vuelva a abrir el programa y elija una opción"}
   configPath = filePaths[0]
   try {
-    await fs.writeFile(path.join(app.getPath("userData"), "config_path.txt"), configPath)
-    fs.chmod(path.join(app.getPath("userData"), "config_path.txt"), 0666, (error) => {
+    await fs.writeFile(path.join(USER_DATA_PATH, CONFIG_PATH_FILE), configPath)
+    fs.chmod(path.join(USER_DATA_PATH, CONFIG_PATH_FILE), 0666, (error) => {
       console.log("Changed file permissions")
     })
     return
@@ -414,13 +416,15 @@ autoUpdater.on("update-available", (info) => {
 
 let updating = false
 autoUpdater.on("error", (err) => {
-  if (updating)
+  if (updating){
+    updating = false
     dialog.showErrorBox("Error de actualización", err?.message)
+  }
 })
 
 autoUpdater.on("download-progress", (progressObj) => {
   updating = true
-  mainWindow.webContents.send("update-progress", progressObj.percent)
+  mainWindow.webContents.send("download-progress", progressObj.percent, updating)
 })
 
 autoUpdater.on("update-downloaded", async(info) => {
