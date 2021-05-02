@@ -6,9 +6,10 @@ const fs = require("fs-extra")
 const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const isDev = false
+const isDev = true
 autoUpdater.autoDownload = false
 
+const CHECK_UPDATES_INTERVAL = 300000
 const CONFIG_PATH_FILE = "config_path.txt"
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
 const MY_DOCUMENTS_PATH = app.getPath("documents")
@@ -106,7 +107,7 @@ Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o
 
 setInterval(() => {
   autoUpdater.checkForUpdates()
-}, 300000)
+}, CHECK_UPDATES_INTERVAL)
 
 let mainWindow
 function createMainWindow() {
@@ -128,6 +129,7 @@ function createMainWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   mainWindow.removeMenu()
+  mainWindow.webContents.openDevTools()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -411,6 +413,7 @@ app.on("window-all-closed", () => {
 })
 
 autoUpdater.on("update-available", (info) => {
+  console.log(info)
   mainWindow.webContents.send("update-available", info)
 })
 

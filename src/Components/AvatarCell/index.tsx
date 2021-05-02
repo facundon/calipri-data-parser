@@ -2,11 +2,11 @@ import React from "react"
 import Avatar from "rsuite/lib/Avatar"
 import Table from "rsuite/lib/Table"
 
-import { Line } from "../StationPanel/template"
+import { TLine } from "../StationPanel/template"
 
 import "./styles/index.scss"
 
-const AvatarCell: React.ElementType = ({ rowData, onClick, ...props }: {rowData: Line, onClick: (id: string) => void}) => {
+const AvatarCell: React.ElementType = ({ rowData, onClick, ...props }: {rowData: TLine, onClick: (id: string) => void}) => {
   const { Cell } = Table
 
   return (

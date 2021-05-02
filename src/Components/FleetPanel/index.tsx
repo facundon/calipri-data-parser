@@ -81,7 +81,12 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
     setEditing(false)
   }
 
-  const handleManageFleetProps = (data: string, fleetId: string, action: "add" | "remove" | "update") => {
+  const handleManageFleetProps = (
+    data: string,
+    fleetId: string,
+    action: "add" | "remove" | "update",
+    itemToUpdate: "reference" | "module" = "reference"
+  ) => {
     const nextFleets: Fleet[] = Object.assign([], fleets)
     nextFleets.forEach((fleet, index) => {
       if (fleet.id === fleetId) {
@@ -94,7 +99,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           nextFleets[index].profiles.splice(profileIndex, 1)
           break
         case "update":
-          nextFleets[index].reference = data
+          nextFleets[index][itemToUpdate] = data
           break
         }
       }
@@ -121,6 +126,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
         fleet: newFleetName,
         profiles: ["ORE"],
         reference: "R",
+        module: "1",
       }
       const nextFleets = Object.assign([], fleets)
       nextFleets.push(newFleet)
@@ -169,7 +175,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
   }
 
   return (
-    <Modal size={"sm"} show={isFleetPanelOpen} className="config-form fleet-form">
+    <Modal size={"md"} show={isFleetPanelOpen} className="config-form fleet-form">
       <Modal.Header closeButton={false}>
         <Modal.Title>Flotas</Modal.Title>
       </Modal.Header>
@@ -193,7 +199,7 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
             <HeaderCell></HeaderCell>
             <ManageCell noTree dataKey="id" onClick={handleRemoveFleet} />
           </Column>
-          <Column flexGrow={2} fixed align="center">
+          <Column flexGrow={3} fixed align="center">
             <HeaderCell>Flota</HeaderCell>
             <Cell dataKey="fleet" className="parameter-cell" />
           </Column>
@@ -209,6 +215,14 @@ const FleetPanel: React.FC<IFleetPanel> = ({ isFleetPanelOpen, fleetPanelHandler
           <Column flexGrow={2} align="right">
             <HeaderCell>Referencia Remolque</HeaderCell>
             <SingleTagCell dataKey="reference" updateReference={handleManageFleetProps} />
+          </Column>
+          <Column flexGrow={2} align="right">
+            <HeaderCell>Cant. de Modulos</HeaderCell>
+            <SingleTagCell 
+              number
+              dataKey="module"
+              updateReference={(data: string, fleetId: string) => handleManageFleetProps(data, fleetId, "update", "module")}
+            />
           </Column>
         </Table>
         <div className="add-profile-wrapper">

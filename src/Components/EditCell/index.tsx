@@ -4,13 +4,13 @@ import Table from "rsuite/lib/Table"
 import Input from "rsuite/lib/Input"
 
 import "./styles/index.scss"
-import { Line } from "../StationPanel/template"
+import { TLine } from "../StationPanel/template"
 
 export type DataKey =
   | "station1"
   | "station2"
 
-const EditCell: React.ElementType = ({ rowData, dataKey, onChange, onPressEnter, ...props }: {rowData: Line, dataKey:DataKey, onChange: any, onPressEnter: any}) => {
+const EditCell: React.ElementType = ({ rowData, dataKey, onChange, onPressEnter, ...props }: {rowData: TLine, dataKey: DataKey, onChange: any, onPressEnter: any}) => {
   const { Cell } = Table
   const editing = rowData!.status === "EDIT"
   return (

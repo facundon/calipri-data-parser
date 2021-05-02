@@ -6,6 +6,9 @@ This project is used in [Buenos Aires Subway](https://www.metrovias.com.ar/) by 
 
 ## Features
 
+- Built with Electron, React, Typescript and Sass
+- Application Auto Update 
+
 ### `Profiles Panel`
 - Posibility to add or remove wheel profiles
 - Repair specification tag for each profile

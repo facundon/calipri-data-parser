@@ -7,7 +7,7 @@
   },
   "homepage": "./",
   "description": "Parser for CSV files emited by Calipri",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "main": "public/electron.js",
   "repository": {
@@ -41,7 +41,7 @@
         "provider": "github",
         "owner": "facundon",
         "repo": "calipri-data-parser",
-        "releaseType": "release" 
+        "releaseType": "draft" 
       }
     ]
   },

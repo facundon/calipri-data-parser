@@ -5,19 +5,21 @@ import Icon from "rsuite/lib/Icon"
 import Tag from "rsuite/lib/Tag"
 import Whisper from "rsuite/lib/Whisper"
 import Tooltip from "rsuite/lib/Tooltip"
+import Input from "rsuite/lib/Input"
 
 import { Fleet } from "../FleetPanel/template"
-import Input from "rsuite/lib/Input"
 
 import "./styles/index.scss"
 
 
-const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }: {
+const SingleTagCell: React.ElementType = ({ rowData, dataKey, updateReference, number = false, ...props }: {
     rowData: Fleet,
+    dataKey: "reference" | "module",
     updateReference: (ref: string, id: string, action: "update") => void,
+    number?: boolean,
   }) => {
   const { Cell } = Table
-  const [ref, setRef] = useState<string>(rowData.reference)
+  const [ref, setRef] = useState<string>(rowData[dataKey])
   const [editing, setEditing] = useState<boolean>(false)
   const [error, setError] = useState<boolean>(false)
 
@@ -35,7 +37,7 @@ const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }
   }
 
   return (
-    <Cell {...props}>
+    <Cell {...props} >
       {editing
         ? 
         <Whisper
@@ -48,18 +50,20 @@ const SingleTagCell: React.ElementType = ({ rowData, updateReference, ...props }
             className="single-tag-input"
             style={{width: 35}}
             onChange={val => {
-              setRef(val)
+              if (number) val = val.replace(/\D/g, "")
+              setRef(val.toUpperCase())
               setError(false)
             }}
             onPressEnter={handleSubmit}
             maxLength={1}
             autoFocus
             size="xs"
-            placeholder={ref || "R"}
+            placeholder={ref || number ? "1" : "R"}
             defaultValue={ref}
+            value={ref}
           />
         </Whisper>
-        : <Tag key={rowData.id} className="single-tag-tag">{rowData.reference}</Tag>
+        : <Tag key={rowData.id} className="single-tag-tag">{rowData[dataKey]}</Tag>
       }
       <IconButton 
         style={{marginLeft: "10px"}}

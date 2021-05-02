@@ -6,7 +6,7 @@ import Table from "rsuite/lib/Table"
 import Divider from "rsuite/lib/Divider"
 import { Dimension } from "../ProfilePanel/template"
 import { DataKey } from "../EditCell"
-import { Line } from "../StationPanel/template" 
+import { TLine } from "../StationPanel/template" 
 
 export type EditableValues = {
   maxVal?: number | null | "-",
@@ -23,7 +23,7 @@ const ActionEditCell: React.ElementType = ({
   station = false,
   ...props 
 }: {
-  rowData: Dimension & Line,
+  rowData: Dimension & TLine,
   dataKey: DataKey,
   onClick: any,
   station?: boolean

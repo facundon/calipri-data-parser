@@ -3,6 +3,7 @@ export type Fleet = {
   fleet: string,
   profiles: string[]
   reference: string,
+  module: string,
 }
 
 export const FLEETS_TEMPLATE: Fleet[] = [
@@ -11,11 +12,13 @@ export const FLEETS_TEMPLATE: Fleet[] = [
     fleet: "CNR",
     profiles: ["ORE"],
     reference: "R",
+    module: "2",
   },
   {
     id: "2",
     fleet: "FIAT",
     profiles: ["ORE", "CDE"],
     reference: "C",
+    module: "2",
   }
 ]
