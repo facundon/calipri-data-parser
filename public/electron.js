@@ -42,16 +42,6 @@ function getRelativePath(folder) {
   return path.join(configPath, folder)
 }
 
-function createMeasurementsTable(table) {
-  return db.prepare(`CREATE TABLE IF NOT EXISTS ${table}(
-    date TEXT NOT NULL,
-    line TEXT NOT NULL,
-    fleet TEXT NOT NULL,
-    unit TEXT NOT NULL,
-    data BLOB NOT NULL UNIQUE)`
-  )
-}
-
 async function selectConfigPath() {
   const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
   if (canceled) throw {name: "Minor Error", message: "Por favor vuelva a abrir el programa y elija una opción"}
@@ -303,6 +293,20 @@ ipcMain.handle("createPdf", async(_, html, name) => {
 })
 
 ipcMain.handle("dbHandler", async(_, action, data, table) => {
+  function createMeasurementsTable() {
+    try {
+      const stmt = db.prepare(`CREATE TABLE IF NOT EXISTS ${table}(
+        date TEXT NOT NULL,
+        line TEXT NOT NULL,
+        fleet TEXT NOT NULL,
+        unit TEXT NOT NULL,
+        data BLOB NOT NULL UNIQUE)`
+      )
+      stmt.run()
+    } catch (err) {
+      throw new Error(err)
+    }
+  }
   function executeAll(query) {
     try {
       const stmt = db.prepare(query)
@@ -336,12 +340,11 @@ ipcMain.handle("dbHandler", async(_, action, data, table) => {
         return true
       } catch (error) {
         console.log(error)
-        db.close()
         if (error.message.includes("UNIQUE")) return "unique"
         if (count === maxTries) return false
         count++
         try {
-          createMeasurementsTable(table).run()
+          createMeasurementsTable()
         } catch (err) { 
           console.log(err)
           db.close()
