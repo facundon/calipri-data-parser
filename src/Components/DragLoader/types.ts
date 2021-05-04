@@ -53,12 +53,12 @@ export type Wheel = {
 }
 
 export interface IPositions {
-  vehicleName: number
-  vehicleValue: number
-  bogie1: number
-  bogie2: number,
-  profile: number,
-  type: number
+  vehicleName: number | undefined,
+  vehicleValue: number | undefined,
+  bogie1: number | undefined,
+  bogie2: number | undefined,
+  profile: number | undefined,
+  type: number | undefined,
 }
 
 export interface IParsedData {

@@ -39,13 +39,17 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
   const [previewData, setPreviewData] = useState<PreviewData[]>([])
 
   const handleOnDrop = (data: T.ILoadedData[]) => {
-    const getPosition = (headerName: string) => (
-      data.find(
-        (val) => val.data.find(
-          (val) => val === headerName
+    const getPosition = (headerName: string) => {
+      const filteredData = data.find(val =>
+        val.data.find(val =>
+          val === headerName
         )
-      )!.data.indexOf(headerName)
-    )
+      )
+      const position = filteredData?.data.indexOf(headerName)
+      if (!position) Alert.error(`Formato de CSV Invalido. Falta parámetro ${headerName}`, 10000)
+      return position
+    }
+
     const positions: T.IPositions = {
       vehicleName: getPosition(Header.VehicleName),
       vehicleValue: getPosition(Header.VehicleValue),
@@ -55,20 +59,25 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
       type: getPosition(Header.Type)
     }
 
+    if (Object.values(positions).includes(undefined)) {
+      handleIsLoaded(false)
+      return
+    }
+
     const parseDimension = (dimension: string) => {
       const posDimensionName = getPosition(Header.DimensionName)
       const posDimensionValue = getPosition(Header.DimensionValue)
       return (
         data.filter(
-          (arr) => arr.data[posDimensionName] === dimension
+          (arr) => arr.data[posDimensionName!] === dimension
         ).map(
-          (marr) => marr.data[posDimensionValue]
+          (marr) => marr.data[posDimensionValue!]
         )
       )
     }
     const parseFlangeExtraData = (posExtraData: number) => (
       data.filter(
-        (arr, index) => arr.data[positions.vehicleName] === Dimension.Vehicle && arr.data[posExtraData] !== "" && index % 3 === 0
+        (arr, index) => arr.data[positions.vehicleName!] === Dimension.Vehicle && arr.data[posExtraData] !== "" && index % 3 === 0
       ).map(
         (marr) => marr.data[posExtraData]
       )
@@ -90,17 +99,17 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
     })
 
     const parsedVehicle = data.filter(
-      (arr) => arr.data[positions.vehicleName] === Dimension.Vehicle
+      (arr) => arr.data[positions.vehicleName!] === Dimension.Vehicle
     ).map(
-      (marr) => marr.data[positions.vehicleValue]
+      (marr) => marr.data[positions.vehicleValue!]
     ).filter(
       (arr, index, self) => self.indexOf(arr) === index
     )
 
     const parsedBogie = data.filter(
-      (arr) => arr.data[positions.vehicleName] === Dimension.Vehicle
+      (arr) => arr.data[positions.vehicleName!] === Dimension.Vehicle
     ).flatMap(
-      (marr) => [marr.data[positions.bogie1], marr.data[positions.bogie2]]
+      (marr) => [marr.data[positions.bogie1!], marr.data[positions.bogie2!]]
     ).filter(
       (arr, index, self) => self.indexOf(arr) === index
     )
@@ -113,8 +122,8 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
       gauges: parseDimension(Dimension.Gauge),
       vehicles: parsedVehicle,
       bogies: parsedBogie,
-      profiles: parseFlangeExtraData(positions.profile),
-      types: parseFlangeExtraData(positions.type)
+      profiles: parseFlangeExtraData(positions.profile!),
+      types: parseFlangeExtraData(positions.type!)
     }
 
     const fleet = parsedPreview.find(item => Object.keys(item)[0] === "Flota")?.Flota
