@@ -2,7 +2,10 @@
 <html lang='en'>
   <head>
     <meta charset='utf-8' />
-    <link rel='stylesheet' href='report.css' type="text/css">
+    <meta http-equiv='Content-Security-Policy' content="script-src 'self' 'unsafe-inline';" />
+    <style>
+      $STYLES$
+    </style>
     <title>Linea $LINEA$ - $FLOTA$ - Formacion $FORMACION$</title>
   </head>
   <body>
@@ -34,8 +37,14 @@
       </table> 
       <div class='esquema'>
         $ESQUEMA$
-      </div>      
-      
+      </div>
+    </div>
+    <footer id='footer-one'>
+      <span>Página 1 de 2</span>
+      <span>FIM307-04-39 Rev.02</span>
+    </footer>
+
+    <div class="container">
       <div class='second-title' style='--bkgr-color: $COLOR$'>
         <div class='title-left'>
           $FECHA$
@@ -53,10 +62,10 @@
           </div>
         </div>
       </div>
-      <div class="diff-wrapper">
+      <div class='diff-wrapper'>
         <table class='difference-table'>
           <caption>
-            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+            <div class='diff-title' style='--bkgr-color: $COLOR$'>
               Ancho de Pestaña
             </div>
           </caption>
@@ -67,7 +76,7 @@
         </table>
         <table class='difference-table'>
           <caption>
-            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+            <div class='diff-title' style='--bkgr-color: $COLOR$'>
               Diametro de Rueda Mismo Eje
             </div>
           </caption>
@@ -78,7 +87,7 @@
         </table>
         <table class='difference-table'>
           <caption>
-            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+            <div class='diff-title' style='--bkgr-color: $COLOR$'>
               Diametro de Rueda Mismo Bogie
             </div>
           </caption>
@@ -89,7 +98,7 @@
         </table>
         <table class='difference-table'>
           <caption>
-            <div class="diff-title" style='--bkgr-color: $COLOR$'>
+            <div class='diff-title' style='--bkgr-color: $COLOR$'>
               Diametro de Rueda Mismo Coche
             </div>
           </caption>
@@ -116,5 +125,9 @@
         </ul>
       </div>
     </div>
+    <footer id='footer-two'>
+      <span>Página 2 de 2</span>
+      <span>FIM307-04-39 Rev.02</span>
+    </footer>
   </body>
 </html>

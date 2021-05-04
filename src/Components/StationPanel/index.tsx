@@ -19,7 +19,7 @@ import EditCell, { DataKey } from "../EditCell"
 import ActionEditCell, { EditableValues } from "../ActionEditCell"
 
 import { save, load, getFiles } from "../../Scripts/electron-bridge"
-import { LINE_TEMPLATE, Line } from "./template"
+import { LINE_TEMPLATE, TLine } from "./template"
 
 import "./styles/index.scss"
 
@@ -31,7 +31,7 @@ interface IStationPanel {
 }
 
 const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPanelHandler }) => {
-  const [lines, setLines] = useState<Line[]>(LINE_TEMPLATE)
+  const [lines, setLines] = useState<TLine[]>(LINE_TEMPLATE)
   const { Column, HeaderCell } = Table
   const [loading, setLoading] = useState<boolean>(false)
   const [editing, setEditing] = useState<boolean>(false)
@@ -55,7 +55,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     if (isStationPanelOpen) {
       const loadProfiles = async() => {
         setLoading(true)
-        const loadedLines: Line[] = await load(LINE_FILE)
+        const loadedLines: TLine[] = await load(LINE_FILE)
         if (loadedLines) {
           setLines([...loadedLines])
         } else {
@@ -80,7 +80,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
   }
 
   const handleRemoveFleet = (fleetId: string) => {
-    const nextLines: Line[] = Object.assign([], lines)
+    const nextLines: TLine[] = Object.assign([], lines)
     const fleetIndex = nextLines.findIndex(line => line.id === fleetId)
     nextLines.splice(fleetIndex, 1)
     setLines([...nextLines])
@@ -93,7 +93,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
         setError(true)
         return
       }
-      const newFleet: Line = {
+      const newFleet: TLine = {
         id: getNewId(),
         name: newLineName,
         station1: "Cabecera 1",
@@ -118,7 +118,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
     })
     if (confirm) {
       setLoading(true)
-      const nextLines: Line[] = Object.assign([], lines)
+      const nextLines: TLine[] = Object.assign([], lines)
       lines.forEach((_, i) => nextLines[i].status = null)
       const saved = await save(LINE_FILE, nextLines)
       setLoading(false)
@@ -151,7 +151,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
 
   const handleEditValue = (id: string, key: DataKey, value: string) => {
     const nextLines = Object.assign([], lines)
-    const activeLine: Line = lines.find(line => line.id === id)!
+    const activeLine: TLine = lines.find(line => line.id === id)!
     if (!value) {
       
     }
@@ -182,7 +182,7 @@ const StationPanel: React.FC<IStationPanel> = ({ isStationPanelOpen, stationPane
   }
 
   const handleColorChange = (color: string) => {
-    const nextLines: Line[] = Object.assign([], lines)
+    const nextLines: TLine[] = Object.assign([], lines)
     const activeLine = nextLines.find(line => line.id === activeId)!
     setActiveColor(color)
     activeLine.color = color

@@ -5,7 +5,7 @@
 }
 @page {
   size: A4;
-  margin: 5mm 5mm 10mm 5mm;
+  margin: 0mm 0mm 0mm 0mm;
 }
 
 @font-face {
@@ -41,11 +41,16 @@ body {
   font-family: 'Roboto Mono', Verdana, Geneva, Tahoma, sans-serif;
   font-size: 12px;
   -webkit-print-color-adjust: exact;
+  margin: 0;
+  counter-reset: page;
 }
 
 .container {
+  margin: 5mm 5mm 0mm 5mm;
   padding: 0;
   line-height: 1.2;
+  page-break-after: always;
+  counter-increment: page;
 }
 
 .title, .second-title {
@@ -245,7 +250,6 @@ tr:nth-child(3)  > td {
   margin-top: 25px;
   justify-content: center;
   break-inside: avoid;
-  break-after: right;
 }
 
 .esquema p {
@@ -331,4 +335,22 @@ tr:nth-child(3)  > td {
 [condenada] {
   background-color: var(--red);
   color: white;
+}
+
+footer {
+  width: 95%;
+  color: var(--black);
+  padding: 0px 15px 15px 15px;
+  vertical-align: middle;
+  font-size: 8px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin-top: 0;
+  display: inline-flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+}
+
+#footer-two {
+  bottom: -296mm;
 }

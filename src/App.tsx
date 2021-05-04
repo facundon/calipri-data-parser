@@ -13,7 +13,6 @@ import { forIn } from "lodash"
 
 import { 
   load,
-  save,
   printPdf,
   useDb,
   selectConfigDirectory,
@@ -145,7 +144,6 @@ class App extends Component<IProps, IState> {
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
       const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
-      // await save("test", replacedHtml, "templates", ".html")
       
       const success = await printPdf(replacedHtml, fileName)
       if (success && success !== "canceled") {
@@ -184,7 +182,7 @@ class App extends Component<IProps, IState> {
     })
     getUpdateProgress((progress: number, updating: boolean) => {
       this.setState({
-        updateProgress: progress,
+        updateProgress: Math.round(progress),
         updateError: !updating
       })
     })

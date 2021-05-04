@@ -1,4 +1,8 @@
+import { chunk } from "lodash"
 import * as T from "../Components/DragLoader/types"
+import { FLEET_FILE } from "../Components/FleetPanel"
+import { Fleet } from "../Components/FleetPanel/template"
+import { load } from "./electron-bridge"
 import { normalize } from "./utils"
 
 type SubstractionStructure = {
@@ -13,7 +17,7 @@ export type SubstractionKinds = {
   shaft: (SubstractionStructure | null)[],
   bogie: (SubstractionStructure | null)[],
   vehicle: (SubstractionStructure | null)[],
-  unit?: (SubstractionStructure | null)[],
+  module?: (SubstractionStructure | null)[],
 }
 
 interface ISubstraction {
@@ -48,12 +52,50 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
     }).filter(val => val !== null)
   )}
 
+const moduleSubstraction = (data: string[], profiles: string[], vehicles: string[], fleet: string) => {
+  load(FLEET_FILE).then((val: Fleet[]) => {
+    let vehiclesPerModule: number | string | undefined = val.find(loadedFleet => loadedFleet.fleet.toUpperCase() === fleet.toUpperCase())?.module
+    if (!vehiclesPerModule) return null
+    vehiclesPerModule = parseInt(vehiclesPerModule)
+    let vehicleChunk
+    switch (vehicles.length) { 
+    // units of 6 vehicles can have: 2 triple modules || 3 duo modules || 1 unique module
+    // units of 5 vehicles can ONLY have 1 duo module && 1 triple module
+    // units of 4 vehicles can ONLY have 2 duo modules
+    // units of 1 vehicle can ONLY have 1 unique module
+    case 6:
+      if (vehiclesPerModule === 1) {
+        vehicleChunk = vehicles
+      } else {
+        // need condition to check if 2 triple modules || 3 duo modules
+        vehicleChunk = chunk(vehicles, 3)
+      }
+      break
+
+    case 5:
+      vehicleChunk = chunk(vehicles, 3)
+      break
+
+    case 4:
+      vehicleChunk = chunk(vehicles, 2)
+      break
+    
+    default:
+      vehicleChunk = vehicles
+      break
+    }
+    // for (let index = 1; index < vehiclesPerModule; index++) { 
+    // }
+    console.log(vehicleChunk)
+  })
+}
+
 export const getSubstractions: ISubstraction = (data, fleet) => (
   {
     width: substraction(data.widths, data.profiles, 2, data.vehicles, data.bogies),
     shaft: substraction(data.diameters, data.profiles, 2, data.vehicles, data.bogies),
     bogie: substraction(data.diameters, data.profiles, 4, data.vehicles, data.bogies),
     vehicle: substraction(data.diameters, data.profiles, 8, data.vehicles, data.bogies),
-    // unit: await unitSubstraction(data.diameters, data.profiles, data.vehicles, fleet),
+    // module: moduleSubstraction(data.diameters, data.profiles, data.vehicles, fleet),
   }
 )

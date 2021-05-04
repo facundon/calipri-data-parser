@@ -3,13 +3,12 @@ const { autoUpdater } = require("electron-updater")
 const path = require("path")
 const fs = require("fs-extra")
 
-const puppeteer = require("puppeteer")
 const Database = require("better-sqlite3")
 
-const isDev = true
+const isDev = false
 autoUpdater.autoDownload = false
 
-const CHECK_UPDATES_INTERVAL = 300000
+const CHECK_UPDATES_INTERVAL = 300000  // in ms
 const CONFIG_PATH_FILE = "config_path.txt"
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
 const MY_DOCUMENTS_PATH = app.getPath("documents")
@@ -96,7 +95,7 @@ Puede elegír la ubicación de la carpeta donde se encuentran dichos archivos, o
 }
 
 setInterval(() => {
-  autoUpdater.checkForUpdates()
+  autoUpdater.checkForUpdates().catch(err => console.log(err))
 }, CHECK_UPDATES_INTERVAL)
 
 let mainWindow
@@ -119,7 +118,7 @@ function createMainWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   mainWindow.removeMenu()
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -157,7 +156,7 @@ app.on("ready", () => {
     createMainWindow()
     mainWindow.webContents.once("dom-ready", () => {
       mainWindow.show()
-      autoUpdater.checkForUpdates()
+      autoUpdater.checkForUpdates().catch(err => console.log(err))
       loading.hide()
       loading.close()
     })
@@ -262,34 +261,25 @@ ipcMain.handle("createPdf", async(_, html, name) => {
     filters: [{name: "Reporte", extensions: ["pdf"]}],
     defaultPath: name,
   }
+  const css = await fs.readFile(getRelativePath("templates/report.css"), { encoding: "utf-8" })
+  const printWindow = new BrowserWindow({
+    show: false,
+    frame: false,
+  })
+  printWindow.loadURL("data:text/html;charset=UTF-8," + encodeURIComponent(html.replace("$STYLES$", css)))
+
   const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
   if (canceled) return "canceled"
-  const footer = await fs.readFile(getRelativePath("templates/footer.html"), {encoding: "utf-8"})
-  if (!footer) return(new Promise(resolve => resolve(false)))
-  return(
-    new Promise(resolve => {
-      puppeteer.launch().then(async browser => {
-        let page = await browser.newPage()
-        try {
-          await page.setContent(html, { waitUntil: ["networkidle2"] })
-          await page.addStyleTag({path: getRelativePath("templates/report.css")})
-          await page.evaluateHandle("document.fonts.ready")
-          await page.pdf({
-            path: filePath,
-            format: "A4",
-            preferCSSPageSize: true,
-            displayHeaderFooter: true,
-            footerTemplate: footer,
-          })
-          browser.close()
-          resolve(true)
-        } catch (error) {
-          console.log(error)
-          resolve(false)
-        }
-      })
-    })
-  )
+  if (!css) return(new Promise(resolve => resolve(false)))
+  try {
+    const pdf = await printWindow.webContents.printToPDF({})
+    printWindow.destroy()
+    const error = await fs.writeFile(filePath, pdf)
+    return !error
+  } catch (err) {
+    console.log(err)
+    return false
+  }
 })
 
 ipcMain.handle("dbHandler", async(_, action, data, table) => {
