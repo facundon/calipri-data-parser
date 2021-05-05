@@ -38,7 +38,7 @@ function addZero(n: number){
 const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData }) => {
   const [previewData, setPreviewData] = useState<PreviewData[]>([])
 
-  const handleOnDrop = (data: T.ILoadedData[]) => {
+  const handleOnDrop = async(data: T.ILoadedData[]) => {
     const getPosition = (headerName: string) => {
       const filteredData = data.find(val =>
         val.data.find(val =>
@@ -127,7 +127,7 @@ const DragLoader: React.FC<T.IDragLoader> = ({ handleIsLoaded, handleParsedData 
     }
 
     const fleet = parsedPreview.find(item => Object.keys(item)[0] === "Flota")?.Flota
-    const substractions = getSubstractions(rawParsedData, fleet || "-")
+    const substractions = await getSubstractions(rawParsedData, fleet || "-")
 
     const parsedWheels: T.Wheel[] = []
     let gaugeIndex = 0
