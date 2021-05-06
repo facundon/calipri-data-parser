@@ -34,7 +34,6 @@ The default configuration file schema is:
   - **report.html** -> *the report template with placeholders*
   - **report.css** -> *the report styling*
   - **unit_schema.html** -> *a html drawed car to insert in the report*
-  - **footer.html** -> *footer of each pdf page*
 - **profiles** -> *one file per profile that holds the repair especification data*
   - **ore.json** 
   - **cde.json**
