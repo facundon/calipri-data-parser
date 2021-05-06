@@ -24,7 +24,7 @@ export const PARSED_DATA_INITIAL_VALUES = {
     shaft: [],
     bogie: [],
     vehicle: [],
-    unit: []
+    module: []
   }
 }
 const readerConfig = {

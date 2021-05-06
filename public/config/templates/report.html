@@ -96,17 +96,30 @@
             $BOGIE_DATA$
           </tbody>
         </table>
-        <table class='difference-table'>
-          <caption>
-            <div class='diff-title' style='--bkgr-color: $COLOR$'>
-              Diametro de Rueda Mismo Coche
-            </div>
-          </caption>
-          <tbody>
-            $VEHICLE_HEADERS$
-            $VEHICLE_DATA$
-          </tbody>
-        </table>
+        <div class="dif-table-wrapper">
+          <table class='difference-table'>
+            <caption>
+              <div class='diff-title' style='--bkgr-color: $COLOR$'>
+                Diametro de Rueda Mismo Coche
+              </div>
+            </caption>
+            <tbody>
+              $VEHICLE_HEADERS$
+              $VEHICLE_DATA$
+            </tbody>
+          </table>
+          <table class='difference-table module-table'>
+            <caption>
+              <div class='diff-title' style='--bkgr-color: $COLOR$'>
+                Diametro de Rueda Mismo Modulo
+              </div>
+            </caption>
+            <tbody>
+              $MODULE_HEADERS$
+              $MODULE_DATA$
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class='footer'>
         <div class='footer-title'>Notas</div>

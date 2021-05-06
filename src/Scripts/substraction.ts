@@ -5,25 +5,25 @@ import { Fleet } from "../Components/FleetPanel/template"
 import { load } from "./electron-bridge"
 import { normalize } from "./utils"
 
-type SubstractionStructure = {
+export type SubstractionStructure = {
   value: number,
   profile: string,
   vehicle: string,
   bogie: string,
-}
+} | null
 
-type ModuleSubstractionStructure = {
+export type ModuleSubstractionStructure = {
   value: number,
   profile: string,
-  vehicle: string[],
+  vehicle: string,
 }
 
 export type SubstractionKinds = {
-  width: (SubstractionStructure | null)[],
-  shaft: (SubstractionStructure | null)[],
-  bogie: (SubstractionStructure | null)[],
-  vehicle: (SubstractionStructure | null)[],
-  module?: ModuleSubstractionStructure[] | null,
+  width: SubstractionStructure[],
+  shaft: SubstractionStructure[],
+  bogie: SubstractionStructure[],
+  vehicle: SubstractionStructure[],
+  module: ModuleSubstractionStructure[] | null,
 }
 
 interface ISubstraction {
@@ -54,7 +54,7 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
           vehicle: adaptedVehicles[index],
           bogie: adaptedBogies[index],
         })
-      } else { return (null) }
+      } else { return null }
     }).filter(val => val !== null)
   )}
 
@@ -89,7 +89,7 @@ const moduleSubstraction = async(data: string[], profiles: string[], vehicles: s
       return({
         value: Math.abs(Math.round((maxMin[0][0] - maxMin[0][1]) * 100) / 100),
         profile: profiles[firstWheel],
-        vehicle: module,
+        vehicle: module.join("-"),
       })
     }
     let difference: number[] = []
@@ -106,7 +106,7 @@ const moduleSubstraction = async(data: string[], profiles: string[], vehicles: s
     return({
       value: Math.abs(Math.round(maxDifference * 100) / 100),
       profile: profiles[firstWheel],
-      vehicle: module,
+      vehicle: module.join("-"),
     })
   })
   return returnList

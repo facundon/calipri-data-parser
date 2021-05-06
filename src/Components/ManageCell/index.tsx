@@ -38,7 +38,7 @@ const ManageCell: React.ElementType = ({ rowData, dataKey, onClick, noTree = fal
           : null}
         {!onlyAdd && !onlyRemove ? <Divider vertical style={{ margin: "0 4px" }}/> : null}
         {onlyAdd
-          ? <Whisper placement="top" trigger="hover" speaker={tooltip("Agregar Sub-Item")}>
+          ? <Whisper placement="left" trigger="hover" speaker={tooltip("Agregar Sub-Item")}>
             <Icon onClick={() => handleAction("add")} icon="plus-square-o" className="action-icon add" />
           </Whisper>
           : null

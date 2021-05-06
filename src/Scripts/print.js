@@ -57,9 +57,13 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDa
         if (!maxVal && !minVal && ref !== "Diametro") {
           minVal = ""
           maxVal = [
-            profileRef[ref]["MOTRIZ"]?.maxVal?.toString() ? `Motriz ${profile}: ` + profileRef[ref]["MOTRIZ"]?.maxVal?.toString() : null,
-            profileRef[ref]["REMOLQUE"]?.maxVal?.toString() ? `Remolque ${profile}: ` + profileRef[ref]["REMOLQUE"]?.maxVal?.toString() : null
+            profileRef[ref]["MOTRIZ"]?.maxVal ? `Motriz ${profile}: ` + profileRef[ref]["MOTRIZ"]?.maxVal?.toString() : null,
+            profileRef[ref]["REMOLQUE"]?.maxVal ? `Remolque ${profile}: ` + profileRef[ref]["REMOLQUE"]?.maxVal?.toString() : null
           ]
+          if (maxVal.includes(null)) {
+            const changeIndex = maxVal.indexOf(null)
+            maxVal[changeIndex] = profileRef[ref]["MOTRIZ - REMOLQUE"]?.maxVal ? `Motriz-Remolque ${profile}: ` + profileRef[ref]["MOTRIZ - REMOLQUE"]?.maxVal?.toString() : null
+          }
         }
         if (typeof maxVal === "string" && ref !== "Diametro") {
           return { [ref]: `${arr.length !== 1 ? profile + ": " : ""}${minVal || ""}-${maxVal || ""}` }
@@ -228,6 +232,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDa
         </tr>`
         break
       case "vehicle":
+      case "module":
         data += `
         <tr>
           <td id=index>${item.vehicle || "-"}</td>
@@ -235,6 +240,7 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDa
           <td>${item.profile}</td>
           <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
         </tr>`
+        break
       default:
         break
       }
@@ -276,11 +282,13 @@ const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDa
     SHAFT_HEADERS: getDifHeaders(["Coche", "Bogie", "Eje",  "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Eje"),
     BOGIE_HEADERS: getDifHeaders(["Coche", "Bogie", "Tipo", "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Bogie"),
     VEHICLE_HEADERS: getDifHeaders(["Coche", "Tipo", "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Coche"),
+    MODULE_HEADERS: getDifHeaders(["Modulo", "Tipo", "Perfil", "Diferencia"], "Dif. Diametro de Rueda - Mismo Modulo"),
     DATA: getTable(),
     WIDTH_DATA: getDifTable("width"),
     SHAFT_DATA: getDifTable("shaft"),
     BOGIE_DATA: getDifTable("bogie"),
     VEHICLE_DATA: getDifTable("vehicle"),
+    MODULE_DATA: getDifTable("module"),
     OPERADORES: findInHeader("Operador"),
     CABECERA: stations[1],
     FIRST_VEHICLE: evaluatedData.wheels[0].vehicle,

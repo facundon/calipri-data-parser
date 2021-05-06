@@ -22,7 +22,7 @@ import {
   onUpdate,
   startUpdate,
   getUpdateProgress,
-  onUpdateDownloaded
+  onUpdateDownloaded,
 } from "./Scripts/electron-bridge"
 import evaluate from "./Scripts/evaluate"
 import prepareData from "./Scripts/print.js"
@@ -144,7 +144,7 @@ class App extends Component<IProps, IState> {
       })
       replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
       const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
-      
+
       const success = await printPdf(replacedHtml, fileName)
       if (success && success !== "canceled") {
         Alert.success("Reporte emitido!", 10000)
@@ -172,7 +172,7 @@ class App extends Component<IProps, IState> {
       } else if (!success) {
         Alert.error("Ocurrio un error al emitir el reporte.", 10000)
       }
-    }   
+    }
     this.setState({ isPrinting: false })
   }
 

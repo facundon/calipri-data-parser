@@ -158,6 +158,14 @@ body {
   border: none;
 }
 
+.module-table tr:first-child > th:nth-child(2),
+.module-table tr:first-child > th:nth-child(3)  {
+  width: 50px !important;
+}
+.module-table tr:first-child > th:nth-child(4) {
+  width: 130px !important;
+}
+
 th { 
   background-color: var(--black);
   color: white;

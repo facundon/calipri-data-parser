@@ -1,12 +1,12 @@
 import Alert from "rsuite/lib/Alert"
-import { PropertyName } from "typescript"
 import { IParsedData, Wheel } from "../Components/DragLoader/types"
 import { FLEET_FILE } from "../Components/FleetPanel"
 import { Fleet } from "../Components/FleetPanel/template"
 import { PROFILES_FOLDER } from "../Components/ProfilePanel"
 import { Dimension } from "../Components/ProfilePanel/template"
 import { load } from "./electron-bridge"
-import { SubstractionKinds } from "./substraction"
+import { SubstractionKinds, SubstractionStructure, ModuleSubstractionStructure } from "./substraction"
+import { toTitleCase } from "./utils"
 
 export type Profiles = {
   [profile: string]: {
@@ -54,32 +54,25 @@ export type Profiles = {
 }
 
 export type Damnation = ("width" | "height" | "qr" | "diameter" | "gauge")[]
+type EvaluatedDimension = ({
+    value: string,
+    damnation: boolean,
+    bogie: string,
+    vehicle: string,
+    type: string | null,
+    profile: string,
+  } | null)
 
 export interface EvaluatedWheel extends Wheel {
   damnation: Damnation
 }
 
 export interface EvaluatedSubstractions {
-  width: {
-    value: number,
-    damnation: boolean,
-  }[]
-  shaft: {
-    value: number,
-    damnation: boolean,
-  }[]
-  bogie: {
-    value: number,
-    damnation: boolean,
-  }[]
-  vehicle: {
-    value: number,
-    damnation: boolean,
-  }[]
-  unit?: {
-    value: number,
-    damnation: boolean,
-  }[]
+  width: EvaluatedDimension[]
+  shaft: EvaluatedDimension[]
+  bogie: EvaluatedDimension[]
+  vehicle: EvaluatedDimension[]
+  module: EvaluatedDimension[] | undefined
 }
 
 interface IEvaluate {
@@ -95,7 +88,7 @@ interface IEvaluateWheel {
 }
 
 interface IEvaluateSubstractions {
-  (substractions: SubstractionKinds, profilesReferences: Profiles, fleet: string) : Promise<EvaluatedSubstractions>
+  (substractions: SubstractionKinds, profilesReferences: any, fleet: string) : Promise<EvaluatedSubstractions | null>
 }
 
 const getProfilesReferences = async(profiles: string[], fleet: string): Promise<Profiles | null> => {
@@ -148,56 +141,62 @@ const getVehicleTypeByFleet = (vehicle: string, fleet: string, loadedFleets: Fle
     return null
   }
   if (fleet.toUpperCase() === "CAF6000") {
+    if (vehicle.length > 4) {
+      const vehicles = vehicle.split("-")
+      const result = vehicles.map(car => car[1] !== fleetObj.reference ? "REMOLQUE" : "MOTRIZ")
+      return result.includes("REMOLQUE") ? "MOTRIZ - REMOLQUE" : "MOTRIZ"
+    } 
     return vehicle[1] !== fleetObj.reference ? "REMOLQUE" : "MOTRIZ"
   }
-  return vehicle?.includes(fleetObj.reference) ? "REMOLQUE" : "MOTRIZ"
+  return vehicle?.includes(fleetObj.reference) ? (vehicle.includes("-") ? "MOTRIZ - REMOLQUE" : "REMOLQUE") : "MOTRIZ"
 }
 
 type SubRef = {[x: string]: {minVal: number | "-", maxVal: number | "-"}}
 type MainRef = {minVal: number | null, maxVal: number | null}
 type Reference = MainRef | SubRef 
 
-const checkSubItems = (reference: any, refType: string | null, profile: string, item: string) => {
+const checkSubItems = (reference: any, refType: string, profile: string, item: string): number | null => {
   let newReference = reference?.maxVal
   if (!newReference) {
-    if (!refType) return 0
-    newReference = reference[refType].maxVal
-    if (newReference === "-" || !newReference) {
-      Alert.warning(`Falta valor de referencia "${item}" para perfil ${profile}`, 10000)
-      newReference = 0
+    newReference = reference[refType]?.maxVal
+    if (!newReference) {
+      Alert.warning(`Falta valor de referencia "${toTitleCase(refType)}" en "${item}" para perfil ${profile}`, 10000)
+      return null
     }
+    if (newReference === "-") return 0
   }
   return newReference
 }
 
-const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profilesReferences: any, fleet) => {
+const evaluateSubstractions: IEvaluateSubstractions = async(substractions, profilesReferences, fleet) => {
   const loadedFleets: Fleet[] = await load(FLEET_FILE)
-  const evaluateItem = (dimension: any, subItem: any) => {
+  const evaluateItem = (dimension: SubstractionStructure | ModuleSubstractionStructure | null, subItem: string) => {
     let damnation = false
-    let reference: any = profilesReferences[dimension!.profile][subItem]
+    let reference = profilesReferences[dimension!.profile][subItem]
     if (!reference) {
       Alert.error(`No se encontro referencia para "${subItem}" en el perfil ${dimension!.profile}`)
     }
     const refType: string | null = getVehicleTypeByFleet(dimension?.vehicle!, fleet, loadedFleets)
+    if (!refType) return null
     reference = checkSubItems(reference, refType, dimension!.profile, subItem)
-    if (dimension!.value > reference) {
-      damnation = true
-    }
+    if (reference === null) return null
+    if (dimension!.value > reference && reference !== 0) damnation = true
     return ({
       value: dimension!.value.toFixed(2) || "-",
       damnation: damnation,
-      bogie: dimension!.bogie,
+      bogie: "bogie" in dimension! ? dimension!.bogie : "-",
       vehicle: dimension!.vehicle,
       type: refType,
       profile: dimension!.profile,
     })
   }
-  return ({
-    width: substractions.width.map(dimension => evaluateItem(dimension, "Dif. Ancho de Pestaña")),
-    shaft: substractions.shaft.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Eje")),
-    bogie: substractions.bogie.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Bogie")),
-    vehicle: substractions.vehicle.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Coche")),
-  })
+  const width = substractions.width.map(dimension => evaluateItem(dimension, "Dif. Ancho de Pestaña"))
+  const shaft = substractions.shaft.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Eje"))
+  const bogie = substractions.bogie.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Bogie"))
+  const vehicle = substractions.vehicle.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Coche"))
+  const module = substractions.module?.map(dimension => evaluateItem(dimension, "Dif. Diametro de Rueda - Mismo Modulo"))
+  if (width.includes(null) || shaft.includes(null) || bogie.includes(null) || vehicle.includes(null) || module?.includes(null)) return null
+  return ({ width, shaft, bogie, vehicle, module })
 }
 
 const evaluateWheels: IEvaluateWheel = (wheels, profilesReferences: any) => {
@@ -228,15 +227,14 @@ const evaluate: IEvaluate = async(parsedData) => {
   }
   const fleet = Object.values(fleetObject)[0]
   const profilesReferences = await getProfilesReferences(profilesInWheels, fleet.toUpperCase())
-  if (profilesReferences) {
-    return ({
-      wheels: evaluateWheels(wheels, profilesReferences),
-      substractions: await evaluateSubstractions(substractions, profilesReferences, fleet),
-      references: profilesReferences,
-    })
-  } else {
-    return null
-  }
+  if (!profilesReferences) return null
+  const evaluatedSubstractions = await evaluateSubstractions(substractions, profilesReferences, fleet)
+  if (!evaluatedSubstractions) return null
+  return ({
+    wheels: evaluateWheels(wheels, profilesReferences),
+    substractions: evaluatedSubstractions ,
+    references: profilesReferences,
+  })
 }
 
 export default evaluate
