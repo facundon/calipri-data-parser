@@ -5,10 +5,10 @@ const fs = require("fs-extra")
 
 const Database = require("better-sqlite3")
 
-const isDev = true
+const isDev = false
 autoUpdater.autoDownload = false
 
-const CHECK_UPDATES_INTERVAL = 300000  // in ms
+const CHECK_UPDATES_INTERVAL = 600000  // in ms
 const CONFIG_PATH_FILE = "config_path.txt"
 const SOURCE_CONFIG_PATH = path.join(__dirname, "config")
 const MY_DOCUMENTS_PATH = app.getPath("documents")
