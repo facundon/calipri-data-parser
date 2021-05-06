@@ -151,24 +151,6 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
   const [loading, setLoading] = useState<boolean>(false)
   const [activeEr, setActiveEr] = useState("ER93-15 Rev.04")
 
-  // load all profiles on folder to display names
-  useEffect(() => {
-    const loadProfiles = async() => {
-      setLoading(true)
-      const files = await getFiles(PROFILES_FOLDER)
-      if (files.length !== 0) {
-        setProfiles(files.map((file: string) => file.replace(".json", "").toUpperCase()))
-      } else {
-        await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
-          Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
-        await save("ers", {[activeProfile]: activeEr})
-      }
-      setLoading(false)
-    }
-    loadProfiles()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProfilePanelOpen])
-
   function getActiveDataWithoutParent(data = activeData) {
     const dataWithoutParent: Dimension[] = Object.assign([], data)
     dataWithoutParent.forEach((val, index) => {
@@ -212,9 +194,22 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     })
   }
 
+  // load all profiles on folder to display names
   useEffect(() => {
-    
-  }, [activeEr])
+    const loadProfiles = async() => {
+      setLoading(true)
+      const files = await getFiles(PROFILES_FOLDER)
+      if (files.length !== 0) {
+        setProfiles(files.map((file: string) => file.replace(".json", "").toUpperCase()))
+      } else {
+        await save(profiles[0], getActiveDataWithoutParent(), PROFILES_FOLDER) && 
+          Alert.info(`Se creo un archivo de configuración para perfil ${profiles[0]}`, 7000)
+        await save("ers", {[activeProfile]: activeEr})
+      }
+      setLoading(false)
+    }
+    loadProfiles()
+  }, [isProfilePanelOpen])
 
   // get profile fleets & load profile data
   useEffect(() => {
@@ -264,7 +259,6 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
       loadFleets()
       setLoading(false)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProfilePanelOpen, activeProfile])
 
   const handleManage = async(id: string, action: "remove" | "add") => {
@@ -453,19 +447,20 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
           height={600}
           data={activeData}
           renderTreeToggle={(icon, rowData) => {
-            if (rowData.children && rowData.children.length === 0) {
+            if (rowData?.children && rowData.children.length === 0) {
               return null
             }
             return icon
           }}
+          onExpandChange={() => {setActiveData([...activeData])}}
         >
-          <Column width={85} align="center" >
+          <Column width={85} align="center">
             <HeaderCell></HeaderCell>
             <ManageCell dataKey="id" onClick={handleManage} />
           </Column>
           <Column flexGrow={4} fixed treeCol>
             <HeaderCell>Parámetro</HeaderCell>
-            <Cell dataKey="name" className="parameter-cell" />
+            <Cell dataKey="name" className="parameter-cell"/>
           </Column>
           <Column flexGrow={2} align="center">
             <HeaderCell>Mínimo</HeaderCell>
