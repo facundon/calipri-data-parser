@@ -29,7 +29,7 @@ import { Fleet } from "../FleetPanel/template"
 
 export const PROFILES_FOLDER = "perfiles"
 
-const ITEMS_WITH_FLEET = [
+export const ITEMS_WITH_FLEET = [
   "Diametro",
   "Dif. Diametro de Rueda - Mismo Eje",
   "Dif. Diametro de Rueda - Mismo Bogie",

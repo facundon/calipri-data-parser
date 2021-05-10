@@ -5,7 +5,7 @@ const fs = require("fs-extra")
 
 const Database = require("better-sqlite3")
 
-const isDev = false
+const isDev = true
 autoUpdater.autoDownload = false
 
 const CHECK_UPDATES_INTERVAL = 600000  // in ms
@@ -118,6 +118,7 @@ function createMainWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   mainWindow.removeMenu()
+  mainWindow.webContents.openDevTools()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()

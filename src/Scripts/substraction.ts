@@ -1,36 +1,18 @@
 import { chunk, findLastIndex, max, min } from "lodash"
-import * as T from "../Components/DragLoader/types"
 import { FLEET_FILE } from "../Components/FleetPanel"
 import { Fleet } from "../Components/FleetPanel/template"
 import { load } from "./electron-bridge"
-import { normalize } from "./utils"
+import { isNotNullOrUndefined, normalize } from "./utils"
+import * as T from "../Components/DragLoader/types"
 
-export type SubstractionStructure = {
-  value: number,
-  profile: string,
-  vehicle: string,
-  bogie: string,
-} | null
 
-export type ModuleSubstractionStructure = {
-  value: number,
-  profile: string,
-  vehicle: string,
-}
-
-export type SubstractionKinds = {
-  width: SubstractionStructure[],
-  shaft: SubstractionStructure[],
-  bogie: SubstractionStructure[],
-  vehicle: SubstractionStructure[],
-  module: ModuleSubstractionStructure[] | null,
-}
-
-interface ISubstraction {
-  (data: T.IRawParsedData, preview: string) : Promise<SubstractionKinds>
-}
-
-const substraction = (data: string[], profiles: string[], step: number, vehicles: string[], bogies: string[]) => {
+const substraction = (
+  data: string[],
+  profiles: string[],
+  step: number,
+  vehicles: string[],
+  bogies: string[]
+) => {
   let adaptedVehicles: string[] = []
   vehicles.forEach(item => {
     for (let index = 0; index < data.length / vehicles.length; index++) {
@@ -43,22 +25,28 @@ const substraction = (data: string[], profiles: string[], step: number, vehicles
       adaptedBogies.push(bogie)
     }
   })
-  return (
-    data.map((_, index, arr) => {
-      if (index % step === 0) {
-        const dataArr = arr.slice(index, index + step).map(val => normalize(val))
-        const rawSubstraction = Math.max.apply(null, dataArr) - Math.min.apply(null, dataArr)
-        return ({
-          value: Math.abs(Math.round(rawSubstraction * 100) / 100),
-          profile: profiles[index],
-          vehicle: adaptedVehicles[index],
-          bogie: adaptedBogies[index],
-        })
-      } else { return null }
-    }).filter(val => val !== null)
-  )}
+  const rawMap = data.map((_, index, arr) => {
+    if (index % step === 0) {
+      const dataArr = arr.slice(index, index + step).map(val => normalize(val))
+      const rawSubstraction = Math.max.apply(null, dataArr) - Math.min.apply(null, dataArr)
+      return ({
+        value: Math.abs(Math.round(rawSubstraction * 100) / 100),
+        profile: profiles[index],
+        vehicle: adaptedVehicles[index],
+        bogie: adaptedBogies[index],
+      })
+    } else { return null }
+  })
+  const result = rawMap.filter(isNotNullOrUndefined)
+  return result
+}
 
-const moduleSubstraction = async(data: string[], profiles: string[], vehicles: string[], fleet: string): Promise<ModuleSubstractionStructure[] | null> => {
+const moduleSubstraction = async(
+  data: string[],
+  profiles: string[],
+  vehicles: string[],
+  fleet: string
+) => {
   const getCurrentFleetData = () => loadedFleets.find(loadedFleet => loadedFleet.fleet.toUpperCase() === fleet.toUpperCase())
 
   const loadedFleets: Fleet[] = await load(FLEET_FILE)
@@ -112,7 +100,10 @@ const moduleSubstraction = async(data: string[], profiles: string[], vehicles: s
   return returnList
 }
 
-export const getSubstractions: ISubstraction = async(data, fleet) => {
+export const getSubstractions = async(
+  data: T.IRawParsedData,
+  fleet: string
+) => {
   const module = await moduleSubstraction(data.diameters, data.profiles, data.vehicles, fleet)
   return (
     {
