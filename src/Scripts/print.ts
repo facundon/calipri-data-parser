@@ -1,4 +1,15 @@
-const prepareData = (evaluatedData, header, vehicleSchema, stations, ers, lastDate) => {
+import { 
+  EvaluatedSubstractionsKinds
+} from "./types"
+
+const prepareData = (
+  evaluatedData,
+  header,
+  vehicleSchema,
+  stations,
+  ers,
+  lastDate
+) => {
   const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
 
   const getLastDate = () => {

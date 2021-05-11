@@ -26,6 +26,7 @@ import "./styles/index.scss"
 
 import { FLEET_FILE } from "../FleetPanel"
 import { Fleet } from "../FleetPanel/template"
+import { DamnationSubItem } from "../../Scripts/types"
 
 export const PROFILES_FOLDER = "perfiles"
 
@@ -241,7 +242,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
                 return (
                   {
                     id: `${dim.id}-${fleetIndex + 1}`,
-                    name: fleet.fleet,
+                    name: fleet.fleet as DamnationSubItem,
                     minVal: currentChild?.minVal || null,
                     maxVal: currentChild?.maxVal || null,
                     status: null,
@@ -307,7 +308,7 @@ const ProfilePanel: React.FC<IProfilePanel> = ({ profilePanelHandler, isProfileP
     const newId = getNewId(activeItem)
     const newSubItem: Dimension = {
       id: newId,
-      name: itemName,
+      name: itemName as DamnationSubItem,
       maxVal: values.max ? normalize(values.max) : "-",
       minVal: values.min ? normalize(values.min) : "-",
       status: null,

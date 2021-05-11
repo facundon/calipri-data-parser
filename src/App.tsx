@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { Component } from "react"
+import { Component } from "react"
 
 import { ProfilePanel, DragLoader, FleetPanel, StationPanel, ExportPanel, confirmService } from "./Components"
 import Button from "rsuite/lib/Button"

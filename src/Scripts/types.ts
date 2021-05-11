@@ -20,9 +20,9 @@ export type DamnationRef = {
   maxVal: number | "-",
 }
 
-export type DamnationSubItem = "MOTRIZ" | "REMOLQUE" | "MOTRIZ - REMOLQUE"
+export type DamnationSubItem = "Motriz" | "Remolque" | "Motriz - Remolque"
 
-export type SubItem = Record<DamnationSubItem, DamnationRef>
+export type SubItem = Partial<Record<DamnationSubItem, DamnationRef>>
 
 export type Profiles = {
   [profile: string]: Record<DamnationName, DamnationRef | SubItem>

@@ -19,8 +19,15 @@ import {
 } from "./types"
 import { IParsedData, Wheel } from "../Components/DragLoader/types"
 
+function isThirdItem(item: DamnationName | DamnationSubItem): item is DamnationSubItem {
+  return item === "Motriz" || item === "Remolque" || item === "Motriz - Remolque"
+}
+function isRef(item: DamnationRef | SubItem): item is DamnationRef {
+  return item === "minVal" || item === "maxVal"
+}
+
 const getProfilesReferences = async(profiles: string[], fleet: string) => {
-  const loadedProfiles: any = {}
+  const loadedProfiles: Profiles = {}
   for (const profile of profiles) {
     const loadedData: Dimension[] = await load(profile, PROFILES_FOLDER)
     if (loadedData) {
@@ -31,27 +38,37 @@ const getProfilesReferences = async(profiles: string[], fleet: string) => {
       }
       loadedProfiles[profile] = {
         Trocha: {maxVal: "-", minVal: "-"},
-        Diametro: {},
+        Diametro: {maxVal: "-", minVal: "-"},
         Alto: {maxVal: "-", minVal: "-"},
         Ancho: {maxVal: "-", minVal: "-"},
         qR: {maxVal: "-", minVal: "-"},
-        "Dif. Ancho de Pestaña": {minVal: "-", maxVal: "-"},
+        "Dif. Ancho de Pestaña": {},
         "Dif. Diametro de Rueda - Mismo Bogie": {},
         "Dif. Diametro de Rueda - Mismo Coche": {},
         "Dif. Diametro de Rueda - Mismo Eje": {},
         "Dif. Diametro de Rueda - Mismo Modulo": {},
       }
-      loadedData.forEach(item => {
-        const fleetData = item.children.filter(child => child.name.toUpperCase() === fleet.toUpperCase())
-        if (fleetData.length && !fleetData[0].maxVal && !fleetData[0].minVal) {
-          loadedProfiles[profile][item.name] = {}
-          fleetData[0].children.forEach(child => {
-            loadedProfiles[profile][item.name][child.name.toUpperCase()] = { maxVal: child.maxVal, minVal: child.minVal }
+      loadedData.forEach(firstItem => {
+        const secondItem = firstItem.children.filter(thirdItem => thirdItem.name.toUpperCase() === fleet.toUpperCase())[0]
+        if (!secondItem?.maxVal && !secondItem?.minVal && !isThirdItem(firstItem.name)) {
+          loadedProfiles[profile][firstItem.name] = {}
+          secondItem.children.forEach(thirdItem => {
+            if (!isThirdItem(firstItem.name) && isThirdItem(thirdItem.name)) {
+              const subItem = loadedProfiles[profile][firstItem.name]
+              if (!isRef(subItem)) {
+                subItem[thirdItem.name] = {
+                  maxVal: thirdItem.maxVal!,
+                  minVal: thirdItem.minVal!
+                }
+              }
+            }
           })
         } else {
-          const maxVal = item.maxVal ? item.maxVal : fleetData[0].maxVal
-          const minVal = item.minVal ? item.minVal : fleetData[0].minVal
-          loadedProfiles[profile][item.name] = { maxVal, minVal }
+          const maxVal = firstItem?.maxVal || secondItem.maxVal!
+          const minVal = firstItem?.minVal || secondItem.minVal!
+          if (!isThirdItem(firstItem.name)) {
+            loadedProfiles[profile][firstItem.name] = { maxVal, minVal }
+          }
         }
       })
     } else {
@@ -71,12 +88,12 @@ const getVehicleTypeByFleet = (vehicle: string, fleet: string, loadedFleets: Fle
   if (fleet.toUpperCase() === "CAF6000") {
     if (vehicle.length > 4) {
       const vehicles = vehicle.split("-")
-      const result = vehicles.map(car => car[1] !== fleetObj.reference ? "REMOLQUE" : "MOTRIZ")
-      return result.includes("REMOLQUE") ? "MOTRIZ - REMOLQUE" : "MOTRIZ"
+      const result = vehicles.map(car => car[1] !== fleetObj.reference ? "Remolque" : "Motriz")
+      return result.includes("Remolque") ? "Motriz - Remolque" : "Motriz"
     } 
-    return vehicle[1] !== fleetObj.reference ? "REMOLQUE" : "MOTRIZ"
+    return vehicle[1] !== fleetObj.reference ? "Remolque" : "Motriz"
   }
-  return vehicle?.includes(fleetObj.reference) ? (vehicle.includes("-") ? "MOTRIZ - REMOLQUE" : "REMOLQUE") : "MOTRIZ"
+  return vehicle?.includes(fleetObj.reference) ? (vehicle.includes("-") ? "Motriz - Remolque" : "Remolque") : "Motriz"
 }
 
 const checkSubItems = (
@@ -87,10 +104,9 @@ const checkSubItems = (
 ) => {
   let newReference: number | null | "-"
   if ("maxVal" in reference) {
-
     newReference = reference?.maxVal
   } else {
-    newReference = reference[refType]?.maxVal
+    newReference = reference[refType]?.maxVal!
     if (!newReference) {
       Alert.warning(`Falta valor de referencia "${toTitleCase(refType)}" en "${item}" para perfil ${profile}`, 10000)
       return null

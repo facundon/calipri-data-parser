@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-use-before-define
-import React, { Component } from "react"
+import { Component } from "react"
 import { render } from "react-dom"
 import Modal from "rsuite/lib/Modal"
 import Button from "rsuite/lib/Button"
@@ -24,10 +24,6 @@ interface IProps {
   createConfirmProps: Config
 }
 
-interface ICreate {
-  (props: Config): ConfirmModal
-}
-
 let resolveAction : (value: any) => void
 const defaultConfig: Config = {
   message: "Esta seguro?",
@@ -38,7 +34,7 @@ const defaultConfig: Config = {
 }
 
 class ConfirmModal extends Component<IProps, IState> {
-  static create: ICreate = (props = {}) => {
+  static create = (props: Config = {}): any => {
     const containerElement = document.createElement("div")
     document.body.appendChild(containerElement)
     return render(

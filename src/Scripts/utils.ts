@@ -9,3 +9,7 @@ export const toTitleCase = (str: string) => (
 export function isNotNullOrUndefined<T>(input: null | undefined | T): input is T {
   return input !== null && input !== undefined
 }
+
+export type UnionRecord<K extends PropertyKey, T> = {
+  [P in K]: { [U in P]: T }
+}[K]

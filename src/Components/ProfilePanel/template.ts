@@ -1,6 +1,8 @@
+import { DamnationName, DamnationSubItem } from "../../Scripts/types"
+
 export type Dimension = {
   id: string,
-  name: string,
+  name: DamnationName | DamnationSubItem,
   maxVal: number | "-" | null,
   minVal: number | "-" | null,
   status: "EDIT" | null,
@@ -42,7 +44,7 @@ export const TEMPLATE: Dimension[] = [
     children:[
       {
         id:"4-1",
-        name:"CNR",
+        name:"CNR" as DamnationSubItem,
         minVal:790,
         maxVal:"-",
         status:null,
@@ -50,7 +52,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-2",
-        name:"FIAT",
+        name:"FIAT" as DamnationSubItem,
         minVal:776,
         maxVal:"-",
         status:null,
@@ -58,7 +60,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-3",
-        name:"GEE",
+        name:"GEE" as DamnationSubItem,
         minVal:830,
         maxVal:"-",
         status:null,
@@ -66,7 +68,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-4",
-        name:"Alstom300",
+        name:"Alstom300" as DamnationSubItem,
         minVal:779,
         maxVal:"-",
         status:null,
@@ -74,7 +76,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-5",
-        name:"Alstom100",
+        name:"Alstom100" as DamnationSubItem,
         minVal:776,
         maxVal:"-",
         status:null,
@@ -82,7 +84,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-6",
-        name:"Mitsubishi",
+        name:"Mitsubishi" as DamnationSubItem,
         minVal:790,
         maxVal:"-",
         status:null,
@@ -90,7 +92,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"4-7",
-        name:"CAF6000",
+        name:"CAF6000" as DamnationSubItem,
         minVal:790,
         maxVal:"-",
         status:null,
@@ -123,7 +125,7 @@ export const TEMPLATE: Dimension[] = [
     children:[
       {
         id:"7-1",
-        name:"CNR",
+        name:"CNR" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -131,7 +133,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-2",
-        name:"FIAT",
+        name:"FIAT" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -139,7 +141,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-3",
-        name:"GEE",
+        name:"GEE" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -147,7 +149,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-4",
-        name:"Alstom300",
+        name:"Alstom300" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -155,7 +157,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-5",
-        name:"Alstom100",
+        name:"Alstom100" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -163,7 +165,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-6",
-        name:"Mitsubishi",
+        name:"Mitsubishi" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -171,7 +173,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"7-7",
-        name:"CAF6000",
+        name:"CAF6000" as DamnationSubItem,
         minVal:"-",
         maxVal:1.2,
         status:null,
@@ -188,7 +190,7 @@ export const TEMPLATE: Dimension[] = [
     children:[
       {
         id:"8-1",
-        name:"CNR",
+        name:"CNR" as DamnationSubItem,
         minVal:"-",
         maxVal:5,
         status:null,
@@ -196,7 +198,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-2",
-        name:"FIAT",
+        name:"FIAT" as DamnationSubItem,
         minVal:"-",
         maxVal:3,
         status:null,
@@ -204,7 +206,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-3",
-        name:"GEE",
+        name:"GEE" as DamnationSubItem,
         minVal:"-",
         maxVal:10,
         status:null,
@@ -212,7 +214,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-4",
-        name:"Alstom300",
+        name:"Alstom300" as DamnationSubItem,
         minVal:"-",
         maxVal:5,
         status:null,
@@ -220,7 +222,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-5",
-        name:"Alstom100",
+        name:"Alstom100" as DamnationSubItem,
         minVal:"-",
         maxVal:5,
         status:null,
@@ -228,7 +230,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-6",
-        name:"Mitsubishi",
+        name:"Mitsubishi" as DamnationSubItem,
         minVal:"-",
         maxVal:10,
         status:null,
@@ -236,7 +238,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"8-7",
-        name:"CAF6000",
+        name:"CAF6000" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -271,7 +273,7 @@ export const TEMPLATE: Dimension[] = [
     children:[
       {
         id:"9-1",
-        name:"CNR",
+        name:"CNR" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -297,7 +299,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-2",
-        name:"FIAT",
+        name:"FIAT" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -323,7 +325,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-3",
-        name:"GEE",
+        name:"GEE" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -349,7 +351,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-4",
-        name:"Alstom300",
+        name:"Alstom300" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -375,7 +377,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-5",
-        name:"Alstom100",
+        name:"Alstom100" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -401,7 +403,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-6",
-        name:"Mitsubishi",
+        name:"Mitsubishi" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -419,7 +421,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"9-7",
-        name:"CAF6000",
+        name:"CAF6000" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -454,7 +456,7 @@ export const TEMPLATE: Dimension[] = [
     children:[
       {
         id:"10-1",
-        name:"CNR",
+        name:"CNR" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -480,7 +482,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-2",
-        name:"FIAT",
+        name:"FIAT" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -506,7 +508,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-3",
-        name:"GEE",
+        name:"GEE" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -532,7 +534,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-4",
-        name:"Alstom300",
+        name:"Alstom300" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -558,7 +560,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-5",
-        name:"Alstom100",
+        name:"Alstom100" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -584,7 +586,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-6",
-        name:"Mitsubishi",
+        name:"Mitsubishi" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,
@@ -602,7 +604,7 @@ export const TEMPLATE: Dimension[] = [
       },
       {
         id:"10-7",
-        name:"CAF6000",
+        name:"CAF6000" as DamnationSubItem,
         minVal:null,
         maxVal:null,
         status:null,

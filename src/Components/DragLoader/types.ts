@@ -1,5 +1,5 @@
 import { PreviewData } from "../Preview"
-import { SubstractionKinds } from "../../Scripts/substraction"
+import { SubstractionKinds } from "../../Scripts/types"
 
 export type Header = {
 
