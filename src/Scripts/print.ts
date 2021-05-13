@@ -1,16 +1,22 @@
+import { PreviewData } from "../Components/Preview"
 import { 
-  EvaluatedSubstractionsKinds
+  Damnation,
+  DamnationName,
+  DifferenceTables,
+  ERs,
+  EvaluatedData,
+  References
 } from "./types"
 
 const prepareData = (
-  evaluatedData,
-  header,
-  vehicleSchema,
-  stations,
-  ers,
-  lastDate
+  evaluatedData: EvaluatedData,
+  header: PreviewData[],
+  vehicleSchema: string,
+  stations: string[],
+  ers: ERs,
+  lastDate: {date: string}
 ) => {
-  const findInHeader = (item) => Object.values(header.find(val => val[item]))[0]
+  const findInHeader = (item: string) => Object.values(header.find(val => val[item])!)[0]
 
   const getLastDate = () => {
     if (lastDate?.date) {
@@ -31,14 +37,14 @@ const prepareData = (
       vehiclesAmount = index
     })
     for (let wheelIndex = 1; wheelIndex <= evaluatedData.wheels.length ; wheelIndex++) {
-      let auxIndex
+      let auxIndex: number
       if (wheelIndex % 2 === 0) {
         auxIndex = wheelIndex - 1
       } else {
         auxIndex = wheelIndex + 1
       }
       const isDamn = evaluatedData.wheels[auxIndex-1].damnation.length
-      schema = schema.replace("$NRO$", auxIndex)
+      schema = schema.replace("$NRO$", auxIndex.toString())
       schema = schema.replace("$CONDENADA$", isDamn ? "condenada" : "")
     }
     const anotherRowStations = `<div class="estaciones"><p>${stations[1]}</p><p>${stations[0]}</p></div>`
@@ -53,60 +59,63 @@ const prepareData = (
   }
 
   const getOrderedRefValues = () => {
-    let allReferences = []
+    let allReferences: References[] = []
     getProfiles().forEach((profile, index, arr) => {
+      let references = {} as References
       const profileRef = evaluatedData.references[profile]
-      const references = Object.keys(evaluatedData.references[profile]).map(ref => {
-        let maxVal = ""
-        let minVal = ""
-        maxVal = profileRef[ref].maxVal?.toString()
-        minVal = profileRef[ref].minVal?.toString()
-        if (ref === "Diametro") {
-          maxVal = null
-          minVal = index === 0 ? `Mín: ${minVal}` : ""
-        }
-        if (!maxVal && !minVal && ref !== "Diametro") {
+      Object.keys(profileRef).forEach(ref => {
+        const refName = ref as DamnationName
+        const refObj = profileRef[refName]
+        let maxVal: string | null | (string | null)[] = ""
+        let minVal: string | null | (string | null)[] = ""
+        if ("maxVal" in refObj || "minVal" in refObj) {
+          maxVal = refObj.maxVal?.toString()
+          minVal = refObj.minVal?.toString()
+          if (refName === "Diametro") {
+            maxVal = ""
+            minVal = index === 0 ? `Mín: ${refObj.minVal}` : ""
+          }
+        } else {
           minVal = ""
           maxVal = [
-            profileRef[ref]["Motriz"]?.maxVal ? `Motriz ${profile}: ` + profileRef[ref]["Motriz"]?.maxVal?.toString() : null,
-            profileRef[ref]["Remolque"]?.maxVal ? `Remolque ${profile}: ` + profileRef[ref]["Remolque"]?.maxVal?.toString() : null
+            refObj.Motriz?.maxVal
+              ? `Motriz ${profile}: ` + refObj.Motriz?.maxVal?.toString()
+              : null,
+            refObj.Remolque?.maxVal
+              ? `Remolque ${profile}: ` + refObj.Remolque?.maxVal?.toString()
+              : null
           ]
           if (maxVal.includes(null)) {
             const changeIndex = maxVal.indexOf(null)
-            maxVal[changeIndex] = profileRef[ref]["Motriz - Remolque"]?.maxVal ? `Motriz-Remolque ${profile}: ` + profileRef[ref]["Motriz - Remolque"]?.maxVal?.toString() : null
+            maxVal[changeIndex] = refObj["Motriz - Remolque"]?.maxVal
+              ? `Motriz-Remolque ${profile}: ` + refObj["Motriz - Remolque"]?.maxVal?.toString()
+              : null
           }
         }
-        if (typeof maxVal === "string" && ref !== "Diametro") {
-          return { [ref]: `${arr.length !== 1 ? profile + ": " : ""}${minVal || ""}-${maxVal || ""}` }
+        if (typeof maxVal === "string" && refName !== "Diametro") {
+          references[refName] = `${arr.length !== 1 ? profile + ": " : ""}${minVal || ""}-${maxVal || ""}`
         } else {
-          return { [ref]: maxVal || minVal || ""}
+          references[refName] = maxVal || minVal || ""
         }
       })
       allReferences.push(references)
     })
-    let orderedRefs
-    if (allReferences.length === 1) {
-      allReferences.forEach(item => {
-        let refObj = {}
-        item.forEach(item => {
-          refObj[Object.keys(item)[0]] = Object.values(item)[0]
-        })
-        orderedRefs = refObj
-      })
-    } else {
+    let orderedRefs = allReferences[0]
+    if (allReferences.length > 1) {
       orderedRefs = allReferences.reduce((prev, current) => {
-        let refObj = {}
-        current.forEach((item, index) => {
-          if (typeof Object.values(prev[index])[0] === "object") {
+        let refObj = {} as References
+        Object.values(current).forEach((currentVal, currentIndex) => {
+          const prevValues = Object.values(prev)[currentIndex]
+          if (typeof prevValues === "object") {
             let nextRef = ""
-            Object.values(prev[index])[0].forEach((val, i) => {
+            prevValues.forEach((prevVal, prevIndex) => {
               nextRef += `
-                ${val ? `<div>${val}</div>` : ""}
-                ${Object.values(item)[i] ? `<div>${Object.values(item)[i][0]}</div>` : ""}`
+                  ${prevVal ? `<div>${prevVal}</div>` : ""}
+                  ${currentVal[prevIndex] ? `<div>${currentVal[prevIndex]}</div>` : ""}`
             })
-            refObj[Object.keys(item)[0]] = nextRef
+            refObj[Object.keys(current)[currentIndex] as DamnationName] = nextRef
           } else {
-            refObj[Object.keys(item)[0]] = `<div>${Object.values(prev[index])}</div><div>${Object.values(item)}</div>`
+            refObj[Object.keys(current)[currentIndex] as DamnationName] = `<div>${Object.values(prev)[currentIndex]}</div><div>${currentVal}</div>`
           }
         })
         return refObj
@@ -125,14 +134,14 @@ const prepareData = (
   }
 
   const getTable = () => {
-    const getObj = (name, value) => ({ damnationName: name, value })
+    const getObj = (name: Damnation[number], value: string) => ({ damnationName: name, value })
     const reorderedWheels = evaluatedData.wheels.map((wheel, index) => 
       [
         getObj("", wheel.vehicle),
         getObj("", wheel.bogie) ,
-        getObj("index", Math.round((index + 1) / 2)),
+        getObj("index", Math.round((index + 1) / 2).toString()),
         getObj("gauge", isNaN(wheel.gauge) ? "-" : wheel.gauge.toFixed(2)),
-        getObj("index", index + 1),
+        getObj("index", (index + 1).toString()),
         getObj("diameter", isNaN(wheel.diameter) ? "-" : wheel.diameter.toFixed(2)),
         getObj("height", isNaN(wheel.height) ? "-" : wheel.height.toFixed(2)),
         getObj("width", isNaN(wheel.width) ? "-" : wheel.width.toFixed(2)),
@@ -208,7 +217,7 @@ const prepareData = (
     data = `<tr>${data}</tr>`
     let subData = ""
     const refValues = getOrderedRefValues()
-    const itemsToDelete = Object.keys(refValues).filter(item => !reorderedHeaders.includes(item))
+    const itemsToDelete = Object.keys(refValues).filter((item) => !reorderedHeaders.includes(item)) as DamnationName[] 
     itemsToDelete.forEach(item => delete refValues[item])
     Object.values(refValues).forEach(val => {
       val ? subData += `<th class=references>${val}</th>` : null
@@ -217,39 +226,39 @@ const prepareData = (
     return data
   }
 
-  const getDifTable = (type) => {
+  const getDifTable = (type: DifferenceTables) => {
     let data = ""
-    evaluatedData.substractions[type].forEach((item, index) => {
+    evaluatedData.substractions[type]!.forEach((item, index) => {
       switch (type) {
       case "width":
       case "shaft":
         data += `
         <tr>
-          ${index % 4 === 0 ? `<td rowspan=4>${item.vehicle || "-"}</td>` : ""}
-          ${index % 2 === 0 ? `<td rowspan=2>${item.bogie || "-"}</td>` : ""}
+          ${index % 4 === 0 ? `<td rowspan=4>${item!.vehicle || "-"}</td>` : ""}
+          ${index % 2 === 0 ? `<td rowspan=2>${item!.bogie || "-"}</td>` : ""}
           <td id=index>${index + 1}</td>
-          <td>${item.profile}</td>
-          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+          <td>${item!.profile}</td>
+          <td ${item!.damnation ? "class=damned" : ""}>${item!.value}</td>
         </tr>`
         break
       case "bogie":
         data += `
         <tr>
-          ${index % 2 === 0 ? `<td rowspan=2>${item.vehicle || "-"}</td>` : ""}
-          <td id=index>${item.bogie || "-"}</td>
-          <td>${item.type}</td>
-          <td>${item.profile}</td>
-          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+          ${index % 2 === 0 ? `<td rowspan=2>${item!.vehicle || "-"}</td>` : ""}
+          <td id=index>${item!.bogie || "-"}</td>
+          <td>${item!.type}</td>
+          <td>${item!.profile}</td>
+          <td ${item!.damnation ? "class=damned" : ""}>${item!.value}</td>
         </tr>`
         break
       case "vehicle":
       case "module":
         data += `
         <tr>
-          <td id=index>${item.vehicle || "-"}</td>
-          <td>${item.type}</td>
-          <td>${item.profile}</td>
-          <td ${item.damnation ? "class=damned" : ""}>${item.value}</td>
+          <td id=index>${item!.vehicle || "-"}</td>
+          <td>${item!.type}</td>
+          <td>${item!.profile}</td>
+          <td ${item!.damnation ? "class=damned" : ""}>${item!.value}</td>
         </tr>`
         break
       default:
@@ -259,14 +268,14 @@ const prepareData = (
     return data
   }
 
-  const getDifHeaders = (headers, ref) => {
+  const getDifHeaders = (headers: string[], ref: string) => {
     let data = ""
     headers.map((item) => {
       data += `<th ${item !== "Diferencia" ? "rowspan=2" : ""}>${item}${item === "Diferencia" ? "<span> [mm]</span>" : ""}</th>`
     })
     data = `<tr>${data}</tr>`
     const refValues = getOrderedRefValues()
-    const currentRef = Object.keys(refValues).find(item => item === ref)
+    const currentRef = Object.keys(refValues).find(item => item === ref) as DamnationName
     let value = refValues[currentRef]
     if (typeof value === "string") {
       value = value.replaceAll("-", "")

@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Component } from "react"
 
-import { ProfilePanel, DragLoader, FleetPanel, StationPanel, ExportPanel, confirmService } from "./Components"
+import { 
+  ProfilePanel,
+  DragLoader,
+  FleetPanel,
+  StationPanel,
+  ExportPanel,
+  confirmService
+} from "./Components"
 import Button from "rsuite/lib/Button"
 import ButtonGroup from "rsuite/lib/ButtonGroup"
 import Dropdown from "rsuite/lib/Dropdown"
@@ -25,7 +32,7 @@ import {
   onUpdateDownloaded,
 } from "./Scripts/electron-bridge"
 import evaluate from "./Scripts/evaluate"
-import prepareData from "./Scripts/print.js"
+import prepareData from "./Scripts/print"
 
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 import { IParsedData } from "./Components/DragLoader/types"
@@ -125,14 +132,20 @@ class App extends Component<IProps, IState> {
     if (evaluatedData) {
       const vehicleSchema: string = await load("esquema", "templates", ".html")
       const stations = await findStations()
-      const ers = await load("ers")
-      const lastDate = await useDb("fetchLastDate", { 
+      const ers: {[x: string]: string} = await load("ers")
+      const lastDate: {date: string} = await useDb("fetchLastDate", { 
         line: this.getItemInHeader("Linea"),
         fleet: this.getItemInHeader("Flota"),
         unit: this.getItemInHeader("Formacion")
       })
       if (!stations) return
-      const preparedData = prepareData(evaluatedData, this.state.parsedData.header, vehicleSchema, stations, ers, lastDate)
+      const preparedData = prepareData(
+        evaluatedData,
+        this.state.parsedData.header,
+        vehicleSchema, stations,
+        ers,
+        lastDate
+      )
       const loadedHtml: string = await load("report", "templates", ".html")
       if (!loadedHtml) {
         Alert.error("No se pudo cargar la plantilla para crear PDF", 10000)

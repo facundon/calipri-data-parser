@@ -50,9 +50,11 @@ const getProfilesReferences = async(profiles: string[], fleet: string) => {
       }
       loadedData.forEach(firstItem => {
         const secondItem = firstItem.children.filter(thirdItem => thirdItem.name.toUpperCase() === fleet.toUpperCase())[0]
-        if (!secondItem?.maxVal && !secondItem?.minVal && !isThirdItem(firstItem.name)) {
+        const maxVal = firstItem?.maxVal || secondItem.maxVal!
+        const minVal = firstItem?.minVal || secondItem.minVal!
+        if (!maxVal && !minVal && !isThirdItem(firstItem.name)) {
           loadedProfiles[profile][firstItem.name] = {}
-          secondItem.children.forEach(thirdItem => {
+          secondItem?.children.forEach(thirdItem => {
             if (!isThirdItem(firstItem.name) && isThirdItem(thirdItem.name)) {
               const subItem = loadedProfiles[profile][firstItem.name]
               if (!isRef(subItem)) {
@@ -63,12 +65,8 @@ const getProfilesReferences = async(profiles: string[], fleet: string) => {
               }
             }
           })
-        } else {
-          const maxVal = firstItem?.maxVal || secondItem.maxVal!
-          const minVal = firstItem?.minVal || secondItem.minVal!
-          if (!isThirdItem(firstItem.name)) {
-            loadedProfiles[profile][firstItem.name] = { maxVal, minVal }
-          }
+        } else if (!isThirdItem(firstItem.name)) {
+          loadedProfiles[profile][firstItem.name] = { maxVal, minVal }
         }
       })
     } else {
