@@ -16,10 +16,8 @@ import Icon from "rsuite/lib/Icon"
 import IconButton from "rsuite/lib/IconButton"
 import Alert from "rsuite/lib/Alert"
 import Progress from "rsuite/lib/Progress"
-import { forIn } from "lodash"
 
-import { 
-  load,
+import {
   printPdf,
   useDb,
   selectConfigDirectory,
@@ -31,18 +29,13 @@ import {
   getUpdateProgress,
   onUpdateDownloaded,
 } from "./Scripts/electron-bridge"
-import evaluate from "./Scripts/evaluate"
-import prepareData from "./Scripts/print"
+import preparePrint, { getItemInHeader } from "./Scripts/print"
 
 import { PARSED_DATA_INITIAL_VALUES } from "./Components/DragLoader"
 import { IParsedData } from "./Components/DragLoader/types"
-import { TLine } from "./Components/StationPanel/template"
 
 import "rsuite/dist/styles/rsuite-default.css"
 import "./globalStyles/index.scss"
-import { AwaitType } from "./Scripts/types"
-import { pipe } from "./Scripts/utils"
-
 
 const { Line } = Progress
 
@@ -111,62 +104,12 @@ class App extends Component<IProps, IState> {
     }
   }
 
-  findStations = async() => {
-    const lines: TLine[] = await load("lineas")
-    if (lines){
-      const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
-      if (!line) {
-        Alert.error("No se encontro el parámetro 'Linea' en los datos de la medición", 10000)  
-        return null
-      }
-      return [line.station1, line.station2, line.color]
-    } else {
-      Alert.error("No se pudieron cargar las cabeceras", 10000)
-      return null
-    }
-  }
-
-  getItemInHeader = (item: string) => this.state.parsedData.header.find(val => Object.keys(val)[0] === item)![item]
- 
-  getPreparedData = async(
-    evaluatedData: NonNullable<AwaitType<ReturnType<typeof evaluate>>>
-  ) => {
-    const vehicleSchema: string = await load("esquema", "templates", ".html")
-    const stations = await this.findStations()
-    const ers: {[x: string]: string} = await load("ers")
-    const lastDate: {date: string} = await useDb("fetchLastDate", { 
-      line: this.getItemInHeader("Linea"),
-      fleet: this.getItemInHeader("Flota"),
-      unit: this.getItemInHeader("Formacion")
-    })
-    if (!stations) throw Error("No se pudieron cargar las estaciones cabeceras")
-    return prepareData(
-      evaluatedData,
-      this.state.parsedData.header,
-      vehicleSchema, stations,
-      ers,
-      lastDate
-    )
-  }
-
-  getReplacedTemplate = async(
-    preparedData: ReturnType<typeof prepareData>
-  ) => {
-    const loadedHtml: string = await load("report", "templates", ".html")
-    if (!loadedHtml) throw Error("No se pudo cargar la plantilla para crear PDF")
-    let replacedHtml = loadedHtml
-    forIn(preparedData, (val, key) => {
-      replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
-    })
-    return replacedHtml.replace(/\r?\n|\r/g, "")
-  }
-
   saveToDb = async(dataToSave: DbMeasurementsData) => {
     let success = await useDb("add", dataToSave)
     !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
     if (success === "unique") {
       const confirm = await confirmService.show({
-        message: `Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}. Desea reemplazarla?`,
+        message: `Ya existe una medición de la formación ${getItemInHeader("Formacion", this.state.parsedData.header)} del día ${getItemInHeader("Fecha", this.state.parsedData.header)}. Desea reemplazarla?`,
         actionIcon: "clone",
         actionMessage: "Reemplazar",
         iconColor: "#f44336",
@@ -180,30 +123,23 @@ class App extends Component<IProps, IState> {
 
   handlePrintPDF = () => {
     this.setState({ isPrinting: true })
-    const preparePrint = pipe(
-      evaluate,
-      this.getPreparedData,
-      this.getReplacedTemplate
-    )
-    preparePrint(this.state.parsedData).then(replacedHtml => {
-      const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
+    preparePrint(this.state.parsedData, replacedHtml => {
+      const fileName = `Linea ${getItemInHeader("Linea", this.state.parsedData.header)} - ${getItemInHeader("Flota", this.state.parsedData.header)} - ${getItemInHeader("Formacion", this.state.parsedData.header)} - ${getItemInHeader("Fecha", this.state.parsedData.header).replaceAll("/", "-")}`
       printPdf(replacedHtml, fileName).then(success => {
         if (success && success !== "canceled") {
           Alert.success("Reporte emitido!", 10000)
           const dataToSave: DbMeasurementsData = {
             data: JSON.stringify(this.state.parsedData),
-            line: this.getItemInHeader("Linea"),
-            fleet: this.getItemInHeader("Flota"),
-            unit: this.getItemInHeader("Formacion"),
-            date: this.getItemInHeader("Fecha")
+            line: getItemInHeader("Linea", this.state.parsedData.header),
+            fleet: getItemInHeader("Flota", this.state.parsedData.header),
+            unit: getItemInHeader("Formacion", this.state.parsedData.header),
+            date: getItemInHeader("Fecha", this.state.parsedData.header)
           }
           this.saveToDb(dataToSave)
         } else if (!success) {
           Alert.error("Ocurrio un error al emitir el reporte.", 10000)
         }
       })
-    }).catch(reason => {
-      Alert.error(reason.message, 10000)
     })
     this.setState({ isPrinting: false })
   }

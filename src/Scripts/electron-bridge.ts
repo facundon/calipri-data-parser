@@ -55,7 +55,10 @@ interface IGetFiles {
 }
 
 interface ICreatePdf {
-  (html: string, name: string): Promise<boolean | "canceled">
+  (
+    html: string,
+    name: string,
+  ): Promise<boolean | "canceled">
 }
 
 interface IUseDb {

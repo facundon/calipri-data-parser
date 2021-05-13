@@ -10,7 +10,7 @@ import Loader from "rsuite/lib/Loader"
 import Alert from "rsuite/lib/Alert"
 
 import { jsonToCSV } from "react-papaparse"
-import { saveBulk, useDb } from "../../Scripts/electron-bridge"
+import { printPdf, saveBulk, useDb } from "../../Scripts/electron-bridge"
 
 import "./styles/index.scss"
 import { concat } from "lodash"
@@ -21,6 +21,7 @@ import {
   FetchedData
 } from "./types"
 import { IParsedData } from "../DragLoader/types"
+import preparePrint, { getItemInHeader } from "../../Scripts/print"
 
 
 const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }) => {
@@ -171,7 +172,15 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
     await getMeasurementData((allData) => {
       for (const data of allData) {
         const dataObj: IParsedData = JSON.parse(data.data)
-        console.log(dataObj.header)
+        preparePrint(dataObj, async(replacedHtml) => {
+          const fileName = `Linea ${getItemInHeader("Linea", dataObj.header)} - ${getItemInHeader("Flota", dataObj.header)} - ${getItemInHeader("Formacion", dataObj.header)} - ${getItemInHeader("Fecha", dataObj.header).replaceAll("/", "-")}`
+          const success = await printPdf(replacedHtml, fileName)
+          if (success && success !== "canceled") {
+            Alert.success("Reporte emitido!", 10000)
+          } else {
+            Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+          }
+        })
       }
     })
     setLoading(false)
@@ -229,11 +238,11 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={handleExport} appearance="primary">
+        <Button onClick={handleExport} appearance="primary" disabled={!selectedMeasurements.length}>
           <Icon icon="file-download" size="lg"/>
           Exportar
         </Button>
-        <Button onClick={handleRePrint} appearance="primary">
+        <Button onClick={handleRePrint} appearance="primary" disabled={!selectedMeasurements.length}>
           <Icon icon="file-pdf-o" size="lg"/>
           Re-Imprimir
         </Button>

@@ -1,12 +1,82 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { PreviewData } from "../Components/Preview"
+import Alert from "rsuite/lib/Alert"
+import { forIn } from "lodash"
+import { load, useDb } from "./electron-bridge"
+import evaluate from "./evaluate"
+
 import { 
   Damnation,
   DamnationName,
   DifferenceTables,
   ERs,
   EvaluatedData,
-  References
+  References,
+  AwaitType
 } from "./types"
+import { TLine } from "../Components/StationPanel/template"
+import { IParsedData } from "../Components/DragLoader/types"
+
+export const getItemInHeader = (item: string, header: PreviewData[]) => (
+  header.find((val: {}) => Object.keys(val)[0] === item)![item]
+)
+ 
+const findStations = async(header: PreviewData[]) => {
+  const lines: TLine[] = await load("lineas")
+  if (lines){
+    const line = lines.find(line => (
+      line.name === getItemInHeader("Linea", header)
+    ))
+    if (!line) throw Error("No se encontro el parámetro 'Linea' en los datos de la medición")
+    return [line.station1, line.station2, line.color]
+  } else {
+    throw Error("No se pudieron cargar las cabeceras")
+  }
+}
+
+const getPreparedData = async(
+  evaluatedData: NonNullable<AwaitType<ReturnType<typeof evaluate>>>,
+  header: PreviewData[]
+) => {
+  const vehicleSchema: string = await load("esquema", "templates", ".html")
+  const stations = await findStations(header)
+  const ers: {[x: string]: string} = await load("ers")
+  const lastDate: {date: string} = await useDb("fetchLastDate", { 
+    line: getItemInHeader("Linea", header),
+    fleet: getItemInHeader("Flota", header),
+    unit: getItemInHeader("Formacion", header)
+  })
+  if (!stations) throw Error("No se pudieron cargar las estaciones cabeceras")
+  return prepareData(
+    evaluatedData,
+    header,
+    vehicleSchema, stations,
+    ers,
+    lastDate
+  )
+}
+
+const getReplacedTemplate = async(
+  preparedData: ReturnType<typeof prepareData>
+) => {
+  const loadedHtml: string = await load("report", "templates", ".html")
+  if (!loadedHtml) throw Error("No se pudo cargar la plantilla para crear PDF")
+  let replacedHtml = loadedHtml
+  forIn(preparedData, (val, key) => {
+    replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
+  })
+  return replacedHtml.replace(/\r?\n|\r/g, "")
+}
+
+const preparePrint = (parsedData: IParsedData, callback: (val: string) => void) => (
+  evaluate(parsedData).then(val => (
+    getPreparedData(val, parsedData.header).then(val => (
+      getReplacedTemplate(val).then(val => callback(val))
+    ))
+  )).catch(reason => {
+    Alert.error(reason.message, 10000)
+  })
+)
 
 const prepareData = (
   evaluatedData: EvaluatedData,
@@ -316,4 +386,4 @@ const prepareData = (
   })
 }
 
-export default prepareData
+export default preparePrint

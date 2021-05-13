@@ -118,7 +118,7 @@ function createMainWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   mainWindow.removeMenu()
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -269,8 +269,8 @@ ipcMain.handle("createPdf", async(_, html, name) => {
   printWindow.loadURL("data:text/html;charset=UTF-8," + encodeURIComponent(html.replace("$STYLES$", css)))
 
   const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
-  if (canceled) return "canceled"
-  if (!css) return(new Promise(resolve => resolve(false)))
+  if (canceled) return new Promise(resolve => resolve("canceled"))
+  if (!css) return new Promise(resolve => resolve(false))
   try {
     const pdf = await printWindow.webContents.printToPDF({})
     printWindow.destroy()
