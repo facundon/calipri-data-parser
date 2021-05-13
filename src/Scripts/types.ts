@@ -4,7 +4,7 @@ import evaluate from "./evaluate"
 
 /* Evaluate */
 
-type AwaitType<T> = T extends PromiseLike<infer U> ? U : T
+export type AwaitType<T> = T extends PromiseLike<infer U> ? U : T
 export type EvaluatedData = NonNullable<AwaitType<ReturnType<typeof evaluate>>>
 export type DamnationName = "Alto"
   | "Ancho"

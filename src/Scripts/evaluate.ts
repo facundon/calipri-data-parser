@@ -190,15 +190,12 @@ const evaluate = async(parsedData: IParsedData) => {
   const { wheels, header, substractions } = parsedData
   const profilesInWheels = wheels.map(wheel => wheel.profile).filter((profile, index, arr) => arr.indexOf(profile) === index)
   const fleetObject = header.find(item => Object.keys(item)[0] === "Flota")
-  if (!fleetObject) {
-    Alert.error("No se encontro el parámetro 'Flota' en los datos de la medición", 10000)
-    return null
-  }
+  if (!fleetObject) throw Error("No se encontro el parámetro 'Flota' en los datos de la medición")
   const fleet = Object.values(fleetObject)[0]
   const profilesReferences = await getProfilesReferences(profilesInWheels, fleet.toUpperCase())
-  if (!profilesReferences) return null
+  if (!profilesReferences) throw Error(`Hubo un error al obtener las referencias del perfil ${profilesInWheels}`)
   const evaluatedSubstractions = await evaluateSubstractions(substractions, profilesReferences, fleet)
-  if (!evaluatedSubstractions) return null
+  if (!evaluatedSubstractions) throw Error("Hubo un error al evaluar las diferencias de diámetro")
   return ({
     wheels: evaluateWheels(wheels, profilesReferences),
     substractions: evaluatedSubstractions ,

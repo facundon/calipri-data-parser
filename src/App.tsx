@@ -40,6 +40,8 @@ import { TLine } from "./Components/StationPanel/template"
 
 import "rsuite/dist/styles/rsuite-default.css"
 import "./globalStyles/index.scss"
+import { AwaitType } from "./Scripts/types"
+import { pipe } from "./Scripts/utils"
 
 
 const { Line } = Progress
@@ -87,8 +89,6 @@ class App extends Component<IProps, IState> {
     }
   }
 
-  getItemInHeader = (item: string) => this.state.parsedData.header.find(val => Object.keys(val)[0] === item)![item]
-  
   handleSelectConfigDirectory = async() => {
     const result = await selectConfigDirectory()
     if (typeof result === "string") {
@@ -111,81 +111,100 @@ class App extends Component<IProps, IState> {
     }
   }
 
-  handlePrintPDF = async() => {
-    const findStations = async() => {
-      const lines: TLine[] = await load("lineas")
-      if (lines){
-        const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
-        if (!line) {
-          Alert.error("No se encontro el parámetro 'Linea' en los datos de la medición", 10000)  
-          return null
-        }
-        return [line.station1, line.station2, line.color]
-      } else {
-        Alert.error("No se pudieron cargar las cabeceras", 10000)
+  findStations = async() => {
+    const lines: TLine[] = await load("lineas")
+    if (lines){
+      const line = lines.find(line => line.name === this.state.parsedData.header.find(item => Object.keys(item)[0] === "Linea")?.Linea)
+      if (!line) {
+        Alert.error("No se encontro el parámetro 'Linea' en los datos de la medición", 10000)  
         return null
       }
+      return [line.station1, line.station2, line.color]
+    } else {
+      Alert.error("No se pudieron cargar las cabeceras", 10000)
+      return null
     }
+  }
 
-    this.setState({ isPrinting: true })
-    const evaluatedData = await evaluate(this.state.parsedData)
-    if (evaluatedData) {
-      const vehicleSchema: string = await load("esquema", "templates", ".html")
-      const stations = await findStations()
-      const ers: {[x: string]: string} = await load("ers")
-      const lastDate: {date: string} = await useDb("fetchLastDate", { 
-        line: this.getItemInHeader("Linea"),
-        fleet: this.getItemInHeader("Flota"),
-        unit: this.getItemInHeader("Formacion")
-      })
-      if (!stations) return
-      const preparedData = prepareData(
-        evaluatedData,
-        this.state.parsedData.header,
-        vehicleSchema, stations,
-        ers,
-        lastDate
-      )
-      const loadedHtml: string = await load("report", "templates", ".html")
-      if (!loadedHtml) {
-        Alert.error("No se pudo cargar la plantilla para crear PDF", 10000)
-        return
-      }
-      let replacedHtml = loadedHtml
-      forIn(preparedData, (val, key) => {
-        replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
-      })
-      replacedHtml = replacedHtml.replace(/\r?\n|\r/g, "")
-      const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
+  getItemInHeader = (item: string) => this.state.parsedData.header.find(val => Object.keys(val)[0] === item)![item]
+ 
+  getPreparedData = async(
+    evaluatedData: NonNullable<AwaitType<ReturnType<typeof evaluate>>>
+  ) => {
+    const vehicleSchema: string = await load("esquema", "templates", ".html")
+    const stations = await this.findStations()
+    const ers: {[x: string]: string} = await load("ers")
+    const lastDate: {date: string} = await useDb("fetchLastDate", { 
+      line: this.getItemInHeader("Linea"),
+      fleet: this.getItemInHeader("Flota"),
+      unit: this.getItemInHeader("Formacion")
+    })
+    if (!stations) throw Error("No se pudieron cargar las estaciones cabeceras")
+    return prepareData(
+      evaluatedData,
+      this.state.parsedData.header,
+      vehicleSchema, stations,
+      ers,
+      lastDate
+    )
+  }
 
-      const success = await printPdf(replacedHtml, fileName)
-      if (success && success !== "canceled") {
-        Alert.success("Reporte emitido!", 10000)
-        const dataToSave: DbMeasurementsData = {
-          data: JSON.stringify(this.state.parsedData.wheels),
-          line: this.getItemInHeader("Linea"),
-          fleet: this.getItemInHeader("Flota"),
-          unit: this.getItemInHeader("Formacion"),
-          date: this.getItemInHeader("Fecha")
-        }
-        let success = await useDb("add", dataToSave)
+  getReplacedTemplate = async(
+    preparedData: ReturnType<typeof prepareData>
+  ) => {
+    const loadedHtml: string = await load("report", "templates", ".html")
+    if (!loadedHtml) throw Error("No se pudo cargar la plantilla para crear PDF")
+    let replacedHtml = loadedHtml
+    forIn(preparedData, (val, key) => {
+      replacedHtml = replacedHtml.replaceAll(`$${key}$`, val)
+    })
+    return replacedHtml.replace(/\r?\n|\r/g, "")
+  }
+
+  saveToDb = async(dataToSave: DbMeasurementsData) => {
+    let success = await useDb("add", dataToSave)
+    !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
+    if (success === "unique") {
+      const confirm = await confirmService.show({
+        message: `Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}. Desea reemplazarla?`,
+        actionIcon: "clone",
+        actionMessage: "Reemplazar",
+        iconColor: "#f44336",
+      })
+      if (confirm) {
+        success = await useDb("update", dataToSave)
         !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
-        if (success === "unique") {
-          const confirm = await confirmService.show({
-            message: `Ya existe una medición de la formación ${this.getItemInHeader("Formacion")} del día ${this.getItemInHeader("Fecha")}. Desea reemplazarla?`,
-            actionIcon: "clone",
-            actionMessage: "Reemplazar",
-            iconColor: "#f44336",
-          })
-          if (confirm) {
-            success = await useDb("update", dataToSave)
-            !success && Alert.error("No se pudo guardar la medición en la base de datos", 10000)
-          }
-        }
-      } else if (!success) {
-        Alert.error("Ocurrio un error al emitir el reporte.", 10000)
       }
     }
+  }
+
+  handlePrintPDF = () => {
+    this.setState({ isPrinting: true })
+    const preparePrint = pipe(
+      evaluate,
+      this.getPreparedData,
+      this.getReplacedTemplate
+    )
+    preparePrint(this.state.parsedData).then(replacedHtml => {
+      const fileName = `Linea ${this.getItemInHeader("Linea")} - ${this.getItemInHeader("Flota")} - ${this.getItemInHeader("Formacion")} - ${this.getItemInHeader("Fecha").replaceAll("/", "-")}`
+      printPdf(replacedHtml, fileName).then(success => {
+        if (success && success !== "canceled") {
+          Alert.success("Reporte emitido!", 10000)
+          const dataToSave: DbMeasurementsData = {
+            data: JSON.stringify(this.state.parsedData),
+            line: this.getItemInHeader("Linea"),
+            fleet: this.getItemInHeader("Flota"),
+            unit: this.getItemInHeader("Formacion"),
+            date: this.getItemInHeader("Fecha")
+          }
+          this.saveToDb(dataToSave)
+        } else if (!success) {
+          Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+        }
+      })
+    }).catch(reason => {
+      Alert.error(reason.message, 10000)
+    })
     this.setState({ isPrinting: false })
   }
 
@@ -267,6 +286,26 @@ class App extends Component<IProps, IState> {
           </div>
           <div className="btn-group">
             <ButtonGroup justified>
+              <Dropdown
+                style={{width: "120px"}}
+                title="Opciones"
+                placement="topStart"
+                renderTitle={(children) =>
+                  <Button
+                    style={{width: "120px"}}
+                    appearance="subtle"
+                    className="dropdown-btn"
+                  >
+                    <Icon icon="ellipsis-h" size="2x" />
+                    {children}
+                  </Button>
+                }
+              >
+                <Dropdown.Item onSelect={() => this.setState({ isExportPanelOpen: true })}>
+                  <Icon icon="file-download" size="lg" />
+                Exportar
+                </Dropdown.Item>
+              </Dropdown>
               <Button
                 color="green"
                 disabled={!isLoaded || isPrinting || isUpdating}
@@ -283,7 +322,6 @@ class App extends Component<IProps, IState> {
                   <Button
                     appearance="subtle"
                     className="dropdown-btn"
-                    disabled={isUpdating}
                   >
                     <Icon icon="sliders" size="2x" />
                     {children}
@@ -300,10 +338,6 @@ class App extends Component<IProps, IState> {
                   Seleccionar Configuración
                   </Dropdown.Item>
                 </Dropdown.Menu>
-                <Dropdown.Item onSelect={() => this.setState({ isExportPanelOpen: true })}>
-                  <Icon icon="file-download" size="lg" />
-                Exportar
-                </Dropdown.Item>
                 <Dropdown.Item onSelect={() => this.setState({ isStationConfigOpen: true })}>
                   <Icon icon="map-marker" size="lg" />
                 Cabeceras

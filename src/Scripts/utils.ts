@@ -13,3 +13,9 @@ export function isNotNullOrUndefined<T>(input: null | undefined | T): input is T
 export type UnionRecord<K extends PropertyKey, T> = {
   [P in K]: { [U in P]: T }
 }[K]
+
+export const pipe = (...functions: ((input: any) => Promise<any>)[]) => (
+  (input: any) => (
+    functions.reduce((chain, func) => chain.then(func), Promise.resolve(input))
+  )
+)

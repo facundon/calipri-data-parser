@@ -118,7 +118,7 @@ function createMainWindow() {
 
   mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "../build/index.html")}`)
   mainWindow.removeMenu()
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 }
 
 const gotTheLock = app.requestSingleInstanceLock()

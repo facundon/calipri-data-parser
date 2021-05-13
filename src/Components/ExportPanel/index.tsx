@@ -14,18 +14,14 @@ import { saveBulk, useDb } from "../../Scripts/electron-bridge"
 
 import "./styles/index.scss"
 import { concat } from "lodash"
+import { 
+  IExportPanel,
+  CascaderData,
+  MeasurementCallback,
+  FetchedData
+} from "./types"
+import { IParsedData } from "../DragLoader/types"
 
-type CascaderData = {
-  value: string,
-  label: string,
-  children?: CascaderData[],
-  parent?: CascaderData | null,
-}
-
-interface IExportPanel {
-  isExportPanelOpen: boolean,
-  exportPanelHandler: (val: boolean) => void
-}
 
 const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }) => {
   const [measurements, setMeasurements] = useState<CascaderData[]>([])
@@ -111,44 +107,73 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
     return concat(lineValues, dateValues)
   }
 
-  const handleExport = async() => {
-    setLoading(true)
-    const getIdData = (item: CascaderData | undefined, id: number | null = null) => {
-      const isDate = Boolean(!item?.children)
-      let line = ""
-      let unit = ""
-      let date: string | null = ""
-      if (isDate) {  
-        line = item?.parent?.parent?.label!
-        unit = item?.parent?.label!
-        date = item?.label!
-      } else {
-        line = item?.parent?.label!
-        unit = item?.label!
-        date = id !== null ? item?.children![id].label! : null
-      }
-      return { line, unit, date }
+  const getIdData = (item: CascaderData | undefined, id: number | null = null) => {
+    const isDate = Boolean(!item?.children)
+    let line = ""
+    let unit = ""
+    let date: string | null = ""
+    if (isDate) {  
+      line = item?.parent?.parent?.label!
+      unit = item?.parent?.label!
+      date = item?.label!
+    } else {
+      line = item?.parent?.label!
+      unit = item?.label!
+      date = id !== null ? item?.children![id].label! : null
     }
+    return { line, unit, date }
+  }
 
-    let fileNames = []
-    let csvs = []
+  const getMeasurementData = async(callback: MeasurementCallback) => {
+    let returnFileNames = []
+    let returnData = []
     for (const item of selectedMeasurements) {
       let idData = getIdData(item)
       idData.line = idData.line?.replace("Linea ", "")
       idData.unit = idData.unit?.replace("Formación ", "")
-      const allData: {["data"]: string}[] = await useDb("fetchData", idData)
+      const allData: FetchedData[] = await useDb("fetchData", idData)
+      const result = callback(allData, item)
+      if (result) {
+        const { fileNames, data } = result
+        returnFileNames.push(fileNames)
+        returnData.push(data)
+      }
+    }
+    return {
+      fileNames: returnFileNames.flat(),
+      data: returnData.flat()
+    }
+  }
 
+  const handleExport = async() => {
+    setLoading(true)
+    const { fileNames, data } = await getMeasurementData((allData, item) => {
+      let fileNames = []
+      let csvs = []
       let index = 0
       for (const data of allData) {
-        const dataObj = JSON.parse(data.data)
-        csvs.push(jsonToCSV(dataObj))
-        idData = getIdData(item, index)
+        const dataObj: IParsedData = JSON.parse(data.data)
+        csvs.push(jsonToCSV(dataObj.wheels))
+        const idData = getIdData(item, index)
         fileNames.push(`${idData.line} - ${idData.unit} - ${idData.date?.replaceAll("/", "-")}`)
         index++
       }
-    }
-    const success = await saveBulk(fileNames, csvs, "Calipri Parser Exports", ".csv")
-    success ? Alert.error("Hubo un problema al exportar", 10000) : Alert.success("Exportación exitosa!", 10000)
+      return { fileNames, data: csvs }
+    })
+    const success = await saveBulk(fileNames, data, "Calipri Parser Exports", ".csv")
+    success ? Alert.success("Exportación exitosa!", 10000) : Alert.error("Hubo un problema al exportar", 10000)
+    setLoading(false)
+    exportPanelHandler(false)
+  }
+
+  const handleRePrint = async() => {
+    setLoading(true)
+    await getMeasurementData((allData) => {
+      for (const data of allData) {
+        const dataObj: IParsedData = JSON.parse(data.data)
+        console.log(dataObj.header)
+      }
+    })
     setLoading(false)
     exportPanelHandler(false)
   }
@@ -207,6 +232,10 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
         <Button onClick={handleExport} appearance="primary">
           <Icon icon="file-download" size="lg"/>
           Exportar
+        </Button>
+        <Button onClick={handleRePrint} appearance="primary">
+          <Icon icon="file-pdf-o" size="lg"/>
+          Re-Imprimir
         </Button>
       </Modal.Footer>
     </Modal>
