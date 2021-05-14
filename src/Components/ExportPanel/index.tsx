@@ -133,7 +133,7 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
       idData.line = idData.line?.replace("Linea ", "")
       idData.unit = idData.unit?.replace("Formación ", "")
       const allData: FetchedData[] = await useDb("fetchData", idData)
-      const result = callback(allData, item)
+      const result = await callback(allData, item)
       if (result) {
         const { fileNames, data } = result
         returnFileNames.push(fileNames)
@@ -148,7 +148,7 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
 
   const handleExport = async() => {
     setLoading(true)
-    const { fileNames, data } = await getMeasurementData((allData, item) => {
+    const { fileNames, data } = await getMeasurementData(async(allData, item) => {
       let fileNames = []
       let csvs = []
       let index = 0
@@ -162,17 +162,21 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
       return { fileNames, data: csvs }
     })
     const success = await saveBulk(fileNames, data, "Calipri Parser Exports", ".csv")
-    success ? Alert.success("Exportación exitosa!", 10000) : Alert.error("Hubo un problema al exportar", 10000)
+    if (typeof success === "boolean"){
+      success
+        ? Alert.success("Exportación exitosa!", 10000)
+        : Alert.error("Hubo un problema al exportar", 10000)
+    } 
     setLoading(false)
     exportPanelHandler(false)
   }
 
   const handleRePrint = async() => {
     setLoading(true)
-    await getMeasurementData((allData) => {
+    await getMeasurementData(async(allData) => {
       for (const data of allData) {
         const dataObj: IParsedData = JSON.parse(data.data)
-        preparePrint(dataObj, async(replacedHtml) => {
+        await preparePrint(dataObj, async(replacedHtml) => {
           const fileName = `Linea ${getItemInHeader("Linea", dataObj.header)} - ${getItemInHeader("Flota", dataObj.header)} - ${getItemInHeader("Formacion", dataObj.header)} - ${getItemInHeader("Fecha", dataObj.header).replaceAll("/", "-")}`
           const success = await printPdf(replacedHtml, fileName)
           if (success && success !== "canceled") {
@@ -190,7 +194,7 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
   return( isExportPanelOpen &&
     loading 
     ? <Loader backdrop size="md" content="Exportando..." /> 
-    :    <Modal 
+    : <Modal 
       backdrop
       size={"sm"}
       show={isExportPanelOpen}

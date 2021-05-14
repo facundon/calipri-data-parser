@@ -24,6 +24,7 @@ export const ReaderStyle = {
     width: 250,
     height: 120,
     background: colors.secondaryDark,
+    zIndex: -1,
   },
   fileSizeInfo: {
     color: colors.baseFont,

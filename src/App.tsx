@@ -121,25 +121,25 @@ class App extends Component<IProps, IState> {
     }
   }
 
-  handlePrintPDF = () => {
+  handlePrintPDF = async() => {
     this.setState({ isPrinting: true })
-    preparePrint(this.state.parsedData, replacedHtml => {
+    await preparePrint(this.state.parsedData, async(replacedHtml) => {
       const fileName = `Linea ${getItemInHeader("Linea", this.state.parsedData.header)} - ${getItemInHeader("Flota", this.state.parsedData.header)} - ${getItemInHeader("Formacion", this.state.parsedData.header)} - ${getItemInHeader("Fecha", this.state.parsedData.header).replaceAll("/", "-")}`
-      printPdf(replacedHtml, fileName).then(success => {
-        if (success && success !== "canceled") {
-          Alert.success("Reporte emitido!", 10000)
-          const dataToSave: DbMeasurementsData = {
-            data: JSON.stringify(this.state.parsedData),
-            line: getItemInHeader("Linea", this.state.parsedData.header),
-            fleet: getItemInHeader("Flota", this.state.parsedData.header),
-            unit: getItemInHeader("Formacion", this.state.parsedData.header),
-            date: getItemInHeader("Fecha", this.state.parsedData.header)
-          }
-          this.saveToDb(dataToSave)
-        } else if (!success) {
-          Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+      const success = await printPdf(replacedHtml, fileName)
+      if (success && success !== "canceled") {
+        Alert.success("Reporte emitido!", 10000)
+        const dataToSave: DbMeasurementsData = {
+          data: JSON.stringify(this.state.parsedData),
+          line: getItemInHeader("Linea", this.state.parsedData.header),
+          fleet: getItemInHeader("Flota", this.state.parsedData.header),
+          unit: getItemInHeader("Formacion", this.state.parsedData.header),
+          date: getItemInHeader("Fecha", this.state.parsedData.header)
         }
-      })
+        this.saveToDb(dataToSave)
+      } else if (!success) {
+        Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+      }
+      
     })
     this.setState({ isPrinting: false })
   }

@@ -204,7 +204,7 @@ ipcMain.handle("saveBulk", async(_, names, data, folder) => {
   let dir = getRelativePath(folder)
   try {
     const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
-    if (canceled) return false
+    if (canceled) return "canceled"
     dir = path.join(filePaths[0], folder)
     fs.mkdirSync(dir, { recursive: true })
     let index = 0

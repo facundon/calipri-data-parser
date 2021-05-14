@@ -17,7 +17,7 @@ export type FetchedData = {
 export type MeasurementCallback = (
   allData: FetchedData[],
   item: CascaderData | undefined
-) => {
+) => Promise<{
   fileNames: string[],
   data: string[]
-} | void
+} | void>
