@@ -44,8 +44,8 @@ The default configuration file schema is:
 - **calipri.db** -> *historical data from all emited reports*
 
 from the options, the user can:
-- Posibility to select a folder from where the configuration is loaded
-- Posibility to overwrite existing configuration to default.
+- Select a folder from where the configuration is loaded
+- Overwrite existing configuration to default.
 
 There is one more file (config_path.txt), saved in appData folder, that contains the path to the configuration folder.
 If the folder doesn't exists, the app asks wether to **chose the path** to the configuration folder or to **create** the folder with the default configuration in `/Documents/Calipri Parser Config`
