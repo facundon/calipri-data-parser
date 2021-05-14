@@ -27,8 +27,8 @@ contextBridge.exposeInMainWorld("electron", {
       const data = await ipcRenderer.invoke("getFiles", folder)
       return data
     },
-    async createPdf(html, name) {
-      const success = await ipcRenderer.invoke("createPdf", html, name)
+    async createPdf(html, name, printData) {
+      const success = await ipcRenderer.invoke("createPdf", html, name, printData)
       return success
     },
   },

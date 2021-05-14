@@ -7,7 +7,7 @@ declare global {
         load: (name: string, folder: string) => Promise<BufferSource | false>
         delete: (name: string, folder: string) =>Promise<boolean>
         getFiles: (folder: string) => Promise<string[]>
-        createPdf: (html: string, name: string) => Promise<boolean | "canceled">
+        createPdf: (html?: string, name?: string, printData?: Map<string, string>) => Promise<boolean | "canceled">
       },
       database: {
         useDb: (action: "add"
@@ -56,8 +56,9 @@ interface IGetFiles {
 
 interface ICreatePdf {
   (
-    html: string,
-    name: string,
+    html?: string,
+    name?: string,
+    printData?: Map<string, string>
   ): Promise<boolean | "canceled">
 }
 
@@ -107,8 +108,8 @@ export const getFiles: IGetFiles = async(folder = "") => {
   return data
 }
 
-export const printPdf: ICreatePdf = async(html, name) => {
-  const success = await window.electron.storage.createPdf(html, name)
+export const printPdf: ICreatePdf = async(html, name, printData) => {
+  const success = await window.electron.storage.createPdf(html, name, printData)
   return success
 }
 

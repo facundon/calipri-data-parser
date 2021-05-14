@@ -173,20 +173,22 @@ const ExportPanel: FC<IExportPanel> = ({ isExportPanelOpen, exportPanelHandler }
 
   const handleRePrint = async() => {
     setLoading(true)
+    const printMap = new Map()
     await getMeasurementData(async(allData) => {
       for (const data of allData) {
         const dataObj: IParsedData = JSON.parse(data.data)
         await preparePrint(dataObj, async(replacedHtml) => {
           const fileName = `Linea ${getItemInHeader("Linea", dataObj.header)} - ${getItemInHeader("Flota", dataObj.header)} - ${getItemInHeader("Formacion", dataObj.header)} - ${getItemInHeader("Fecha", dataObj.header).replaceAll("/", "-")}`
-          const success = await printPdf(replacedHtml, fileName)
-          if (success && success !== "canceled") {
-            Alert.success("Reporte emitido!", 10000)
-          } else {
-            Alert.error("Ocurrio un error al emitir el reporte.", 10000)
-          }
+          printMap.set(fileName, replacedHtml)
         })
       }
     })
+    const success = await printPdf(undefined, undefined, printMap)
+    if (typeof success === "boolean"){
+      success
+        ? Alert.success("Reporte emitido!", 10000)
+        : Alert.error("Ocurrio un error al emitir el reporte.", 10000)
+    } 
     setLoading(false)
     exportPanelHandler(false)
   }

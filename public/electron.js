@@ -5,7 +5,7 @@ const fs = require("fs-extra")
 
 const Database = require("better-sqlite3")
 
-const isDev = true
+const isDev = false
 autoUpdater.autoDownload = false
 
 // const CHECK_UPDATES_INTERVAL = 600000  // in ms
@@ -254,31 +254,44 @@ ipcMain.handle("getFiles", async(_, folder) => {
   }
 })
 
-ipcMain.handle("createPdf", async(_, html, name) => {
-  const SAVE_PDF_DIALOG_OPT = {
-    title: "Guardar Reporte",
-    buttonLabel: "Guardar",
-    filters: [{name: "Reporte", extensions: ["pdf"]}],
-    defaultPath: name,
-  }
+async function printPdf(html, name) {
   const css = await fs.readFile(getRelativePath("templates/report.css"), { encoding: "utf-8" })
+  if (!css) return false
   const printWindow = new BrowserWindow({
     show: false,
     frame: false,
   })
-  printWindow.loadURL("data:text/html;charset=UTF-8," + encodeURIComponent(html.replace("$STYLES$", css)))
-
-  const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
-  if (canceled) return new Promise(resolve => resolve("canceled"))
-  if (!css) return new Promise(resolve => resolve(false))
+  await printWindow.loadURL("data:text/html;charset=UTF-8," + encodeURIComponent(html.replace("$STYLES$", css)))
   try {
     const pdf = await printWindow.webContents.printToPDF({})
     printWindow.destroy()
-    const error = await fs.writeFile(filePath, pdf)
+    const error = await fs.writeFile(name, pdf)
     return !error
   } catch (err) {
     console.log(err)
     return false
+  }
+}
+
+ipcMain.handle("createPdf", async(_, html, name, printData) => {
+  if (printData){
+    const { filePaths, canceled } = await dialog.showOpenDialog(mainWindow, PATH_SELECT_DIALOG_OPTION)
+    if (canceled) return "canceled"
+    let result = []
+    for (let [name, html] of printData) {
+      result.push(await printPdf(html, path.join(filePaths[0], name + ".pdf")))
+    }
+    return !result.includes(false)
+  }else{
+    const SAVE_PDF_DIALOG_OPT = {
+      title: "Guardar Reporte",
+      buttonLabel: "Guardar",
+      filters: [{name: "Reporte", extensions: ["pdf"]}],
+      defaultPath: name,
+    }
+    const { filePath, canceled } = await dialog.showSaveDialog(mainWindow, SAVE_PDF_DIALOG_OPT)
+    if (canceled) return "canceled"
+    return await printPdf(html, filePath)
   }
 })
 
